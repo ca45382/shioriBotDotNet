@@ -19,9 +19,14 @@ namespace PriconneBotConsoleApp
         //public static IServiceProvider services;
 
         static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
+
+        /// <summary>
+        /// ボットの起動処理
+        /// </summary>
+        /// <returns></returns>
         public async Task MainAsync()
         {
-            var jsonSettingData = new JsonDataManager(@"D:\Users\ca45382\Documents\GitHub\shioriBotOnDotNet\Data\botConfig.json");
+            var jsonSettingData = new JsonDataManager(@"./botConfig.json");
 
             client = new DiscordSocketClient();
             var commands = new CommandService();
@@ -36,31 +41,6 @@ namespace PriconneBotConsoleApp
 
             await Task.Delay(-1);
         }
-
-
-        /// <summary>
-        /// 起動時処理
-        /// </summary>
-        /// <returns></returns>
-        /// 
-        /*
-        public async Task MainAsync()
-        {
-            client = new DiscordSocketClient();
-            commands = new CommandService();
-            services = new ServiceCollection().BuildServiceProvider();
-            Func<SocketMessage, Task> function = CommandRecieved;
-            client.MessageReceived += function;
-            
-            client.Log += Log;
-            string token = ;
-            await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
-            await client.LoginAsync(TokenType.Bot, token);
-            await client.StartAsync();
-
-            await Task.Delay(-1);
-        }
-        */
 
         /// <summary>
         /// メッセージの受信処理
