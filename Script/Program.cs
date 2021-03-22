@@ -1,14 +1,13 @@
-﻿using System;
+﻿using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Reflection;
 //using System.Collections.Generic;
 //using System.Linq;
 //using System.Text;
 using System.Threading.Tasks;
-
-using Discord.Commands;
-using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
-using Discord;
 
 namespace PriconneBotConsoleApp
 {
@@ -26,9 +25,12 @@ namespace PriconneBotConsoleApp
         /// <returns></returns>
         public async Task MainAsync()
         {
-            var jsonSettingData = new JsonDataManager(@"./botConfig.json");
+            var jsonSettingData = new JsonDataManager(@"./data/botConfig.json");
 
             client = new DiscordSocketClient();
+            var clanBattleInfo = new Script.MakeClanBattleInfo();
+            clanBattleInfo.loadClanBattleScadule();
+
             var commands = new CommandService();
             var services = new ServiceCollection().BuildServiceProvider();
             Func<SocketMessage, Task> function = CommandRecieved;
