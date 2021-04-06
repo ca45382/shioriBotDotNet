@@ -1,26 +1,25 @@
-﻿using System;
+﻿using PriconneBotConsoleApp.DataTypes;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace PriconneBotConsoleApp.Script
 {
-    public class MakeClanBattleInfo
+    public class ClanBattleInfoLoader
     {
-        public MakeClanBattleInfo()
+        public ClanBattleInfoLoader()
         {
 
         }
 
-        public void loadClanBattleScadule()
+        public void LoadClanBattleScadule()
         {
-            var conn = new LoadRediveSQLiteData();
-            conn.open();
+            List<ClanBattleDate> schedule;
+            using (var rediveDatabaseConnection = new RediveDatabaseLoader())
+            {
+                schedule = rediveDatabaseConnection.LoadClanBattleSchedule();
+            }
 
-            var schedule = conn.loadClanBattleScadule();
-
-            conn.close();
-
-            return;
         }
     }
 }

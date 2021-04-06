@@ -7,9 +7,9 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace PriconneBotConsoleApp
+namespace PriconneBotConsoleApp.Script
 {
-    class ProgressBattle
+    class BattleProgression
     {
         public async Task CallProgress(SocketMessage socketMessage)
         {

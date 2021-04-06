@@ -4,12 +4,14 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Reflection;
+using System.Timers;
+using System.Threading;
 //using System.Collections.Generic;
 //using System.Linq;
 //using System.Text;
 using System.Threading.Tasks;
 
-namespace PriconneBotConsoleApp
+namespace PriconneBotConsoleApp.Script
 {
     class Program
     {
@@ -28,18 +30,23 @@ namespace PriconneBotConsoleApp
             var jsonSettingData = new JsonDataManager(@"./data/botConfig.json");
 
             client = new DiscordSocketClient();
-            var clanBattleInfo = new Script.MakeClanBattleInfo();
-            clanBattleInfo.loadClanBattleScadule();
+            //var clanBattleInfo = new Script.ClanBattleInfoLoader();
+            //clanBattleInfo.LoadClanBattleScadule();
 
             var commands = new CommandService();
             var services = new ServiceCollection().BuildServiceProvider();
             Func<SocketMessage, Task> function = CommandRecieved;
             client.MessageReceived += function;
+            client.GuildMembersDownloaded += GuildMembersDownloaded;
+            client.UserLeft += UserLeft;
+            client.GuildMemberUpdated += GuildMemberUpdated;
 
             client.Log += Log;
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
-            await client.LoginAsync(TokenType.Bot, jsonSettingData.m_Token);
+            await client.LoginAsync(TokenType.Bot, jsonSettingData.Token);
             await client.StartAsync();
+            await test();
+
 
             await Task.Delay(-1);
         }
@@ -59,6 +66,44 @@ namespace PriconneBotConsoleApp
             if (message.Author.IsBot) { return; }
 
             await message.Channel.SendMessageAsync(message.Content.ToString());
+        }
+
+        /// <summary>
+        /// 起動時にサーバー情報がbotにダウンロードされた際に
+        /// 動作する。
+        /// </summary>
+        /// <param name="guild"></param>
+        /// <returns></returns>
+        private Task GuildMembersDownloaded(SocketGuild guild)
+        {
+            var playerData = new PlayerDataLoader();
+            playerData.UpdatePlayerData(guild);
+            return Task.CompletedTask;
+        }
+
+
+        private Task UserLeft(SocketGuildUser userInfo)
+        {
+            var playerDataLoader = new PlayerDataLoader();
+            playerDataLoader.UpdatePlayerData(userInfo.Guild);
+            return Task.CompletedTask;
+        }
+
+        private Task GuildMemberUpdated(
+            SocketGuildUser oldUserInfo, SocketGuildUser newUserInfo)
+        {
+            var playerDataLoader = new PlayerDataLoader();
+            playerDataLoader.UpdatePlayerData(newUserInfo.Guild);
+            return Task.CompletedTask;
+        }
+
+        private async Task test()
+        {
+            while (true)
+            {
+                await Task.Run(() => Thread.Sleep(2000));
+            }
+            
         }
 
         /// <summary>

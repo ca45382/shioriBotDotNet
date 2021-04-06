@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord.Commands;
 
-namespace PriconneBotConsoleApp
+namespace PriconneBotConsoleApp.Script
 {
     public class Messages : ModuleBase
     {

@@ -8,44 +8,68 @@ using System.IO;
 using Newtonsoft.Json;
 
 
-namespace PriconneBotConsoleApp
+namespace PriconneBotConsoleApp.Script
 {
     public class JsonDataManager
     {
-        public string m_Token { get; } 
+        public string Token { get; }
+
+        private static BotConfigSchema m_configData;
+
+        public JsonDataManager()
+        {
+
+        }
 
         public JsonDataManager(string path)
         {
             //path = @"C:\Users\ca45382\source\repos\PriconneBot\PriconneBot\botConfig.json";
             var sr = new StreamReader(path);
             var jsonData = sr.ReadToEnd();
-            var data = JsonConvert.DeserializeObject<JsonData>(jsonData);
-            m_Token = data.DiscordSettingValue.DisordToken;
+            m_configData = JsonConvert.DeserializeObject<BotConfigSchema>(jsonData);
+            Token = m_configData.DiscordSettingValue.DisordToken;
+        }
+
+        public string MySQLConnectionString()
+        {
+            var hostName = m_configData.SqlConnectorValue.Host;
+            var portNumber = m_configData.SqlConnectorValue.Port;
+            var userName = m_configData.SqlConnectorValue.User;
+            var password = m_configData.SqlConnectorValue.Password;
+            var databaseName = m_configData.SqlConnectorValue.Database;
+
+            var connectionString =
+                $"Server = {hostName}; " +
+                $"Port = {portNumber}; " +
+                $"Database = {databaseName}; " +
+                $"Uid = {userName}; " +
+                $"Pwd = {password}";
+            return connectionString;
         }
 
         [DataContract]
-        private class JsonData
+        private class BotConfigSchema
         {
-
+#pragma warning disable CS0649
             [DataMember(Name = "discord")]
             public DiscordSetupData DiscordSettingValue;
 
-            [DataMember(Name ="database")]
+            [DataMember(Name = "database")]
             public SqlDatabase SqlConnectorValue;
 
 
             [DataContract]
             public class DiscordSetupData
             {
-                [DataMember(Name ="token")]
+                [DataMember(Name = "token")]
                 public string DisordToken;
 
-                [DataMember (Name = "intents")]
+                [DataMember(Name = "intents")]
                 public DiscordIntentsData DiscordIntents;
 
                 public class DiscordIntentsData
                 {
-                    [DataMember (Name = "members")]
+                    [DataMember(Name = "members")]
                     public bool members;
                 }
             }
@@ -65,5 +89,6 @@ namespace PriconneBotConsoleApp
                 public string Database;
             }
         }
+#pragma warning restore CA0649
     }
 }
