@@ -9,6 +9,6 @@ namespace PriconneBotConsoleApp.MySQL
 {
     class MySQLReservatinController:MySQLConnector
     {
-        public List<ReservationData>
+        //public List<ReservationData>
     }
 }

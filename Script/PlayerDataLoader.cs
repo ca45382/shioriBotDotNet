@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 using MySql.Data.MySqlClient;
 using PriconneBotConsoleApp.DataTypes;
@@ -34,67 +35,18 @@ namespace PriconneBotConsoleApp.Script
 
         /// <summary>
         /// SQLサーバー側とDiscord側の
+        /// プレイヤーデータ同期
         /// </summary>
         /// <param name="guild"></param>
         public void UpdatePlayerData(SocketGuild guild)
         {
-            var guildAllUsers = guild.Users;
-            var guildClanID = new List<string>() ;
-            var usersOnDiscord = new List<PlayerData>();
             var usersOnSQLServer = new List<PlayerData>();
             var createUserData = new List<PlayerData>();
             var deleteUserData = new List<PlayerData>();
             var updateUserData = new List<PlayerData>();
 
-            // SQL側の情報から対象のクランロールを抽出
-            foreach (ClanData clanInfo in m_clanData)
-            {
-                if(clanInfo.ServerID == guild.Id.ToString())
-                {
-                    guildClanID.Add(clanInfo.ClanRoleID);
-                }
-            }
-
-            //現在のDiscord上の名前を抽出
-            //同一サーバーで複数クランに所属している場合は弾く
-            foreach (SocketGuildUser user in guildAllUsers)
-            {
-                if(user.IsBot) { continue; }
-
-                var userRoles = user.Roles;
-                var roleCount = 0;
-                string nickName;
-                string roleID = null;
-                foreach (SocketRole userRole in userRoles)
-                {
-                    if (guildClanID.Contains(userRole.Id.ToString()))
-                    {
-                        roleID = userRole.Id.ToString();
-                        roleCount += 1;
-                    }
-                }
-
-                if (roleCount != 1) { continue; }
-
-                if (user.Nickname == null)
-                {
-                    nickName = user.Username;
-                }
-                else
-                {
-                    nickName = user.Nickname;
-                }
-
-                usersOnDiscord.Add(new PlayerData()
-                {
-                    ServerID = user.Guild.Id.ToString(),
-                    ClanRoleID = roleID,
-                    UserID = user.Id.ToString(),
-                    GuildUserName = nickName
-                });
-
-                //Console.WriteLine(user.ToString() + roleCount.ToString());
-            }
+            //サーバー上のクランメンバー情報の取得
+            var usersOnDiscord = GetServerClanMember(guild);
             
             // SQL上のプレイヤーデータを読み取る
             using (var playerDataSQLController = new MySQLPlayerDataController())
@@ -108,6 +60,7 @@ namespace PriconneBotConsoleApp.Script
             {
                 var sameNameFlag = 0;
                 var existFlag = 0;
+
                 foreach (PlayerData mySQLUser in usersOnSQLServer)
                 {
                     if (mySQLUser.UserID == discordUser.UserID &&
@@ -120,6 +73,7 @@ namespace PriconneBotConsoleApp.Script
                         }
                     }
                 }
+
                 if (existFlag == 0)
                 {
                     createUserData.Add(discordUser);
@@ -157,6 +111,63 @@ namespace PriconneBotConsoleApp.Script
                 playerDataSQLController.DeletePlayerData(deleteUserData);
             }
             return;
+        }
+
+        /// <summary>
+        /// サーバー内の登録クランに所属しているユーザー情報の入手
+        /// </summary>
+        /// <param name="guild"></param>
+        /// <returns></returns>
+        private List<PlayerData> GetServerClanMember(SocketGuild guild)
+        {
+            var clanMember = new List<PlayerData>();
+
+            // SQL側の情報から対象のクランロールを抽出
+            var guildClanIDs = ClanIDInServer(guild.Id.ToString());
+
+            //現在のDiscord上の名前を抽出
+            //同一サーバーで複数クランに所属している場合は弾く
+            foreach (SocketGuildUser user in guild.Users)
+            {
+                if (user.IsBot) { continue; }
+
+                var allUserRoleID = user.Roles
+                    .Where(x => guildClanIDs.Contains(x.Id.ToString()))
+                    .Select(x => x.Id.ToString());
+
+                var roleCount = allUserRoleID.Count();
+
+                if (roleCount != 1) { continue; }
+
+                string nickName;
+                var roleID = allUserRoleID.First();
+
+                nickName = (user.Nickname == null) ? user.Username : user.Nickname;
+
+                clanMember.Add(new PlayerData()
+                {
+                    ServerID = user.Guild.Id.ToString(),
+                    ClanRoleID = roleID,
+                    UserID = user.Id.ToString(),
+                    GuildUserName = nickName
+                });
+            }
+
+            return clanMember;
+        }
+
+        /// <summary>
+        /// サーバー内のクランIDの抽出
+        /// </summary>
+        /// <param name="guildID"></param>
+        /// <returns></returns>
+        private IEnumerable<string> ClanIDInServer(string guildID)
+        {
+            var guildClanIDs = m_clanData
+                .Where(x => x.ServerID == guildID)
+                .Select(x => x.ClanRoleID);
+
+            return guildClanIDs;
         }
     }
 }

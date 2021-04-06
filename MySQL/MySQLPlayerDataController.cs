@@ -44,7 +44,7 @@ namespace PriconneBotConsoleApp.MySQL
             return result; 
         }
 
-        public void CreatePlayerData(List<PlayerData> playersData)
+        public void CreatePlayerData(IEnumerable<PlayerData> playersData)
         {
             var transaction = m_mySQLConnection.BeginTransaction();
             foreach(PlayerData player in playersData)
@@ -61,7 +61,7 @@ namespace PriconneBotConsoleApp.MySQL
             transaction.Commit();
         }
 
-        public void UpdatePlayerData(List<PlayerData> playersData)
+        public void UpdatePlayerData(IEnumerable<PlayerData> playersData)
         {
             var transaction = m_mySQLConnection.BeginTransaction();
             foreach (PlayerData player in playersData)
@@ -78,7 +78,7 @@ namespace PriconneBotConsoleApp.MySQL
             transaction.Commit();
         }
 
-        public void DeletePlayerData(List<PlayerData> playersData)
+        public void DeletePlayerData(IEnumerable<PlayerData> playersData)
         {
             var transaction = m_mySQLConnection.BeginTransaction();
             foreach (PlayerData player in playersData)
@@ -98,25 +98,24 @@ namespace PriconneBotConsoleApp.MySQL
         private int InsertData(PlayerData playerData)
         {
             var commandString =
-                "INSERT " +
-                "INTO player_data " +
+                "INSERT INTO player_data " +
                 "VALUES (@serverID, @clanRoleID, @userID, @guildName)";
 
             var mySQLCommand = new MySqlCommand(
-                    commandString, m_mySQLConnection
-                    );
+                commandString, m_mySQLConnection
+            );
             mySQLCommand.Parameters.Add(
                 new MySqlParameter("serverID", playerData.ServerID)
-                );
+            );
             mySQLCommand.Parameters.Add(
                 new MySqlParameter("clanRoleID", playerData.ClanRoleID)
-                );
+            );
             mySQLCommand.Parameters.Add(
                 new MySqlParameter("userID", playerData.UserID)
-                );
+            );
             mySQLCommand.Parameters.Add(
                 new MySqlParameter("guildName", playerData.GuildUserName)
-                );
+            );
 
             var result = mySQLCommand.ExecuteNonQuery();
             return result;
@@ -124,29 +123,26 @@ namespace PriconneBotConsoleApp.MySQL
 
         private int UpdateData(PlayerData playerData)
         {
-            var commandString =
-                "UPDATE " +
-                "player_data " +
-                "SET name = @guildName " +
-                "WHERE server_id = @serverID " +
-                "AND clan_role_id = @clanRoleID " +
-                "AND user_id = @userID";
+            
+            var commandString = 
+                "UPDATE player_data SET name = @guildName " +
+                "WHERE server_id = @serverID AND clan_role_id = @clanRoleID AND user_id = @userID";
 
             var mySQLCommand = new MySqlCommand(
                     commandString, m_mySQLConnection
                     );
             mySQLCommand.Parameters.Add(
                 new MySqlParameter("serverID", playerData.ServerID)
-                );
+            );
             mySQLCommand.Parameters.Add(
                 new MySqlParameter("clanRoleID", playerData.ClanRoleID)
-                );
+            );
             mySQLCommand.Parameters.Add(
                 new MySqlParameter("userID", playerData.UserID)
-                );
+            );
             mySQLCommand.Parameters.Add(
                 new MySqlParameter("guildName", playerData.GuildUserName)
-                );
+            );
 
             var result = mySQLCommand.ExecuteNonQuery();
             return result;
@@ -155,14 +151,11 @@ namespace PriconneBotConsoleApp.MySQL
         private int DeleteData(PlayerData playerData)
         {
             var commandString =
-                "DELETE " +
-                "FROM player_data " +
-                "WHERE server_id = @serverID " +
-                "AND clan_role_id = @clanRoleID " +
-                "AND user_id = @userID";
+                "DELETE FROM player_data " +
+                "WHERE server_id = @serverID AND clan_role_id = @clanRoleID AND user_id = @userID";
 
             var mySQLCommand = new MySqlCommand(
-                    commandString, m_mySQLConnection
+                commandString, m_mySQLConnection
                     );
             mySQLCommand.Parameters.Add(
                 new MySqlParameter("serverID", playerData.ServerID)
