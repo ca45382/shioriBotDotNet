@@ -16,13 +16,11 @@ namespace PriconneBotConsoleApp.Script
 
         public PlayerDataLoader()
         {
-            //object data;
             try 
             {
                 using (var playerDataSQLController = new MySQLPlayerDataController())
                 {
                     m_clanData = playerDataSQLController.LoadClanInfo();
-                    //data = playerDataSQLController.LoadPlayerData();
                 }
             }
             catch (Exception e)
@@ -32,6 +30,7 @@ namespace PriconneBotConsoleApp.Script
 
             return;
         }
+
 
         /// <summary>
         /// SQLサーバー側とDiscord側の

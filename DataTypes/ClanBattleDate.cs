@@ -12,18 +12,6 @@ namespace PriconneBotConsoleApp.DataTypes
 
         public int ClanBattleID;
         public int Month;
-        //public string StartBattle
-        //{
-        //    get { return startBattle.ToString();  }
-        //    set { startBattle = DateTime.Parse(value); }
 
-        //}
-
-        //public string EndBattle
-        //{
-        //    get { return endBattle.ToString(); }
-        //    set { endBattle = DateTime.Parse(value); }
-
-        //}
     }
 }

@@ -65,7 +65,10 @@ namespace PriconneBotConsoleApp.Script
             // コメントがユーザーかBotかの判定
             if (message.Author.IsBot) { return; }
 
-            await message.Channel.SendMessageAsync(message.Content.ToString());
+            var receiveMessages = new ReceiveMessageController(message);
+            receiveMessages.RunMessageReceive();
+
+            //await message.Channel.SendMessageAsync(message.Content.ToString());
         }
 
         /// <summary>

@@ -7,7 +7,7 @@ using PriconneBotConsoleApp.DataTypes;
 
 namespace PriconneBotConsoleApp.MySQL
 {
-    class MySQLReservatinController:MySQLConnector
+    class MySQLReservationController:MySQLConnector
     {
         //public List<ReservationData>
     }

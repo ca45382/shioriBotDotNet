@@ -18,17 +18,18 @@ namespace PriconneBotConsoleApp.MySQL
         /// <returns> PlayerInfoのList</returns>
         public List<PlayerData> LoadPlayerData(string guildID)
         {
-            var commandString = 
-                "SELECT " +
-                "server_id, clan_role_id, user_id, name " +
-                "FROM player_data " +
-                $"WHERE server_id = {guildID}";
-            var command = new MySqlCommand();
+            var commandString =
+                 "SELECT server_id, clan_role_id, user_id, name " +
+                 "FROM player_data WHERE server_id = @serverID";
             var result = new List<PlayerData>();
 
-            command.Connection = m_mySQLConnection;
-            command.CommandText = commandString;
-            var sqlDataReader= command.ExecuteReader();
+            var mySQLCommand = new MySqlCommand(
+                commandString, m_mySQLConnection
+            );
+            mySQLCommand.Parameters.Add(
+                new MySqlParameter("serverID", guildID)
+            );
+            var sqlDataReader= mySQLCommand.ExecuteReader();
             while (sqlDataReader.Read())
             {
                 result.Add(new PlayerData()
@@ -42,6 +43,38 @@ namespace PriconneBotConsoleApp.MySQL
             sqlDataReader.Close();
 
             return result; 
+        }
+
+        public PlayerData LoadPlayerData(string guildID, string userID)
+        {
+            var commandString =
+                "SELECT server_id, clan_role_id, user_id, name " +
+                "FROM player_data WHERE server_id = @serverID AND user_id = @userID";
+
+            var mySQLCommand = new MySqlCommand(
+                commandString, m_mySQLConnection
+            );
+            mySQLCommand.Parameters.Add(
+                new MySqlParameter("serverID", guildID)
+            );
+            mySQLCommand.Parameters.Add(
+                new MySqlParameter("userID", userID)
+            );
+            var sqlDataReader = mySQLCommand.ExecuteReader();
+            var result = new PlayerData();
+            while (sqlDataReader.Read())
+            {
+                result = new PlayerData()
+                {
+                    ServerID = sqlDataReader.GetString(0),
+                    ClanRoleID = sqlDataReader.GetString(1),
+                    UserID = sqlDataReader.GetString(2),
+                    GuildUserName = sqlDataReader.GetString(3)
+                };
+            }
+            sqlDataReader.Close();
+
+            return result;
         }
 
         public void CreatePlayerData(IEnumerable<PlayerData> playersData)
