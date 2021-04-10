@@ -59,14 +59,14 @@ namespace PriconneBotConsoleApp.Script
         private async Task CommandRecieved(SocketMessage messageParam)
         {
             var message = messageParam as SocketUserMessage;
-            Console.WriteLine("{0} {1}:{2}", message.Channel.Name, message.Author.Username, message);
-
+            
             if (message == null) { return; }
+            Console.WriteLine("{0} {1}:{2}", message.Channel.Name, message.Author.Username, message);
             // コメントがユーザーかBotかの判定
             if (message.Author.IsBot) { return; }
 
             var receiveMessages = new ReceiveMessageController(message);
-            receiveMessages.RunMessageReceive();
+            await receiveMessages.RunMessageReceive();
 
             //await message.Channel.SendMessageAsync(message.Content.ToString());
         }

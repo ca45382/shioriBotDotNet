@@ -6,6 +6,8 @@ using System.Linq;
 using MySql.Data.MySqlClient;
 using Discord.WebSocket;
 
+using Microsoft.EntityFrameworkCore;
+
 using PriconneBotConsoleApp.Script;
 using PriconneBotConsoleApp.DataTypes;
 
@@ -76,7 +78,7 @@ namespace PriconneBotConsoleApp.MySQL
             var loadClanChannelCommandString =
                 "SELECT progress_id, report_id, carry_over_id, " +
                 "task_kill_id, declare_id, reserve_id, tl_time_id " +
-                "FROM clan_channel " +
+                "FROM clan_channel INNER JOIN clan_info ON clan_channel.clan_id = clan_info.clan_id " +
                 "WHERE server_id = @guildID AND clan_role_id = @clanRoleID";
 
             var command = new MySqlCommand(

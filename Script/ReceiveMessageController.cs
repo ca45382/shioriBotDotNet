@@ -34,23 +34,26 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
-        public void RunMessageReceive()
+        async public Task RunMessageReceive()
         {
             if (m_message != null)
             {
-                RunMessageReceive(m_message);
+                await RunMessageReceive(m_message);
             }
+
+            return;
             
         }
 
-        public void RunMessageReceive(SocketUserMessage message)
+        async public Task RunMessageReceive(SocketUserMessage message)
         {
             if (message.Channel.Id.ToString() == 
                 m_playerClanData.ChannelIDs.ReservationChannelID)
             {
-                var battleReservation = new BattleReservation(m_playerClanData);
-                battleReservation.RunReservationCommand(message);
+                await new BattleReservation(m_playerClanData, message).RunReservationCommand();
             }
+
+            return;
         }
 
     }

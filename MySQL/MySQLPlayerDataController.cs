@@ -20,7 +20,8 @@ namespace PriconneBotConsoleApp.MySQL
         {
             var commandString =
                  "SELECT server_id, clan_role_id, user_id, name " +
-                 "FROM player_data WHERE server_id = @serverID";
+                 "FROM player_data JOIN clan_info ON player_data.clan_id = clan_info.clan_id " +
+                 "WHERE server_id = @serverID";
             var result = new List<PlayerData>();
 
             var mySQLCommand = new MySqlCommand(
@@ -49,7 +50,8 @@ namespace PriconneBotConsoleApp.MySQL
         {
             var commandString =
                 "SELECT server_id, clan_role_id, user_id, name " +
-                "FROM player_data WHERE server_id = @serverID AND user_id = @userID";
+                "FROM player_data JOIN clan_info ON player_data.clan_id = clan_info.clan_id " +
+                "WHERE server_id = @serverID AND user_id = @userID";
 
             var mySQLCommand = new MySqlCommand(
                 commandString, m_mySQLConnection
@@ -132,7 +134,9 @@ namespace PriconneBotConsoleApp.MySQL
         {
             var commandString =
                 "INSERT INTO player_data " +
-                "VALUES (@serverID, @clanRoleID, @userID, @guildName)";
+                "(clan_id, user_id, name) " +
+                "SELECT clan_info.clan_id, @userID, @guildName FROM clan_info " +
+                "WHERE server_id = @serverID AND clan_role_id = @clanRoleID";
 
             var mySQLCommand = new MySqlCommand(
                 commandString, m_mySQLConnection
@@ -159,7 +163,10 @@ namespace PriconneBotConsoleApp.MySQL
             
             var commandString = 
                 "UPDATE player_data SET name = @guildName " +
-                "WHERE server_id = @serverID AND clan_role_id = @clanRoleID AND user_id = @userID";
+                "WHERE user_id = @userID AND " +
+                "clan_id IN " +
+                "(SELECT clan_info.clan_id FROM clan_info " +
+                "WHERE server_id = @serverID AND clan_role_id = @clanRoleID)";
 
             var mySQLCommand = new MySqlCommand(
                     commandString, m_mySQLConnection
@@ -185,7 +192,10 @@ namespace PriconneBotConsoleApp.MySQL
         {
             var commandString =
                 "DELETE FROM player_data " +
-                "WHERE server_id = @serverID AND clan_role_id = @clanRoleID AND user_id = @userID";
+                "WHERE user_id = @userID AND " +
+                "clan_id IN " +
+                "(SELECT clan_info.clan_id FROM clan_info " +
+                "WHERE server_id = @serverID AND clan_role_id = @clanRoleID)";
 
             var mySQLCommand = new MySqlCommand(
                 commandString, m_mySQLConnection
