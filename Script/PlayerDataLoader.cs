@@ -18,7 +18,7 @@ namespace PriconneBotConsoleApp.Script
         {
             try 
             {
-                using (var playerDataSQLController = new MySQLPlayerDataController())
+                using (var playerDataSQLController = new MySQLPlayerDataControllerOld())
                 {
                     m_clanData = playerDataSQLController.LoadClanInfo();
                 }
@@ -48,7 +48,7 @@ namespace PriconneBotConsoleApp.Script
             var usersOnDiscord = GetServerClanMember(guild);
             
             // SQL上のプレイヤーデータを読み取る
-            using (var playerDataSQLController = new MySQLPlayerDataController())
+            using (var playerDataSQLController = new MySQLPlayerDataControllerOld())
             {
                 usersOnSQLServer = 
                     playerDataSQLController.LoadPlayerData(guild.Id.ToString());
@@ -103,7 +103,7 @@ namespace PriconneBotConsoleApp.Script
             }
 
             //SQL上のデータの更新
-            using (var playerDataSQLController = new MySQLPlayerDataController())
+            using (var playerDataSQLController = new MySQLPlayerDataControllerOld())
             {
                 playerDataSQLController.CreatePlayerData(createUserData);
                 playerDataSQLController.UpdatePlayerData(updateUserData);

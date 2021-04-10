@@ -8,7 +8,7 @@ using PriconneBotConsoleApp.DataTypes;
 
 namespace PriconneBotConsoleApp.MySQL
 {
-    class MySQLReservationController:MySQLConnector
+    class MySQLReservationController:MySQLConnectorOld
     {
         /// <summary>
         /// クラン内すべての予約情報を取得する。

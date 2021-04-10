@@ -66,7 +66,7 @@ namespace PriconneBotConsoleApp.Script
             if (message.Author.IsBot) { return; }
 
             var receiveMessages = new ReceiveMessageController(message);
-            await receiveMessages.RunMessageReceive();
+            //await receiveMessages.RunMessageReceive();
 
             //await message.Channel.SendMessageAsync(message.Content.ToString());
         }

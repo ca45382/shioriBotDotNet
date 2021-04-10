@@ -39,11 +39,11 @@ namespace PriconneBotConsoleApp.Script
             var databaseName = m_configData.SqlConnectorValue.Database;
 
             var connectionString =
-                $"Server = {hostName}; " +
-                $"Port = {portNumber}; " +
-                $"Database = {databaseName}; " +
-                $"Uid = {userName}; " +
-                $"Pwd = {password}";
+                $"server = {hostName}; " +
+                $"port = {portNumber}; " +
+                $"database = {databaseName}; " +
+                $"userid = {userName}; " +
+                $"password = {password}";
             return connectionString;
         }
 

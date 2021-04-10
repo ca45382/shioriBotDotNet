@@ -25,13 +25,14 @@ namespace PriconneBotConsoleApp.Script
             var guildID = messageChannel.Guild.Id.ToString();
             var userID = message.Author.Id.ToString();
 
-            using (var mySQLPlayerData = new MySQLPlayerDataController())
-            {
-                m_playerData = mySQLPlayerData.LoadPlayerData(guildID, userID);
 
-                var userRole = messageChannel.Guild.GetRole(ulong.Parse(m_playerData.ClanRoleID));
-                m_playerClanData = mySQLPlayerData.LoadClanInfo(userRole);
-            }
+            //using (var mySQLPlayerData = new MySQLPlayerDataControllerOld())
+            //{
+            //    m_playerData = mySQLPlayerData.LoadPlayerData(guildID, userID);
+
+            //    var userRole = messageChannel.Guild.GetRole(ulong.Parse(m_playerData.ClanRoleID));
+            //    m_playerClanData = mySQLPlayerData.LoadClanInfo(userRole);
+            //}
         }
 
         async public Task RunMessageReceive()
