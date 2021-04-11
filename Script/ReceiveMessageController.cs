@@ -48,7 +48,7 @@ namespace PriconneBotConsoleApp.Script
             if (message.Channel.Id.ToString() == 
                 m_playerClanData.ChannelIDs.ReservationChannelID)
             {
-                //await new BattleReservation(m_playerClanData, message).RunReservationCommand();
+                await new BattleReservation(m_playerClanData, message).RunReservationCommand();
             }
 
             return;

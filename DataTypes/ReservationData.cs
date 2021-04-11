@@ -14,8 +14,9 @@ namespace PriconneBotConsoleApp.DataTypes
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public ulong ReserveID { get; set; }
 
-        [Column("date_time", TypeName = "timestamp"), Required]
-        public DateTime DateTime { get; set; }
+        [Column("date_time"), Required]
+        [Timestamp]
+        public byte[] DateTime { get; set; }
 
         [Column("boss_num", TypeName = "int(1)")]
         public int BossNumber { get; set; }
@@ -37,7 +38,7 @@ namespace PriconneBotConsoleApp.DataTypes
 
 
 
-        [Column("clan_role_id", TypeName = "bigint(20) unsigned"), Required]
+        [Column("player_id", TypeName = "bigint(20) unsigned"), Required]
         public ulong PlayerID { get; set; }
 
         public PlayerData PlayerData { get; set; }

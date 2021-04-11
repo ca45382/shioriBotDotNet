@@ -84,8 +84,6 @@ namespace PriconneBotConsoleApp.Script
             { 
                 return null;
             }
-            //if ((Regex.IsMatch(splitMessageContent[1], @"\d+") && Regex.IsMatch(splitMessageContent[2], @"[1-5]")) == false)
-            //{ return reservationData; }
 
             if (!(int.TryParse(splitMessageContent[1], out int bossNumber)
                 && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber))
@@ -127,24 +125,21 @@ namespace PriconneBotConsoleApp.Script
 
         private void RegisterReservationData(ReservationData reservationData)
         {
-            using (var mySQLReservationController = new MySQLReservationControllerOld())
+            var mySQLReservationController = new MySQLReservationController();
+            var allSqlReservationData =
+                mySQLReservationController.LoadReservationData(reservationData.PlayerData);
+
+            var sqlReservationData = allSqlReservationData
+                .Where(x => x.BossNumber == reservationData.BossNumber)
+                .Where(y => y.BattleLaps == reservationData.BattleLaps);
+
+            if (sqlReservationData.Count() == 0)
             {
-                var allSqlReservationData =  mySQLReservationController.LoadReservationData(
-                    m_userClanData, reservationData.UserID);
-
-                var sqlReservationData = allSqlReservationData
-                    .Where(x => x.BossNumber == reservationData.BossNumber )
-                    .Where(y => y.BattleLaps == reservationData.BattleLaps );
-
-                if (sqlReservationData.Count() != 0)
-                {
-                    mySQLReservationController.UpdateReservationData(reservationData);
-                }
-                else
-                {
-                    mySQLReservationController.CreateReservationData(reservationData);
-                }
-
+                mySQLReservationController.CreateReservationData(reservationData);
+            }
+            else
+            {
+                mySQLReservationController.UpdateReservationData(reservationData);
             }
         }
 

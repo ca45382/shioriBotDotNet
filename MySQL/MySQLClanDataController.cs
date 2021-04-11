@@ -38,6 +38,7 @@ namespace PriconneBotConsoleApp.MySQL
                     .Include(b => b.ChannelIDs)
                     .Include(b => b.RoleIDs)
                     .Where(b => b.ServerID == role.Guild.Id.ToString())
+                    .Where(b => b.ClanRoleID == role.Id.ToString())
                     .FirstOrDefault();
 
                 clanData = result;

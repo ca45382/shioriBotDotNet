@@ -57,25 +57,25 @@ namespace PriconneBotConsoleApp.DataTypes
     public class ChannelIDs
     {
         [Column("progress_id", TypeName = "varchar(21)")]
-        public string ProgressiveChannelID;
+        public string ProgressiveChannelID { get; set; }
 
         [Column("report_id", TypeName = "varchar(21)")]
-        public string ReportChannelID;
+        public string ReportChannelID { get; set; }
         
         [Column("carry_over_id", TypeName = "varchar(21)")]
-        public string CarryOverChannelID;
+        public string CarryOverChannelID { get; set; }
         
         [Column("task_kill_id", TypeName = "varchar(21)")]
-        public string TaskKillChannelID;
+        public string TaskKillChannelID { get; set; }
         
         [Column("declare_id", TypeName = "varchar(21)")]
-        public string DeclarationChannelID;
+        public string DeclarationChannelID { get; set; }
         
         [Column("reserve_id", TypeName = "varchar(21)")]
-        public string ReservationChannelID;
+        public string ReservationChannelID { get; set; }
         
         [Column("tl_time_id", TypeName = "varchar(21)")]
-        public string TimeLineConversionChannelID;
+        public string TimeLineConversionChannelID { get; set; }
 
         [Column("clan_id", TypeName = "bigint(20) unsigned"), Key]
         public ulong ClanID { get; set; }
@@ -87,13 +87,13 @@ namespace PriconneBotConsoleApp.DataTypes
     public class MessageIDs
     {
         [Column("progress_msg_id", TypeName = "varchar(21)")]
-        public string ProgressiveMessageID;
+        public string ProgressiveMessageID { get; set; }
         
         [Column("declare_msg_id", TypeName = "varchar(21)")]
-        public string DeclarationMessageID;
+        public string DeclarationMessageID { get; set; }
 
         [Column("reserve_msg_id", TypeName = "varchar(21)")]
-        public string ReservationMessageID;
+        public string ReservationMessageID { get; set; }
 
         [Column("clan_id", TypeName = "bigint(20) unsigned"), Key]
         public ulong ClanID { get; set; }
@@ -106,22 +106,22 @@ namespace PriconneBotConsoleApp.DataTypes
     public class RoleIDs
     {
         [Column("task_kill_role_id", TypeName = "varchar(21)")]
-        public string TaskKillRoleID;
+        public string TaskKillRoleID { get; set; }
 
         [Column("boss_1_role_id", TypeName = "varchar(21)")]
-        public string FirstBossID;
+        public string FirstBossID { get; set; }
 
         [Column("boss_2_role_id", TypeName = "varchar(21)")]
-        public string SecondBossID;
+        public string SecondBossID { get; set; }
         
         [Column("boss_3_role_id", TypeName = "varchar(21)")]
-        public string ThirdBossID;
+        public string ThirdBossID { get; set; }
         
         [Column("boss_4_role_id", TypeName = "varchar(21)")]
-        public string FourthBossID;
+        public string FourthBossID { get; set; }
         
         [Column("boss_5_role_id", TypeName = "varchar(21)")]
-        public string FifthBossID;
+        public string FifthBossID { get; set; }
 
         [Column("clan_id", TypeName = "bigint(20) unsigned"), Key]
         public ulong ClanID { get; set; }
