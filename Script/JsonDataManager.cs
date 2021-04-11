@@ -41,9 +41,9 @@ namespace PriconneBotConsoleApp.Script
             var connectionString =
                 $"server = {hostName}; " +
                 $"port = {portNumber}; " +
-                $"database = {databaseName}; " +
-                $"userid = {userName}; " +
-                $"password = {password}";
+                $"user = {userName}; " +
+                $"password = {password};" + 
+                $"database = {databaseName}";
             return connectionString;
         }
 

@@ -10,13 +10,11 @@ namespace PriconneBotConsoleApp.DataTypes
     [Table("reserve_data")]
     public class ReservationData
     {
-        [Column("reserve_id", TypeName = "BIGINT UNSIGNED AUTO_INCREMENT")]
-        public int ReserveID { get; set; }
+        [Column("reserve_id", TypeName = "bigint(20) unsigned"), Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public ulong ReserveID { get; set; }
 
-        [Column("clan_role_id", TypeName = "BIGINT UNSIGNED"), Required]
-        public int PlayerID { get; set; }
-
-        [Column("date_time", TypeName = "TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), Required]
+        [Column("date_time", TypeName = "timestamp"), Required]
         public DateTime DateTime { get; set; }
 
         [Column("boss_num", TypeName = "int(1)")]
@@ -28,17 +26,21 @@ namespace PriconneBotConsoleApp.DataTypes
         [Column("attack_type", TypeName = "int(2)")]
         public int AttackType { get; set; }
 
-        [Column("reply", TypeName = "TINYINT")]
+        [Column("reply", TypeName = "tinyint(4)")]
         public bool Reply { get; set; }
 
-        [Column("comment_data", TypeName = "VARCHAR(100)")]
+        [Column("comment_data", TypeName = "varchar(100)")]
         public string CommentData { get; set; }
 
-        [Column("delete_flag", TypeName = "TINYINT")]
+        [Column("delete_flag", TypeName = "tinyint(4)")]
         public bool DeleteFlag { get; set; }
 
 
-        public ClanData ClanData { get; set; }
+
+        [Column("clan_role_id", TypeName = "bigint(20) unsigned"), Required]
+        public ulong PlayerID { get; set; }
+
+        public PlayerData PlayerData { get; set; }
 
     }
 }

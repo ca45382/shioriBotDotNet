@@ -25,14 +25,11 @@ namespace PriconneBotConsoleApp.Script
             var guildID = messageChannel.Guild.Id.ToString();
             var userID = message.Author.Id.ToString();
 
+            m_playerData = new MySQLPlayerDataController().LoadPlayerData(guildID, userID);
 
-            //using (var mySQLPlayerData = new MySQLPlayerDataControllerOld())
-            //{
-            //    m_playerData = mySQLPlayerData.LoadPlayerData(guildID, userID);
+            var userRole = messageChannel.Guild.GetRole(ulong.Parse(m_playerData.ClanData.ClanRoleID));
 
-            //    var userRole = messageChannel.Guild.GetRole(ulong.Parse(m_playerData.ClanRoleID));
-            //    m_playerClanData = mySQLPlayerData.LoadClanInfo(userRole);
-            //}
+            m_playerClanData = new MySQLClanDataController().LoadClanData(userRole);
         }
 
         async public Task RunMessageReceive()
@@ -51,7 +48,7 @@ namespace PriconneBotConsoleApp.Script
             if (message.Channel.Id.ToString() == 
                 m_playerClanData.ChannelIDs.ReservationChannelID)
             {
-                await new BattleReservation(m_playerClanData, message).RunReservationCommand();
+                //await new BattleReservation(m_playerClanData, message).RunReservationCommand();
             }
 
             return;

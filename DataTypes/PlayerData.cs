@@ -10,19 +10,20 @@ namespace PriconneBotConsoleApp.DataTypes
     [Table("player_data")]
     public class PlayerData
     {
-        [Column("player_id", TypeName = "BIGINT UNSIGNED AUTO_INCREMENT")]
-        public int PlayerID { get; set; }
+        [Column("player_id", TypeName = "bigint(20) unsigned"), Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public ulong PlayerID { get; set; }
 
         [Column("user_id", TypeName = "varchar(21)"), Required]
         public string UserID { get; set; }
 
-        [Column("name", TypeName = "VARCHAR(100)")]
+        [Column("name", TypeName = "varchar(100)")]
         public string GuildUserName { get; set; }
 
 
         //外部キー
-        [Column("clan_id", TypeName = "BIGINT UNSIGNED"), Required]
-        public int ClanID { get; set; }
+        [Column("clan_id", TypeName = "bigint(20) unsigned"), Required]
+        public ulong ClanID { get; set; }
 
         public ClanData ClanData { get; set; }
 

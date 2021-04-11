@@ -109,12 +109,25 @@ namespace PriconneBotConsoleApp.Script
             }
 
 
-            return new ReservationData(serverID, clanRoleID, userID, bossNumber, battleLap, commentData);
+            return new ReservationData(){
+                PlayerData = new PlayerData()
+                {
+                    ClanData = new ClanData()
+                    {
+                        ServerID = serverID,
+                        ClanRoleID = clanRoleID
+                    },
+                    UserID = userID   
+                },
+                BattleLaps = battleLap,
+                BossNumber = bossNumber,
+                CommentData = commentData
+            };
         }
 
         private void RegisterReservationData(ReservationData reservationData)
         {
-            using (var mySQLReservationController = new MySQLReservationController())
+            using (var mySQLReservationController = new MySQLReservationControllerOld())
             {
                 var allSqlReservationData =  mySQLReservationController.LoadReservationData(
                     m_userClanData, reservationData.UserID);

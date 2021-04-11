@@ -11,6 +11,8 @@ using System.Threading;
 //using System.Text;
 using System.Threading.Tasks;
 
+using PriconneBotConsoleApp.MySQL;
+
 namespace PriconneBotConsoleApp.Script
 {
     class Program
@@ -69,6 +71,7 @@ namespace PriconneBotConsoleApp.Script
             //await receiveMessages.RunMessageReceive();
 
             //await message.Channel.SendMessageAsync(message.Content.ToString());
+            return;
         }
 
         /// <summary>
@@ -79,8 +82,8 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private Task GuildMembersDownloaded(SocketGuild guild)
         {
-            var playerData = new PlayerDataLoader();
-            playerData.UpdatePlayerData(guild);
+            var playerDataLoader = new PlayerDataLoader();
+            playerDataLoader.UpdatePlayerData(guild);
             return Task.CompletedTask;
         }
 

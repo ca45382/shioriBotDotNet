@@ -16,12 +16,10 @@ namespace PriconneBotConsoleApp.Script
 
         public PlayerDataLoader()
         {
-            try 
+            try
             {
-                using (var playerDataSQLController = new MySQLPlayerDataControllerOld())
-                {
-                    m_clanData = playerDataSQLController.LoadClanInfo();
-                }
+                var clanData = new MySQLClanDataController().LoadClanData();
+                m_clanData = clanData;
             }
             catch (Exception e)
             {
@@ -39,20 +37,15 @@ namespace PriconneBotConsoleApp.Script
         /// <param name="guild"></param>
         public void UpdatePlayerData(SocketGuild guild)
         {
-            var usersOnSQLServer = new List<PlayerData>();
             var createUserData = new List<PlayerData>();
             var deleteUserData = new List<PlayerData>();
             var updateUserData = new List<PlayerData>();
 
             //サーバー上のクランメンバー情報の取得
             var usersOnDiscord = GetServerClanMember(guild);
-            
+
             // SQL上のプレイヤーデータを読み取る
-            using (var playerDataSQLController = new MySQLPlayerDataControllerOld())
-            {
-                usersOnSQLServer = 
-                    playerDataSQLController.LoadPlayerData(guild.Id.ToString());
-            }
+            var usersOnSQLServer = new MySQLPlayerDataController().LoadPlayerData(guild.Id.ToString());
 
             //SQLに追加・更新する情報の抽出
             foreach (PlayerData discordUser in usersOnDiscord)
@@ -63,10 +56,10 @@ namespace PriconneBotConsoleApp.Script
                 foreach (PlayerData mySQLUser in usersOnSQLServer)
                 {
                     if (mySQLUser.UserID == discordUser.UserID &&
-                        mySQLUser.ClanRoleID == discordUser.ClanRoleID)
+                        mySQLUser.ClanData.ClanRoleID == discordUser.ClanData.ClanRoleID)
                     {
                         existFlag = 1;
-                        if(mySQLUser.GuildUserName == discordUser.GuildUserName)
+                        if (mySQLUser.GuildUserName == discordUser.GuildUserName)
                         {
                             sameNameFlag = 1;
                         }
@@ -88,10 +81,10 @@ namespace PriconneBotConsoleApp.Script
             foreach (PlayerData mySQLUser in usersOnSQLServer)
             {
                 var existFlag = 0;
-                foreach(PlayerData discordUser in usersOnDiscord)
+                foreach (PlayerData discordUser in usersOnDiscord)
                 {
                     if (mySQLUser.UserID == discordUser.UserID &&
-                        mySQLUser.ClanRoleID == discordUser.ClanRoleID)
+                        mySQLUser.ClanData.ClanRoleID == discordUser.ClanData.ClanRoleID)
                     {
                         existFlag = 1;
                     }
@@ -102,13 +95,10 @@ namespace PriconneBotConsoleApp.Script
                 }
             }
 
-            //SQL上のデータの更新
-            using (var playerDataSQLController = new MySQLPlayerDataControllerOld())
-            {
-                playerDataSQLController.CreatePlayerData(createUserData);
-                playerDataSQLController.UpdatePlayerData(updateUserData);
-                playerDataSQLController.DeletePlayerData(deleteUserData);
-            }
+            var playerDataControl = new MySQLPlayerDataController();
+            playerDataControl.CreatePlayerData(createUserData);
+            playerDataControl.UpdatePlayerData(updateUserData);
+            playerDataControl.DeletePlayerData(deleteUserData);
             return;
         }
 
@@ -143,13 +133,19 @@ namespace PriconneBotConsoleApp.Script
 
                 nickName = (user.Nickname == null) ? user.Username : user.Nickname;
 
-                clanMember.Add(new PlayerData()
+                var playerData = new PlayerData
                 {
-                    ServerID = user.Guild.Id.ToString(),
-                    ClanRoleID = roleID,
+                    ClanData = new ClanData() 
+                    {
+                        ServerID = user.Guild.Id.ToString(),
+                        ClanRoleID = roleID
+                    },
+
                     UserID = user.Id.ToString(),
                     GuildUserName = nickName
-                });
+                };
+
+                clanMember.Add(playerData);
             }
 
             return clanMember;

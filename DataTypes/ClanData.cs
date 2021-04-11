@@ -11,36 +11,43 @@ namespace PriconneBotConsoleApp.DataTypes
     [Table("clan_info")]
     public class ClanData
     {
-        [Column("server_id", TypeName = "BIGINT UNSIGNED AUTO_INCREMENT")]
-        public int ClanID { get; set; }
 
-        [Column("clan_role_id", TypeName = "varchar(21)"), Required]
+        [Column("clan_id", TypeName = "bigint(20) unsigned"), Key, Required]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public ulong ClanID { get; set; }
+
+        [Column("clan_role_id", TypeName = "varchar(21)")]
         public string ClanRoleID { get; set; }
 
-        [Column("clan_name")]
+        [Column("clan_name", TypeName = "varchar(100)")]
         public string ClanName { get; set; }
 
-        [Column("battle_lap")]
-        public int BattleLaps { get; set; } = 0;
+        [Column("battle_lap", TypeName = "int(3)")]
+        public int BattleLap { get; set; }
 
-        [Column("boss_num")]
-        public int BossNumber { get; set; } = 0;
+        [Column("boss_num", TypeName = "int(1)")]
+        public int BossNumber { get; set; }
 
-        [Column("progress_flag")]
-        public bool ProgressiveFlag { get; set; } = false;
+        [Column("progress_flag", TypeName = "tinyint(4)")]
+        public bool ProgressiveFlag { get; set; }
 
-        [Column("boss_role_ready")]
-        public bool BossRoleReady { get; set; } = false;
+        [Column("boss_role_ready", TypeName = "tinyint(4)")]
+        public bool BossRoleReady { get; set; }
 
         // 外部キー
         [Column("server_id", TypeName = "varchar(21)"), Required]
         public string ServerID { get; set; }
-        public BotDatabase Database { get; set; }
+
+
+        public BotDatabase BotDatabase { get; set; }
 
         //リレーション
         public ChannelIDs ChannelIDs { get; set; }
+
         public MessageIDs MessageIDs { get; set; }
+
         public RoleIDs RoleIDs { get; set; }
+
         public List<PlayerData> PlayerData { get; set; }
 
         
@@ -70,8 +77,9 @@ namespace PriconneBotConsoleApp.DataTypes
         [Column("tl_time_id", TypeName = "varchar(21)")]
         public string TimeLineConversionChannelID;
 
-        [Column("clan_id", TypeName = "BIGINT UNSIGNED")]
-        public int ClanID { get; set; }
+        [Column("clan_id", TypeName = "bigint(20) unsigned"), Key]
+        public ulong ClanID { get; set; }
+
         public ClanData ClanData { get; set; }
     }
 
@@ -87,8 +95,10 @@ namespace PriconneBotConsoleApp.DataTypes
         [Column("reserve_msg_id", TypeName = "varchar(21)")]
         public string ReservationMessageID;
 
-        [Column("clan_id", TypeName = "BIGINT UNSIGNED")]
-        public int ClanID { get; set; }
+        [Column("clan_id", TypeName = "bigint(20) unsigned"), Key]
+        public ulong ClanID { get; set; }
+
+
         public ClanData ClanData { get; set; }
     }
 
@@ -113,8 +123,9 @@ namespace PriconneBotConsoleApp.DataTypes
         [Column("boss_5_role_id", TypeName = "varchar(21)")]
         public string FifthBossID;
 
-        [Column("clan_id", TypeName = "BIGINT UNSIGNED")]
-        public int ClanID { get; set; }
+        [Column("clan_id", TypeName = "bigint(20) unsigned"), Key]
+        public ulong ClanID { get; set; }
+
         public ClanData ClanData { get; set; }
     }
 }
