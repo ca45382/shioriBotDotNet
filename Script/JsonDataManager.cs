@@ -37,13 +37,15 @@ namespace PriconneBotConsoleApp.Script
             var userName = m_configData.SqlConnectorValue.User;
             var password = m_configData.SqlConnectorValue.Password;
             var databaseName = m_configData.SqlConnectorValue.Database;
+            var sslMode = m_configData.SqlConnectorValue.sslMode;
 
             var connectionString =
                 $"server = {hostName}; " +
                 $"port = {portNumber}; " +
                 $"user = {userName}; " +
                 $"password = {password};" + 
-                $"database = {databaseName}";
+                $"database = {databaseName};" +
+                $"SslMode = {sslMode}";
             return connectionString;
         }
 
@@ -87,6 +89,8 @@ namespace PriconneBotConsoleApp.Script
                 public string Password;
                 [DataMember(Name = "database")]
                 public string Database;
+                [DataMember(Name = "sslmode")]
+                public string sslMode;
             }
         }
 #pragma warning restore CA0649
