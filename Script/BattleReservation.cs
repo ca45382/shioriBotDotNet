@@ -188,6 +188,16 @@ namespace PriconneBotConsoleApp.Script
         {
             var playerData = new MySQLPlayerDataController()
                 .LoadPlayerData(m_userClanData.ServerID, m_userMessage.Author.Id.ToString());
+
+            var messageData =
+                CreateUserReservationDataMessage(playerData);
+
+            return messageData;
+            
+        }
+
+        private string CreateUserReservationDataMessage(PlayerData playerData)
+        {
             var reservationDataSet = new MySQLReservationController().LoadReservationData(playerData);
 
             if (reservationDataSet.Count() == 0)
@@ -208,7 +218,7 @@ namespace PriconneBotConsoleApp.Script
                     "\n";
             }
             messageData += $"以上の{loopNum}件です";
-            messageData  += "```";
+            messageData += "```";
 
             return messageData;
         }
