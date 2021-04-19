@@ -192,7 +192,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (reservationDataSet.Count() == 0)
             {
-                return "予約がないです。";
+                return "予約がありません";
             }
 
             var messageData = "```python\n";
@@ -207,7 +207,7 @@ namespace PriconneBotConsoleApp.Script
                     reservationData.CommentData +
                     "\n";
             }
-            messageData += $"以上の{loopNum}件です。";
+            messageData += $"以上の{loopNum}件です";
             messageData  += "```";
 
             return messageData;
