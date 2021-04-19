@@ -1,4 +1,5 @@
 ﻿using Discord.WebSocket;
+using Discord.Rest;
 using Discord;
 using System;
 using System.Collections.Generic;
@@ -35,9 +36,12 @@ namespace PriconneBotConsoleApp.Script
             }
             else if (messageContents.StartsWith("予約"))
             {
-                if (messageContents == "予約" || messageContents == "予約確認")
+                if (messageContents == "予約" || messageContents == "予約確認"
+                    || messageContents == "予約状況")
                 {
                     Console.WriteLine("予約確認");
+                    var sendMessageData = CreateUserReservationDataMessage();
+                    await SendMessageToChannel(sendMessageData);
                     return;
                 }
                 var reservationData = MessageToReservationData();
@@ -125,15 +129,16 @@ namespace PriconneBotConsoleApp.Script
             }
 
 
-            return new ReservationData(){
+            return new ReservationData() {
                 PlayerData = new PlayerData()
                 {
-                    ClanData = new ClanData()
-                    {
-                        ServerID = serverID,
-                        ClanRoleID = clanRoleID
-                    },
-                    UserID = userID   
+                    //ClanData = new ClanData()
+                    //{
+                    //    ServerID = serverID,
+                    //    ClanRoleID = clanRoleID
+                    //},
+                    ClanData = m_userClanData,
+                    UserID = userID
                 },
                 BattleLaps = battleLap,
                 BossNumber = bossNumber,
@@ -179,6 +184,35 @@ namespace PriconneBotConsoleApp.Script
             return true;
         }
 
+        private string CreateUserReservationDataMessage()
+        {
+            var playerData = new MySQLPlayerDataController()
+                .LoadPlayerData(m_userClanData.ServerID, m_userMessage.Author.Id.ToString());
+            var reservationDataSet = new MySQLReservationController().LoadReservationData(playerData);
+
+            if (reservationDataSet.Count() == 0)
+            {
+                return "予約がないです。";
+            }
+
+            var messageData = "```python\n";
+            messageData += playerData.GuildUserName + "さんの予約状況 \n";
+            var loopNum = 0;
+            foreach (var reservationData in reservationDataSet)
+            {
+                loopNum += 1;
+                messageData += loopNum.ToString().PadLeft(2) + ". " +
+                    reservationData.BattleLaps.ToString().PadLeft(2) + "周目 " +
+                    reservationData.BossNumber.ToString() + "ボス " +
+                    reservationData.CommentData +
+                    "\n";
+            }
+            messageData += $"以上の{loopNum}件です。";
+            messageData  += "```";
+
+            return messageData;
+        }
+
         private string CreateAllReservationDataMessage()
         {
 
@@ -186,11 +220,17 @@ namespace PriconneBotConsoleApp.Script
             return hoge;
         }
 
+        async private Task<RestMessage> SendMessageToChannel(string messageData)
+        {
+            var result = await m_userMessage.Channel.SendMessageAsync(messageData);
+            return result;
+        }
+
         async private Task FailedToRegisterMessage()
         {
             var textMessage = "予約に失敗しました。";
             await m_userMessage.Channel.SendMessageAsync(textMessage);
-            return ;
+            return;
         }
 
         async private Task SuccessAddEmoji()
