@@ -1,4 +1,5 @@
 ﻿using Discord.WebSocket;
+using Discord;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -47,8 +48,25 @@ namespace PriconneBotConsoleApp.Script
                 }
                 RegisterReservationData(reservationData);
 
+                await SuccessAddEmoji();
+                
+                return;
             }
-
+            else if (messageContents.StartsWith("削除"))
+            {
+                var deleteReservationData = MessageToReservationData();
+                if (deleteReservationData is null)
+                {
+                    //await FailedToRegisterMessage();
+                    return;
+                }
+                var result = DeleteUserReservationData(deleteReservationData);
+                if (result)
+                {
+                    await SuccessAddEmoji();
+                }
+                return;
+            }
         }
 
         public void SendSystemMessage()
@@ -143,14 +161,25 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
-        private string DeleteUserReservationData()
+        private bool DeleteUserReservationData(ReservationData reservationData)
         {
-            var resultMessage = "";
+            var mySQLReservationController = new MySQLReservationController();
+            var allSqlReservationData =
+                mySQLReservationController.LoadReservationData(reservationData.PlayerData);
 
-            return resultMessage;
+            var sqlReservationData = allSqlReservationData
+                .Where(x => x.BossNumber == reservationData.BossNumber)
+                .Where(y => y.BattleLaps == reservationData.BattleLaps);
+            if (sqlReservationData.Count() == 0)
+            {
+                return false;
+            }
+            mySQLReservationController.DeleteReservationData(sqlReservationData);
+
+            return true;
         }
 
-        private string CreateMessage()
+        private string CreateAllReservationDataMessage()
         {
 
             var hoge = "";
@@ -164,6 +193,12 @@ namespace PriconneBotConsoleApp.Script
             return ;
         }
 
+        async private Task SuccessAddEmoji()
+        {
+            var successEmoji = new Emoji("🆗");
+            await m_userMessage.AddReactionAsync(successEmoji);
+            return;
+        }
         private string ZenToHan(string textData)
         {
             var convertText = textData;
