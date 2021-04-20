@@ -13,6 +13,67 @@ namespace PriconneBotConsoleApp.MySQL
     class MySQLReservationController
     {
 
+        public string LoadReservationMessageID(ClanData clanData)
+        {
+            using (var mySQLConnector = new MySQLConnector())
+            {
+                var clanID = mySQLConnector.ClanData
+                    .Include(d => d.BotDatabase)
+                    .Where(d => d.ServerID == clanData.ServerID)
+                    .Where(d => d.ClanRoleID == clanData.ClanRoleID)
+                    .Select(d => d.ClanID)
+                    .FirstOrDefault();
+
+                if (clanID == 0)
+                {
+                    return "";
+                }
+                var messageID = mySQLConnector.MessageIDs
+                    .Include(d => d.ClanData)
+                    .Where(d => d.ClanID == clanID)
+                    .Select(d => d.ProgressiveMessageID)
+                    .FirstOrDefault();
+
+                return messageID;
+            }
+        }
+        public bool UpdateReservationMessageID(ClanData clanData, string messageID)
+        {
+            using (var mySQLConnector = new MySQLConnector())
+            {
+                var transaction = mySQLConnector.Database.BeginTransaction();
+
+                var clanID = mySQLConnector.ClanData
+                    .Include(d => d.BotDatabase)
+                    .Where(d => d.ServerID == clanData.ServerID)
+                    .Where(d => d.ClanRoleID == clanData.ClanRoleID)
+                    .Select(d => d.ClanID)
+                    .FirstOrDefault();
+
+                if (clanID == 0) 
+                {
+                    transaction.Rollback();
+                    return false;
+                }
+
+                var updateData = mySQLConnector.MessageIDs
+                    .Include(d => d.ClanData)
+                    .Where(d => d.ClanID == clanID)
+                    .FirstOrDefault();
+
+                if (updateData == null)
+                {
+                    transaction.Rollback();
+                    return false;
+                }
+
+                updateData.ReservationMessageID = messageID;
+                mySQLConnector.SaveChanges();
+                transaction.Commit();
+            }
+            return true;
+        }
+
         public List<ReservationData> LoadReservationData(ClanData clanData)
         {
             var reservationData = new List<ReservationData>();
@@ -24,6 +85,9 @@ namespace PriconneBotConsoleApp.MySQL
                 .Where(b => b.PlayerData.ClanData.ServerID == clanData.ServerID)
                 .Where(b => b.PlayerData.ClanData.ClanID == clanData.ClanID)
                 .Where(b => b.DeleteFlag == false)
+                .OrderBy(o => o.BattleLaps)
+                .ThenBy(d => d.BossNumber)
+                .ThenBy(d => d.DateTime)
                 .ToList();
 
 
@@ -45,12 +109,15 @@ namespace PriconneBotConsoleApp.MySQL
                 .Where(b => b.ClanData.ClanRoleID == playerData.ClanData.ClanRoleID)
                 .Where(b => b.UserID == playerData.UserID)
                 .Select(b => b.PlayerID)
+                
                 .FirstOrDefault();
 
             var result = mySQLConnector.ReservationData
                 .Include(b => b.PlayerData)
                 .Where(b => b.PlayerID == playerID)
                 .Where(b => b.DeleteFlag == false)
+                .OrderBy(o => o.BattleLaps)
+                .ThenBy(d => d.BossNumber)
                 .ToList();
 
             reservationData = result;

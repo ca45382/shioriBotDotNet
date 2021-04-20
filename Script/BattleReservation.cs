@@ -16,6 +16,7 @@ namespace PriconneBotConsoleApp.Script
     class BattleReservation
     {
         private ClanData m_userClanData;
+        private SocketRole m_userRole;
         private const int MinBossNumber = 1;
         private const int MaxBossNumber = 5;
 
@@ -25,6 +26,10 @@ namespace PriconneBotConsoleApp.Script
         {
             m_userClanData = userClanData;
             m_userMessage = message;
+
+            var socketGuildChannel = message.Channel as SocketGuildChannel;
+
+            m_userRole = socketGuildChannel.Guild.GetRole(ulong.Parse(m_userClanData.ClanRoleID));
         }
 
         async public Task RunReservationCommand()
@@ -73,13 +78,22 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
-        public void SendSystemMessage()
+        async public Task SendSystemMessage()
         {
-            Console.WriteLine("test");
+            var messageData = CreateAllReservationDataMessage(m_userClanData);
+            var sendedMessageData = await SendMessageToChannel(messageData);
+            new MySQLReservationController().UpdateReservationMessageID(
+                m_userClanData, sendedMessageData.Id.ToString());
+            return;
         }
 
-        public void UpdateSystemMessage()
+        async public Task UpdateSystemMessage()
         {
+            var reservationMessageID = m_userClanData.MessageIDs.ReservationMessageID;
+            if (reservationMessageID == null)
+            {
+                return;
+            }
 
         }
 
@@ -223,11 +237,32 @@ namespace PriconneBotConsoleApp.Script
             return messageData;
         }
 
-        private string CreateAllReservationDataMessage()
+        private string CreateAllReservationDataMessage(ClanData clanData)
         {
+            var reservationDataSet = new MySQLReservationController().LoadReservationData(clanData);
 
-            var hoge = "";
-            return hoge;
+            if (reservationDataSet.Count() == 0)
+            {
+                return "予約がありません";
+            }
+
+            var messageData = "```python\n";
+
+            var loopNum = 0;
+            foreach (var reservationData in reservationDataSet)
+            {
+                loopNum += 1;
+                messageData += loopNum.ToString().PadLeft(2) + ". " +
+                    reservationData.BattleLaps.ToString().PadLeft(2) + "周目 " +
+                    reservationData.BossNumber.ToString() + "ボス " +
+                    reservationData.PlayerData.GuildUserName + " " +
+                    reservationData.CommentData +
+                    "\n";
+            }
+            messageData += $"以上の{loopNum}件です";
+            messageData += "```";
+
+            return messageData;
         }
 
         async private Task<RestMessage> SendMessageToChannel(string messageData)

@@ -18,6 +18,7 @@ namespace PriconneBotConsoleApp.MySQL
         public DbSet<ClanData> ClanData { get; set; }
         public DbSet<PlayerData> PlayerData { get; set; }
         public DbSet<ReservationData> ReservationData { get; set; }
+        public DbSet<MessageIDs> MessageIDs { get; set; }
         public JsonDataManager JsonData;
 
         public MySQLConnector()

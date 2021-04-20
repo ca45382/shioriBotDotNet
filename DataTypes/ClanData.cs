@@ -73,6 +73,9 @@ namespace PriconneBotConsoleApp.DataTypes
         
         [Column("reserve_id", TypeName = "varchar(21)")]
         public string ReservationChannelID { get; set; }
+
+        [Column("reserve_result_id", TypeName = "varchar(21)")]
+        public string ReservationResultChannelID { get; set; }
         
         [Column("tl_time_id", TypeName = "varchar(21)")]
         public string TimeLineConversionChannelID { get; set; }
