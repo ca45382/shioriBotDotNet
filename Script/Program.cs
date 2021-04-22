@@ -17,7 +17,8 @@ namespace PriconneBotConsoleApp.Script
 {
     class Program
     {
-        private DiscordSocketClient client;
+        private DiscordSocketClient m_client;
+        private DiscordSocketConfig m_config;
         //public static CommandService commands;
         //public static IServiceProvider services;
 
@@ -31,22 +32,27 @@ namespace PriconneBotConsoleApp.Script
         {
             var jsonSettingData = new JsonDataManager(@"./data/botConfig.json");
 
-            client = new DiscordSocketClient();
+            m_config = new DiscordSocketConfig
+            {
+                MessageCacheSize = 10
+            };
+
+            m_client = new DiscordSocketClient(m_config);
             //var clanBattleInfo = new Script.ClanBattleInfoLoader();
             //clanBattleInfo.LoadClanBattleScadule();
 
             var commands = new CommandService();
             var services = new ServiceCollection().BuildServiceProvider();
             Func<SocketMessage, Task> function = CommandRecieved;
-            client.MessageReceived += function;
-            client.GuildMembersDownloaded += GuildMembersDownloaded;
-            client.UserLeft += UserLeft;
-            client.GuildMemberUpdated += GuildMemberUpdated;
+            m_client.MessageReceived += function;
+            m_client.GuildMembersDownloaded += GuildMembersDownloaded;
+            m_client.UserLeft += UserLeft;
+            m_client.GuildMemberUpdated += GuildMemberUpdated;
 
-            client.Log += Log;
+            m_client.Log += Log;
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
-            await client.LoginAsync(TokenType.Bot, jsonSettingData.Token);
-            await client.StartAsync();
+            await m_client.LoginAsync(TokenType.Bot, jsonSettingData.Token);
+            await m_client.StartAsync();
             await test();
 
 

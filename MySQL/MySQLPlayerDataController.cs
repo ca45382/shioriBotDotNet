@@ -13,11 +13,7 @@ namespace PriconneBotConsoleApp.MySQL
     {
         public List<PlayerData> LoadPlayerData(string serverID)
         {
-            //var commandString =
-            //     "SELECT clan_info.server_id, clan_info.clan_role_id, player_data.user_id, player_data.name " +
-            //     "FROM player_data INNER JOIN clan_info ON player_data.clan_id = clan_info.clan_id " +
-            //     "WHERE server_id = @serverID";
-
+            
             var playerData = new List<PlayerData>();
 
             using (var mySQLConnector = new MySQLConnector())

@@ -20,7 +20,7 @@ namespace PriconneBotConsoleApp.Script
         {
             m_message = message;
             var messageChannel = message.Channel as SocketGuildChannel;
-            
+
 
             var guildID = messageChannel.Guild.Id.ToString();
             var userID = message.Author.Id.ToString();
@@ -40,15 +40,20 @@ namespace PriconneBotConsoleApp.Script
             }
 
             return;
-            
+
         }
 
         async public Task RunMessageReceive(SocketUserMessage message)
         {
-            if (message.Channel.Id.ToString() == 
+            if (message.Channel.Id.ToString() ==
                 m_playerClanData.ChannelIDs.ReservationChannelID)
             {
                 await new BattleReservation(m_playerClanData, message).RunReservationCommand();
+            }
+            if (message.Channel.Id.ToString() ==
+                m_playerClanData.ChannelIDs.ReservationResultChannelID)
+            {
+                await new BattleReservation(m_playerClanData, message).RunReservationResultCommand();
             }
 
             return;
