@@ -45,15 +45,22 @@ namespace PriconneBotConsoleApp.Script
 
         async public Task RunMessageReceive(SocketUserMessage message)
         {
-            if (message.Channel.Id.ToString() ==
+            var userClanData = m_playerClanData;
+            var messageChannelID = message.Channel.Id.ToString();
+            if (messageChannelID ==
                 m_playerClanData.ChannelIDs.ReservationChannelID)
             {
-                await new BattleReservation(m_playerClanData, message).RunReservationCommand();
+                await new BattleReservation(userClanData, message).RunReservationCommand();
             }
-            if (message.Channel.Id.ToString() ==
+            if (messageChannelID ==
                 m_playerClanData.ChannelIDs.ReservationResultChannelID)
             {
-                await new BattleReservation(m_playerClanData, message).RunReservationResultCommand();
+                await new BattleReservation(userClanData, message).RunReservationResultCommand();
+            }
+            if (messageChannelID ==
+                m_playerClanData.ChannelIDs.DeclarationChannelID)
+            {
+                await new BattleDeclaration(userClanData, message).RunDeclarationCommand();
             }
 
             return;

@@ -29,5 +29,7 @@ namespace PriconneBotConsoleApp.DataTypes
 
 
         public List<ReservationData> ReservationData { get; set; }
+
+        public List<DeclarationData> DeclarationData { get; set; }
     }
 }

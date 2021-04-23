@@ -16,9 +16,12 @@ namespace PriconneBotConsoleApp.MySQL
 
         public DbSet<BotDatabase> BotDatabase { get; set; }
         public DbSet<ClanData> ClanData { get; set; }
+
+        public DbSet<MessageIDs> MessageIDs { get; set; }
         public DbSet<PlayerData> PlayerData { get; set; }
         public DbSet<ReservationData> ReservationData { get; set; }
-        public DbSet<MessageIDs> MessageIDs { get; set; }
+        public DbSet<DeclarationData> DeclarationData { get; set; }
+        
         public JsonDataManager JsonData;
 
         public MySQLConnector()
@@ -62,7 +65,11 @@ namespace PriconneBotConsoleApp.MySQL
                 .HasOne(b => b.PlayerData)
                 .WithMany(i => i.ReservationData)
                 .HasForeignKey(b => b.PlayerID);
-            
+
+            modelBuilder.Entity<DeclarationData>()
+                .HasOne(b => b.PlayerData)
+                .WithMany(i => i.DeclarationData)
+                .HasForeignKey(b => b.PlayerID);
             
         }
 

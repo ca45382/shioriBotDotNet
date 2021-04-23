@@ -13,13 +13,13 @@ using System.Linq;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class BattleReservation
+    class BattleReservation:BaseClass
     {
-        private ClanData m_userClanData;
-        private SocketRole m_userRole;
         private const int MinBossNumber = 1;
         private const int MaxBossNumber = 5;
 
+        private ClanData m_userClanData;
+        private SocketRole m_userRole;
         private SocketUserMessage m_userMessage;
         private SocketReaction m_userReaction;
         
@@ -44,8 +44,10 @@ namespace PriconneBotConsoleApp.Script
 
         async public Task RunReservationCommand()
         {
-            if (m_userMessage == null) return;
-            var messageContents = m_userMessage.Content;
+            var userMessage = m_userMessage;
+
+            if (userMessage == null) return;
+            var messageContents = userMessage.Content;
             
             if (messageContents.StartsWith("予約"))
             {
@@ -54,7 +56,7 @@ namespace PriconneBotConsoleApp.Script
                 {
                     Console.WriteLine("予約確認");
                     var sendMessageData = CreateUserReservationDataMessage();
-                    await SendMessageToChannel(m_userMessage.Channel,sendMessageData);
+                    await SendMessageToChannel(userMessage.Channel,sendMessageData);
                     return;
                 }
                 var reservationData = MessageToReservationData();
@@ -90,53 +92,67 @@ namespace PriconneBotConsoleApp.Script
 
         async public Task RunReservationResultCommand()
         {
-            var messageContents = m_userMessage.Content;
+            var userMessage = m_userMessage;
+
+            var messageContents = userMessage.Content;
             if (messageContents.StartsWith("!start"))
             {
                 await SendSystemMessage();
             }
             return;
         }
+
         async public Task SendSystemMessage()
         {
-            var messageData = CreateAllReservationDataMessage(m_userClanData);
-            var resultChannel = m_userRole.Guild.GetTextChannel(ulong.Parse(m_userClanData.ChannelIDs.ReservationResultChannelID));
+            var userClanData = m_userClanData;
+            var userRole = m_userRole;
+
+            var messageData = CreateAllReservationDataMessage(userClanData);
+            var resultChannel = userRole.Guild.GetTextChannel(
+                ulong.Parse(userClanData.ChannelIDs.ReservationResultChannelID));
+
             var sendedMessageData = await SendMessageToChannel(resultChannel, messageData);
             new MySQLReservationController().UpdateReservationMessageID(
-                m_userClanData, sendedMessageData.Id.ToString());
+                userClanData, sendedMessageData.Id.ToString());
+
             return;
         }
 
         async public Task UpdateSystemMessage()
         {
-            var reservationMessageID = m_userClanData.MessageIDs.ReservationMessageID;
+            var userClanData = m_userClanData;
+            var userRole = m_userRole;
+
+            var reservationMessageID = userClanData.MessageIDs.ReservationMessageID;
             if (reservationMessageID == null)
             {
                 return;
             }
-            var guildChannel = m_userRole.Guild.GetChannel(
-                ulong.Parse(m_userClanData.ChannelIDs.ReservationResultChannelID)) as SocketTextChannel;
-            
+            var guildChannel = userRole.Guild.GetChannel(
+                ulong.Parse(userClanData.ChannelIDs.ReservationResultChannelID)) as SocketTextChannel;
+
 
             var socketMessage = guildChannel.GetCachedMessage(
-                ulong.Parse(m_userClanData.MessageIDs.ReservationMessageID));
+                ulong.Parse(reservationMessageID));
 
             if (socketMessage == null || !(socketMessage is SocketUserMessage))
             {
                 var message = await guildChannel.GetMessageAsync(
-                    ulong.Parse(m_userClanData.MessageIDs.ReservationMessageID));
-                if (message != null) 
-                { 
+                    ulong.Parse(reservationMessageID));
+                if (message == null)
+                {
+                    return;
+                }
+
                 await guildChannel.DeleteMessageAsync(message);
                 await SendSystemMessage();
-                }
                 return;
             }
 
             SocketUserMessage serverMessage;
             serverMessage = socketMessage as SocketUserMessage;
 
-            var messageData = CreateAllReservationDataMessage(m_userClanData);
+            var messageData = CreateAllReservationDataMessage(userClanData);
             await EditMessage(serverMessage, messageData);
         }
 
@@ -154,7 +170,11 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private ReservationData MessageToReservationData()
         {
-            var massageContent = ZenToHan(m_userMessage.Content);
+            var userClanData = m_userClanData;
+            var userMessage = m_userMessage;
+
+
+            var massageContent = ZenToHan(userMessage.Content);
             
             var splitMessageContent =
                 massageContent.Split(new string[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
@@ -164,18 +184,18 @@ namespace PriconneBotConsoleApp.Script
                 return null;
             }
 
-            if (!(int.TryParse(splitMessageContent[1], out int bossNumber)
-                && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber))
-            {
-                return null;
-            }
-            if (!(int.TryParse(splitMessageContent[2], out int battleLap) 
+            if (!(int.TryParse(splitMessageContent[1], out int battleLap)
                 && battleLap > 0))
             {
                 return null;
             }
-
-            var userID = m_userMessage.Author.Id.ToString();
+            if (!(int.TryParse(splitMessageContent[2], out int bossNumber)
+                && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber))
+            {
+                return null;
+            }
+            
+            var userID = userMessage.Author.Id.ToString();
             string commentData = null;
 
             if (splitMessageContent.Length == 4)
@@ -187,10 +207,10 @@ namespace PriconneBotConsoleApp.Script
             return new ReservationData() {
                 PlayerData = new PlayerData()
                 {
-                    ClanData = m_userClanData,
+                    ClanData = userClanData,
                     UserID = userID
                 },
-                BattleLaps = battleLap,
+                BattleLap = battleLap,
                 BossNumber = bossNumber,
                 CommentData = commentData
             };
@@ -204,7 +224,7 @@ namespace PriconneBotConsoleApp.Script
 
             var sqlReservationData = allSqlReservationData
                 .Where(x => x.BossNumber == reservationData.BossNumber)
-                .Where(y => y.BattleLaps == reservationData.BattleLaps);
+                .Where(y => y.BattleLap == reservationData.BattleLap);
 
             if (sqlReservationData.Count() == 0)
             {
@@ -224,7 +244,7 @@ namespace PriconneBotConsoleApp.Script
 
             var sqlReservationData = allSqlReservationData
                 .Where(x => x.BossNumber == reservationData.BossNumber)
-                .Where(y => y.BattleLaps == reservationData.BattleLaps);
+                .Where(y => y.BattleLap == reservationData.BattleLap);
             if (sqlReservationData.Count() == 0)
             {
                 return false;
@@ -236,8 +256,11 @@ namespace PriconneBotConsoleApp.Script
 
         private string CreateUserReservationDataMessage()
         {
+            var userClanData = m_userClanData;
+            var userMessage = m_userMessage;
+
             var playerData = new MySQLPlayerDataController()
-                .LoadPlayerData(m_userClanData.ServerID, m_userMessage.Author.Id.ToString());
+                .LoadPlayerData(userClanData.ServerID, userMessage.Author.Id.ToString());
 
             var messageData =
                 CreateUserReservationDataMessage(playerData);
@@ -262,7 +285,7 @@ namespace PriconneBotConsoleApp.Script
             {
                 loopNum += 1;
                 messageData += loopNum.ToString().PadLeft(2) + ". " +
-                    reservationData.BattleLaps.ToString().PadLeft(2) + "周目 " +
+                    reservationData.BattleLap.ToString().PadLeft(2) + "周目 " +
                     reservationData.BossNumber.ToString() + "ボス " +
                     reservationData.CommentData +
                     "\n";
@@ -275,21 +298,31 @@ namespace PriconneBotConsoleApp.Script
 
         private string CreateAllReservationDataMessage(ClanData clanData)
         {
+            var bossNumber = clanData.BossNumber;
+            var battleLap = clanData.BattleLap;
+
             var reservationDataSet = new MySQLReservationController().LoadReservationData(clanData);
+
+            reservationDataSet = reservationDataSet
+                .Where(b => (b.BattleLap >= battleLap) || (b.BattleLap == battleLap && b.BossNumber >= bossNumber))
+                .ToList();
+
 
             if (reservationDataSet.Count() == 0)
             {
                 return "予約がありません";
             }
+            
 
             var messageData = "```python\n";
+            messageData += $"{battleLap}周目, {bossNumber}ボス以降の予約一覧です. \n";
 
             var loopNum = 0;
             foreach (var reservationData in reservationDataSet)
             {
                 loopNum += 1;
                 messageData += loopNum.ToString().PadLeft(2) + ". " +
-                    reservationData.BattleLaps.ToString().PadLeft(2) + "周目 " +
+                    reservationData.BattleLap.ToString().PadLeft(2) + "周目 " +
                     reservationData.BossNumber.ToString() + "ボス " +
                     reservationData.PlayerData.GuildUserName + " " +
                     reservationData.CommentData +
@@ -301,39 +334,24 @@ namespace PriconneBotConsoleApp.Script
             return messageData;
         }
 
-        async private Task<RestMessage> SendMessageToChannel(ISocketMessageChannel channel, string messageData)
-        {
-            var result = await channel.SendMessageAsync(messageData);
-            return result;
-        }
-
-        async private Task EditMessage(SocketUserMessage message, string messageData)
-        {
-            await message.ModifyAsync(msg => msg.Content = messageData);
-        }
-
         async private Task FailedToRegisterMessage()
         {
+            var userMessage = m_userMessage;
             var textMessage = "予約に失敗しました。";
-            await m_userMessage.Channel.SendMessageAsync(textMessage);
+
+            
+            await userMessage.Channel.SendMessageAsync(textMessage);
             return;
         }
 
         async private Task SuccessAddEmoji()
         {
+            var message = m_userMessage;
+
             var successEmoji = new Emoji("🆗");
-            await m_userMessage.AddReactionAsync(successEmoji);
+            await message.AddReactionAsync(successEmoji);
             return;
         }
 
-        private string ZenToHan(string textData)
-        {
-            var convertText = textData;
-            convertText = Regex.Replace(convertText, "　", p => ((char)(p.Value[0] - '　' + ' ')).ToString());
-            convertText = Regex.Replace(convertText, "[０-９]", p => ((char)(p.Value[0] - '０' + '0')).ToString());
-            convertText = Regex.Replace(convertText, "[ａ-ｚ]", p => ((char)(p.Value[0] - 'ａ' + 'a')).ToString());
-            convertText = Regex.Replace(convertText, "[Ａ-Ｚ]", p => ((char)(p.Value[0] - 'Ａ' + 'A')).ToString());
-            return convertText;
-        }
     }
 }

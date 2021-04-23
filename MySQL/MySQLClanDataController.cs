@@ -46,5 +46,30 @@ namespace PriconneBotConsoleApp.MySQL
 
             return clanData;
         }
+
+        public bool UpdateClanData (ClanData clanData)
+        {
+            using (var mySQLConnector = new MySQLConnector())
+            {
+                var transaction = mySQLConnector.Database.BeginTransaction();
+
+                var mySQLData = mySQLConnector.ClanData
+                    .Include(b => b.BotDatabase)
+                    .Where(b => b.ClanID == clanData.ClanID)
+                    .FirstOrDefault();
+
+                if (mySQLData == null)
+                {
+                    transaction.Rollback();
+                    return false;
+                }
+
+                mySQLData = clanData;
+                mySQLConnector.SaveChanges();
+                transaction.Commit();
+            }
+
+            return true;
+        }
     }
 }

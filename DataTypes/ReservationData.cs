@@ -22,7 +22,7 @@ namespace PriconneBotConsoleApp.DataTypes
         public int BossNumber { get; set; }
 
         [Column("battle_lap", TypeName = "int(3)")]
-        public int BattleLaps { get; set; }
+        public int BattleLap { get; set; }
 
         [Column("attack_type", TypeName = "int(2)")]
         public int AttackType { get; set; }

@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace PriconneBotConsoleApp.DataTypes
 {
     [Table("declare_data")]
-    class DeclarationData
+    public class DeclarationData
     {
 
         [Column("declare_id", TypeName = "bigint(20) unsigned"), Key]

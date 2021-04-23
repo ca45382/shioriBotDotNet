@@ -13,6 +13,7 @@ namespace PriconneBotConsoleApp.MySQL
     class MySQLReservationController
     {
 
+        /*
         public string LoadReservationMessageID(ClanData clanData)
         {
             using (var mySQLConnector = new MySQLConnector())
@@ -37,6 +38,8 @@ namespace PriconneBotConsoleApp.MySQL
                 return messageID;
             }
         }
+        */
+
         public bool UpdateReservationMessageID(ClanData clanData, string messageID)
         {
             using (var mySQLConnector = new MySQLConnector())
@@ -85,7 +88,7 @@ namespace PriconneBotConsoleApp.MySQL
                 .Where(b => b.PlayerData.ClanData.ServerID == clanData.ServerID)
                 .Where(b => b.PlayerData.ClanData.ClanID == clanData.ClanID)
                 .Where(b => b.DeleteFlag == false)
-                .OrderBy(o => o.BattleLaps)
+                .OrderBy(o => o.BattleLap)
                 .ThenBy(d => d.BossNumber)
                 .ThenBy(d => d.DateTime)
                 .ToList();
@@ -116,12 +119,43 @@ namespace PriconneBotConsoleApp.MySQL
                 .Include(b => b.PlayerData)
                 .Where(b => b.PlayerID == playerID)
                 .Where(b => b.DeleteFlag == false)
-                .OrderBy(o => o.BattleLaps)
+                .OrderBy(o => o.BattleLap)
                 .ThenBy(d => d.BossNumber)
                 .ToList();
 
             reservationData = result;
 
+            return reservationData;
+        }
+
+        public List<ReservationData> LoadBossLapReservationData(ClanData clanData)
+        {
+            var reservationData = new List<ReservationData>();
+
+            using (var mySQLConnector = new MySQLConnector())
+            {
+                var clanID = mySQLConnector.ClanData
+                    .Include(d => d.BotDatabase)
+                    .Where(d => d.ServerID == clanData.ServerID)
+                    .Where(d => d.ClanRoleID == clanData.ClanRoleID)
+                    .Select(d => d.ClanID)
+                    .FirstOrDefault();
+
+                if (clanID == 0)
+                {
+                    return null;
+                }
+
+                reservationData = mySQLConnector.ReservationData
+                .Include(b => b.PlayerData)
+                .ThenInclude(d => d.ClanData)
+                .Where(d => d.PlayerData.ClanID == clanID)
+                .Where(b => b.DeleteFlag == false)
+                .Where(b => b.BattleLap == clanData.BattleLap)
+                .Where(b => b.BossNumber == clanData.BossNumber)
+                .OrderBy(d => d.DateTime)
+                .ToList();
+            }
             return reservationData;
         }
 
@@ -145,7 +179,7 @@ namespace PriconneBotConsoleApp.MySQL
                 new ReservationData()
                 {
                     PlayerID = playerID,
-                    BattleLaps = reservationData.BattleLaps,
+                    BattleLap = reservationData.BattleLap,
                     BossNumber = reservationData.BossNumber,
                     CommentData = reservationData.CommentData
                 });
@@ -177,7 +211,7 @@ namespace PriconneBotConsoleApp.MySQL
                 var updateData = mySQLConnector.ReservationData
                     .Include(d => d.PlayerData)
                     .Where(d => d.PlayerID == playerID)
-                    .Where(d => d.BattleLaps == reservationData.BattleLaps)
+                    .Where(d => d.BattleLap == reservationData.BattleLap)
                     .Where(d => d.BossNumber == reservationData.BossNumber)
                     .Where(b => b.DeleteFlag == false)
                     .FirstOrDefault();
@@ -212,7 +246,7 @@ namespace PriconneBotConsoleApp.MySQL
                         .Include(d => d.PlayerData)
                         .Where(d => d.PlayerID == reservationData.PlayerID )
                         .Where(d => d.BossNumber == reservationData.BossNumber)
-                        .Where(d => d.BattleLaps == reservationData.BattleLaps)
+                        .Where(d => d.BattleLap == reservationData.BattleLap)
                         .Where(b => b.DeleteFlag == false)
                         .FirstOrDefault();
 

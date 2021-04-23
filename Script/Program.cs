@@ -43,8 +43,8 @@ namespace PriconneBotConsoleApp.Script
 
             var commands = new CommandService();
             var services = new ServiceCollection().BuildServiceProvider();
-            Func<SocketMessage, Task> function = CommandRecieved;
-            m_client.MessageReceived += function;
+            //Func<SocketMessage, Task> function = CommandRecieved;
+            m_client.MessageReceived += CommandRecieved;
             m_client.GuildMembersDownloaded += GuildMembersDownloaded;
             m_client.UserLeft += UserLeft;
             m_client.GuildMemberUpdated += GuildMemberUpdated;
@@ -69,7 +69,7 @@ namespace PriconneBotConsoleApp.Script
             var message = messageParam as SocketUserMessage;
             
             if (message == null) { return; }
-            Console.WriteLine("{0} {1}:{2}", message.Channel.Name, message.Author.Username, message);
+            //Console.WriteLine("{0} {1}:{2}", message.Channel.Name, message.Author.Username, message);
             // コメントがユーザーかBotかの判定
             if (message.Author.IsBot) { return; }
 
