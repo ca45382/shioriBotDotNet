@@ -109,7 +109,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (sendedMessage == null) return false;
 
-            AttacheDefaultReaction(sendedMessage);
+            await AttacheDefaultReaction(sendedMessage);
 
             var result = new MySQLDeclarationController().UpdateDeclarationMessageID(
                 userClanData, sendedMessage.Id.ToString());
@@ -150,10 +150,92 @@ namespace PriconneBotConsoleApp.Script
 
         }
 
-        private void AttacheDefaultReaction(IMessage message)
+        /// <summary>
+        /// 凸宣言した時のコード
+        /// </summary>
+        /// <returns></returns>
+        private bool UserRegistorDeclareCommand()
+        {
+            var userReaction = m_userReaction;
+            var declarationData = UserToDeclareData(userReaction.UserId.ToString());
+            var result = new MySQLDeclarationController()
+                .CreateDeclarationData(declarationData);
+
+            return result;
+        }
+
+        /// <summary>
+        /// 本戦が終了した際のコード
+        /// </summary>
+        /// <returns></returns>
+        private bool UserFinishBattleCommand()
+        {
+            var userRole = m_userRole;
+            var userClanData = m_userClanData;
+            var userReaction = m_userReaction;
+
+
+            var declarationData = UserToDeclareData(userReaction.UserId.ToString());  
+            var result = new MySQLDeclarationController()
+                .UpdateDeclarationData(declarationData);
+
+            var playerData = new MySQLPlayerDataController().LoadPlayerData(
+                userRole.Guild.Id.ToString(), userReaction.UserId.ToString());
+
+            var mySQLReservationController = new MySQLReservationController();
+            var reservationData = mySQLReservationController.LoadReservationData(playerData);
+            var finishReservationData = reservationData
+                .Where(d => d.BattleLap == userClanData.BattleLap)
+                .Where(d => d.BossNumber == userClanData.BossNumber)
+                .FirstOrDefault();
+
+            if (finishReservationData != null)
+            {
+                mySQLReservationController.DeleteReservationData(finishReservationData);
+            }
+
+            return result;
+
+        }
+
+        /// <summary>
+        /// ユーザーがバトルをキャンセルした際のコード
+        /// </summary>
+        /// <returns></returns>
+        private bool UserDeleteBattleData()
+        {
+            var userReaction = m_userReaction;
+
+            return true;
+        }
+
+        private bool NextBossCommand()
         {
 
-            string[] emojiData = { "⚔️", "✅", "🏁", "❌", "☠️", "🆘" };
+            return true;
+        }
+
+        private DeclarationData UserToDeclareData(string userID)
+        {
+            var userClanData = m_userClanData;
+            var userRole = m_userRole;
+
+            var playerData = new MySQLPlayerDataController().LoadPlayerData(
+                userRole.Guild.Id.ToString(), userID);
+
+            return new DeclarationData()
+            {
+                PlayerID = playerData.PlayerID,
+                BattleLap = userClanData.BattleLap,
+                BossNumber = userClanData.BossNumber,
+                FinishFlag = true
+            };
+        }
+
+        async private Task AttacheDefaultReaction(IMessage message)
+        {
+
+            string[] emojiData = { "⚔️", "✅", "🏁", "❌" };
             var emojiMatrix = Enumerable
                 .Range(0, 6)
                 .Select((x) => new Emoji(emojiData[x]))
@@ -161,8 +243,7 @@ namespace PriconneBotConsoleApp.Script
 
             foreach (var emoji in emojiMatrix)
             {
-                var task1 = Task.Run(() => { message.AddReactionAsync(emoji); });
-                task1.Wait();
+                await message.AddReactionAsync(emoji);
             }
             return;
 

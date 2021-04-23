@@ -13,33 +13,6 @@ namespace PriconneBotConsoleApp.MySQL
     class MySQLReservationController
     {
 
-        /*
-        public string LoadReservationMessageID(ClanData clanData)
-        {
-            using (var mySQLConnector = new MySQLConnector())
-            {
-                var clanID = mySQLConnector.ClanData
-                    .Include(d => d.BotDatabase)
-                    .Where(d => d.ServerID == clanData.ServerID)
-                    .Where(d => d.ClanRoleID == clanData.ClanRoleID)
-                    .Select(d => d.ClanID)
-                    .FirstOrDefault();
-
-                if (clanID == 0)
-                {
-                    return "";
-                }
-                var messageID = mySQLConnector.MessageIDs
-                    .Include(d => d.ClanData)
-                    .Where(d => d.ClanID == clanID)
-                    .Select(d => d.ProgressiveMessageID)
-                    .FirstOrDefault();
-
-                return messageID;
-            }
-        }
-        */
-
         public bool UpdateReservationMessageID(ClanData clanData, string messageID)
         {
             using (var mySQLConnector = new MySQLConnector())
@@ -225,6 +198,11 @@ namespace PriconneBotConsoleApp.MySQL
             return;
         }
 
+        public void DeleteReservationData(ReservationData reservationData)
+        {
+            DeleteReservationData(new ReservationData[] { reservationData });
+        }
+
         public void DeleteReservationData(IEnumerable<ReservationData> reservationDataSet)
         {
 
@@ -234,13 +212,6 @@ namespace PriconneBotConsoleApp.MySQL
 
                 foreach ( var reservationData in reservationDataSet)
                 {
-                    //var playerID = mySQLConnector.PlayerData
-                    //    .Include(d => d.ClanData)
-                    //    .Where(d => d.ClanData.ServerID == reservationData.PlayerData.ClanData.ServerID)
-                    //    .Where(e => e.ClanData.ClanRoleID == reservationData.PlayerData.ClanData.ClanRoleID)
-                    //    .Where(f => f.UserID == reservationData.PlayerData.UserID)
-                    //    .Select(d => d.PlayerID)
-                    //    .FirstOrDefault();
 
                     var updateData = mySQLConnector.ReservationData
                         .Include(d => d.PlayerData)
