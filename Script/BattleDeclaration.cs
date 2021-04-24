@@ -131,10 +131,12 @@ namespace PriconneBotConsoleApp.Script
 
             var embed = CreateDeclarationDataEmbed(userClanData);
 
+            var content = CreateDeclarationDataMessage(userClanData);
+
             var declarationChannel = userRole.Guild.GetTextChannel(
                 ulong.Parse(userClanData.ChannelIDs.DeclarationChannelID));
 
-            var sendedMessage = await declarationChannel.SendMessageAsync(embed: embed);
+            var sendedMessage = await declarationChannel.SendMessageAsync(text:content,embed: embed);
 
             if (sendedMessage == null) return false;
 
@@ -471,6 +473,27 @@ namespace PriconneBotConsoleApp.Script
             var embed = embedBuild.Build();
 
             return embed;
+        }
+
+        private string CreateDeclarationDataMessage(ClanData clanData)
+        {
+            var reservationDataList =
+                new MySQLReservationController().LoadBossLapReservationData(clanData);
+
+            var reservationIDList = reservationDataList
+               .OrderBy(d => BitConverter.ToUInt64(d.DateTime))
+               .Select(d => d.PlayerData.UserID)
+               .ToList();
+
+            var messageData = "";
+            foreach ( var reservationID in reservationIDList)
+            {
+                messageData += MentionUtils.MentionUser(ulong.Parse(reservationID));
+                messageData += " ";
+            }
+
+            return messageData;
+
         }
 
         private string NameListToMessageData(List<string> nameDataSet)
