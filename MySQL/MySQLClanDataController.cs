@@ -64,7 +64,11 @@ namespace PriconneBotConsoleApp.MySQL
                     return false;
                 }
 
-                mySQLData = clanData;
+                mySQLData.BattleLap = clanData.BattleLap;
+                mySQLData.BossNumber = clanData.BossNumber;
+                mySQLData.ProgressiveFlag = clanData.ProgressiveFlag;
+                mySQLData.BossRoleReady = clanData.BossRoleReady;
+                mySQLData.ClanName = clanData.ClanName;
                 mySQLConnector.SaveChanges();
                 transaction.Commit();
             }

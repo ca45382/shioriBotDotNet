@@ -48,6 +48,7 @@ namespace PriconneBotConsoleApp.Script
             m_client.GuildMembersDownloaded += GuildMembersDownloaded;
             m_client.UserLeft += UserLeft;
             m_client.GuildMemberUpdated += GuildMemberUpdated;
+            m_client.ReactionAdded += ReactionAdded;
 
             m_client.Log += Log;
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
@@ -64,7 +65,7 @@ namespace PriconneBotConsoleApp.Script
         /// </summary>
         /// <param name="msgParam"></param>
         /// <returns></returns>
-        private async Task CommandRecieved(SocketMessage messageParam)
+        async private Task CommandRecieved(SocketMessage messageParam)
         {
             var message = messageParam as SocketUserMessage;
             
@@ -107,6 +108,20 @@ namespace PriconneBotConsoleApp.Script
             var playerDataLoader = new PlayerDataLoader();
             playerDataLoader.UpdatePlayerData(newUserInfo.Guild);
             return Task.CompletedTask;
+        }
+
+        async private Task ReactionAdded(
+            Cacheable<IUserMessage, ulong> cachedMessage, 
+            ISocketMessageChannel channel, SocketReaction reaction)
+        {
+            if (reaction.User.Value.IsBot)
+            {
+                return;
+            }
+            await new ReceiveReactionController(reaction)
+                .RunReactionReceive();
+
+            return;
         }
 
         private async Task test()

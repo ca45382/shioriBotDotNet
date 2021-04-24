@@ -60,7 +60,7 @@ namespace PriconneBotConsoleApp.Script
             if (messageChannelID ==
                 m_playerClanData.ChannelIDs.DeclarationChannelID)
             {
-                await new BattleDeclaration(userClanData, message).RunDeclarationCommand();
+                await new BattleDeclaration(userClanData, message).RunDeclarationCommandByMessage();
             }
 
             return;
