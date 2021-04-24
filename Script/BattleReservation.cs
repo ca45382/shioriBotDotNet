@@ -374,7 +374,7 @@ namespace PriconneBotConsoleApp.Script
             var reservationDataSet = new MySQLReservationController().LoadReservationData(clanData);
 
             reservationDataSet = reservationDataSet
-                .Where(b => (b.BattleLap >= battleLap) || (b.BattleLap == battleLap && b.BossNumber >= bossNumber))
+                .Where(b => b.BattleLap > battleLap || (b.BattleLap == battleLap && b.BossNumber >= bossNumber))
                 .ToList();
 
 
