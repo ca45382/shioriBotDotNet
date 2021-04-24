@@ -77,16 +77,23 @@ namespace PriconneBotConsoleApp.MySQL
         {
             var reservationData = new List<ReservationData>();
 
+            if (playerData == null)
+            {
+                return null;
+            }
+
             using var mySQLConnector = new MySQLConnector();
 
-            var playerID = mySQLConnector.PlayerData
+            var playerDataOnSQL = mySQLConnector.PlayerData
                 .Include(b => b.ClanData)
-                .Where(b => b.ClanData.ServerID == playerData.ClanData.ServerID)
-                .Where(b => b.ClanData.ClanRoleID == playerData.ClanData.ClanRoleID)
-                .Where(b => b.UserID == playerData.UserID)
-                .Select(b => b.PlayerID)
-                
-                .FirstOrDefault();
+                .ThenInclude(b => b.BotDatabase)
+                .Where(b => b.ClanData.ServerID == playerData.ClanData.ServerID
+                    && b.ClanData.ClanRoleID == playerData.ClanData.ClanRoleID
+                    && b.UserID == playerData.UserID);
+
+            var playerID = playerDataOnSQL
+                .FirstOrDefault()
+                ?.PlayerID;
 
             var result = mySQLConnector.ReservationData
                 .Include(b => b.PlayerData)

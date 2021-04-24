@@ -18,6 +18,8 @@ namespace PriconneBotConsoleApp.Script
         private const int MinBossNumber = 1;
         private const int MaxBossNumber = 5;
 
+        private const int LimitReservationLap = 2;
+
         private ClanData m_userClanData;
         private SocketRole m_userRole;
         private SocketUserMessage m_userMessage;
@@ -84,9 +86,27 @@ namespace PriconneBotConsoleApp.Script
                 if (result)
                 {
                     await SuccessAddEmoji();
+                    await UpdateSystemMessage();
                 }
                 return;
             }
+            else if (messageContents.StartsWith("!rm"))
+            {
+                var userReservationData = MessageToUserReservationData();
+                if (userReservationData == null)
+                {
+                    return;
+                }
+                var result = DeleteUserReservationData(userReservationData);
+
+                if (result == false)
+                {
+                    return;
+                }
+
+            }
+
+            return;
         }
 
 
@@ -173,7 +193,6 @@ namespace PriconneBotConsoleApp.Script
             var userClanData = m_userClanData;
             var userMessage = m_userMessage;
 
-
             var massageContent = ZenToHan(userMessage.Content);
             
             var splitMessageContent =
@@ -191,6 +210,13 @@ namespace PriconneBotConsoleApp.Script
             }
             if (!(int.TryParse(splitMessageContent[2], out int bossNumber)
                 && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber))
+            {
+                return null;
+            }
+
+            if (battleLap < userClanData.BattleLap || battleLap > ( userClanData.BattleLap + LimitReservationLap) 
+                || (battleLap == userClanData.BattleLap && bossNumber < userClanData.BossNumber )
+                || (battleLap == (userClanData.BattleLap + LimitReservationLap) && bossNumber > userClanData.BossNumber ))
             {
                 return null;
             }
@@ -234,6 +260,53 @@ namespace PriconneBotConsoleApp.Script
             {
                 mySQLReservationController.UpdateReservationData(reservationData);
             }
+        }
+
+
+        private ReservationData MessageToUserReservationData()
+        {
+
+            var userClanData = m_userClanData;
+            var userMessage = m_userMessage;
+
+            var splitMessageContent =
+                userMessage.Content.Split(new string[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (splitMessageContent.Length != 4)
+            {
+                return null;
+            }
+            if (!(ulong.TryParse(splitMessageContent[1], out ulong userID)))
+            {
+                return null;
+            }
+            if (!(int.TryParse(splitMessageContent[2], out int battleLap)
+                && battleLap > 0))
+            {
+                return null;
+            }
+            if (!(int.TryParse(splitMessageContent[3], out int bossNumber)
+                && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber))
+            {
+                return null;
+            }
+
+            var playerData = new MySQLPlayerDataController().LoadPlayerData(
+                m_userClanData.ServerID, userID.ToString());
+
+            if (playerData == null)
+            {
+                return null;
+            }
+
+            var allSqlReservationData =
+                new MySQLReservationController().LoadReservationData(playerData);
+
+            var reservationData = allSqlReservationData
+                .FirstOrDefault(d => d.BattleLap == battleLap && d.BossNumber == bossNumber);
+
+            return reservationData;
+
         }
 
         private bool DeleteUserReservationData(ReservationData reservationData)
@@ -304,7 +377,7 @@ namespace PriconneBotConsoleApp.Script
             var reservationDataSet = new MySQLReservationController().LoadReservationData(clanData);
 
             reservationDataSet = reservationDataSet
-                .Where(b => (b.BattleLap >= battleLap) || (b.BattleLap == battleLap && b.BossNumber >= bossNumber))
+                .Where(b => b.BattleLap > battleLap || (b.BattleLap == battleLap && b.BossNumber >= bossNumber))
                 .ToList();
 
 
@@ -334,6 +407,12 @@ namespace PriconneBotConsoleApp.Script
             return messageData;
         }
 
+        private bool SendDeleteUserReserve(ReservationData reservationData)
+        {
+            var userMessage = m_userMessage;
+
+            return true;
+        }
         async private Task FailedToRegisterMessage()
         {
             var userMessage = m_userMessage;

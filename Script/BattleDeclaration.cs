@@ -46,7 +46,7 @@ namespace PriconneBotConsoleApp.Script
             );
         }
 
-        async public Task RunDeclarationCommandByMessage()
+        public async Task RunDeclarationCommandByMessage()
         {
             var userMessage = m_userMessage;
             if (userMessage == null) return;
@@ -55,11 +55,12 @@ namespace PriconneBotConsoleApp.Script
             if (messageContents.StartsWith("!call"))
             {
                 await DeclarationCallCommand();
+                await new BattleReservation(m_userClanData, m_userMessage).UpdateSystemMessage();
             }
             return;
         }
 
-        async public Task RunDeclarationCommandByReaction()
+        public async Task RunDeclarationCommandByReaction()
         {
 
             if (m_userReaction.Emote.Name == "⚔️")
@@ -73,6 +74,7 @@ namespace PriconneBotConsoleApp.Script
             else if(m_userReaction.Emote.Name == "🏁")
             {
                 await NextBossCommand();
+                await new BattleReservation(m_userClanData, m_userReaction).UpdateSystemMessage();
                 return;
             }
             else if (m_userReaction.Emote.Name == "❌")
@@ -83,11 +85,13 @@ namespace PriconneBotConsoleApp.Script
             await UpdateDeclarationBotMessage();
 
             await RemoveUserReaction();
+
+            await new BattleReservation(m_userClanData, m_userReaction).UpdateSystemMessage();
         
             return;
         }
 
-        async private Task<bool> DeclarationCallCommand()
+        private async Task<bool> DeclarationCallCommand()
         {
             var userMessage = m_userMessage;
             var userClanData = m_userClanData;
@@ -124,17 +128,19 @@ namespace PriconneBotConsoleApp.Script
             return result;
         }
 
-        async private Task<bool> SendDeclarationBotMessage()
+        private async Task<bool> SendDeclarationBotMessage()
         {
             var userClanData = m_userClanData;
             var userRole = m_userRole;
 
             var embed = CreateDeclarationDataEmbed(userClanData);
 
+            var content = CreateDeclarationDataMessage(userClanData);
+
             var declarationChannel = userRole.Guild.GetTextChannel(
                 ulong.Parse(userClanData.ChannelIDs.DeclarationChannelID));
 
-            var sendedMessage = await declarationChannel.SendMessageAsync(embed: embed);
+            var sendedMessage = await declarationChannel.SendMessageAsync(text:content,embed: embed);
 
             if (sendedMessage == null) return false;
 
@@ -148,7 +154,7 @@ namespace PriconneBotConsoleApp.Script
             return result;
         }
 
-        async public Task<bool> UpdateDeclarationBotMessage()
+        public async Task<bool> UpdateDeclarationBotMessage()
         {
             var userClanData = m_userClanData;
             var userRole = m_userRole;
@@ -441,6 +447,13 @@ namespace PriconneBotConsoleApp.Script
                 Title = $"凸宣言({battleLap, 2}周目{bossNumber,1}ボス)"
             };
 
+            var explainMessage = "```python\n" +
+                "1. ⚔️で本戦開始の宣言をします。\n" +
+                "2. (ボスを倒さず)本戦が終わったら✅で完了します。\n" +
+                "3. ボスを倒したら🏁を押してください。\n" +
+                "4. 凸宣言をキャンセルするときは❌\n" +
+                "```\n";
+
             embedBuild.AddField(new EmbedFieldBuilder()
             {
                 IsInline = true,
@@ -462,6 +475,13 @@ namespace PriconneBotConsoleApp.Script
                 Value = finishListMessage
             });
 
+            embedBuild.AddField(new EmbedFieldBuilder()
+            {
+                IsInline = false,
+                Name = $"説明",
+                Value = explainMessage
+            });
+
             embedBuild.Color = Color.Red;
             embedBuild.Footer = new EmbedFooterBuilder()
             {
@@ -471,6 +491,27 @@ namespace PriconneBotConsoleApp.Script
             var embed = embedBuild.Build();
 
             return embed;
+        }
+
+        private string CreateDeclarationDataMessage(ClanData clanData)
+        {
+            var reservationDataList =
+                new MySQLReservationController().LoadBossLapReservationData(clanData);
+
+            var reservationIDList = reservationDataList
+               .OrderBy(d => BitConverter.ToUInt64(d.DateTime))
+               .Select(d => d.PlayerData.UserID)
+               .ToList();
+
+            var messageData = "";
+            foreach ( var reservationID in reservationIDList)
+            {
+                messageData += MentionUtils.MentionUser(ulong.Parse(reservationID));
+                messageData += " ";
+            }
+
+            return messageData;
+
         }
 
         private string NameListToMessageData(List<string> nameDataSet)

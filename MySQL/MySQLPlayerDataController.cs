@@ -36,6 +36,7 @@ namespace PriconneBotConsoleApp.MySQL
             {
                 playerData = mySQLConnector.PlayerData
                     .Include(b => b.ClanData)
+                    .ThenInclude(b => b.BotDatabase)
                     .Where(b => b.UserID == userID)
                     .Where(b => b.ClanData.ServerID == serverID)
                     .FirstOrDefault();
