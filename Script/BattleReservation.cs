@@ -20,6 +20,8 @@ namespace PriconneBotConsoleApp.Script
 
         private const int LimitReservationLap = 2;
 
+        private const int ReservableStartTimeHour = 18;
+
         private ClanData m_userClanData;
         private SocketRole m_userRole;
         private SocketUserMessage m_userMessage;
@@ -61,6 +63,14 @@ namespace PriconneBotConsoleApp.Script
                     await SendMessageToChannel(userMessage.Channel,sendMessageData);
                     return;
                 }
+
+                var currentHour = DateTime.Now.Hour;
+                if (currentHour < ReservableStartTimeHour )
+                {
+                    await OutOfReservationTime();
+                    return;
+                }
+
                 var reservationData = MessageToReservationData();
                 if (reservationData is null)
                 {
@@ -419,6 +429,16 @@ namespace PriconneBotConsoleApp.Script
             var textMessage = "予約に失敗しました。";
 
             
+            await userMessage.Channel.SendMessageAsync(textMessage);
+            return;
+        }
+
+        private async Task OutOfReservationTime()
+        {
+            var userMessage = m_userMessage;
+            var textMessage = "予約できません。予約可能時間は18:00～23:59です。";
+
+
             await userMessage.Channel.SendMessageAsync(textMessage);
             return;
         }
