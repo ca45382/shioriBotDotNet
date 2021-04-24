@@ -46,7 +46,7 @@ namespace PriconneBotConsoleApp.Script
             );
         }
 
-        async public Task RunDeclarationCommandByMessage()
+        public async Task RunDeclarationCommandByMessage()
         {
             var userMessage = m_userMessage;
             if (userMessage == null) return;
@@ -59,7 +59,7 @@ namespace PriconneBotConsoleApp.Script
             return;
         }
 
-        async public Task RunDeclarationCommandByReaction()
+        public async Task RunDeclarationCommandByReaction()
         {
 
             if (m_userReaction.Emote.Name == "⚔️")
@@ -73,6 +73,7 @@ namespace PriconneBotConsoleApp.Script
             else if(m_userReaction.Emote.Name == "🏁")
             {
                 await NextBossCommand();
+                await new BattleReservation(m_userClanData, m_userReaction).UpdateSystemMessage();
                 return;
             }
             else if (m_userReaction.Emote.Name == "❌")
@@ -83,11 +84,13 @@ namespace PriconneBotConsoleApp.Script
             await UpdateDeclarationBotMessage();
 
             await RemoveUserReaction();
+
+            await new BattleReservation(m_userClanData, m_userReaction).UpdateSystemMessage();
         
             return;
         }
 
-        async private Task<bool> DeclarationCallCommand()
+        private async Task<bool> DeclarationCallCommand()
         {
             var userMessage = m_userMessage;
             var userClanData = m_userClanData;
@@ -124,7 +127,7 @@ namespace PriconneBotConsoleApp.Script
             return result;
         }
 
-        async private Task<bool> SendDeclarationBotMessage()
+        private async Task<bool> SendDeclarationBotMessage()
         {
             var userClanData = m_userClanData;
             var userRole = m_userRole;
@@ -150,7 +153,7 @@ namespace PriconneBotConsoleApp.Script
             return result;
         }
 
-        async public Task<bool> UpdateDeclarationBotMessage()
+        public async Task<bool> UpdateDeclarationBotMessage()
         {
             var userClanData = m_userClanData;
             var userRole = m_userRole;
@@ -443,6 +446,13 @@ namespace PriconneBotConsoleApp.Script
                 Title = $"凸宣言({battleLap, 2}周目{bossNumber,1}ボス)"
             };
 
+            var explainMessage = "```python\n" +
+                "1. ⚔️で本戦開始の宣言をします。\n" +
+                "2. (ボスを倒さず)本戦が終わったら✅で完了します。\n" +
+                "3. ボスを倒したら🏁を押してください。\n" +
+                "4. 凸宣言をキャンセルするときは❌\n" +
+                "```\n";
+
             embedBuild.AddField(new EmbedFieldBuilder()
             {
                 IsInline = true,
@@ -462,6 +472,13 @@ namespace PriconneBotConsoleApp.Script
                 IsInline = false,
                 Name = $"本戦完了({finishPlayerCount}人)",
                 Value = finishListMessage
+            });
+
+            embedBuild.AddField(new EmbedFieldBuilder()
+            {
+                IsInline = false,
+                Name = $"説明",
+                Value = explainMessage
             });
 
             embedBuild.Color = Color.Red;

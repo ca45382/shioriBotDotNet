@@ -70,7 +70,7 @@ namespace PriconneBotConsoleApp.Script
             var message = messageParam as SocketUserMessage;
             
             if (message == null) { return; }
-            //Console.WriteLine("{0} {1}:{2}", message.Channel.Name, message.Author.Username, message);
+            Console.WriteLine("{0} {1}:{2}", message.Channel.Name, message.Author.Username, message);
             // コメントがユーザーかBotかの判定
             if (message.Author.IsBot) { return; }
 
