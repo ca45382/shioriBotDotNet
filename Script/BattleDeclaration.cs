@@ -55,6 +55,7 @@ namespace PriconneBotConsoleApp.Script
             if (messageContents.StartsWith("!call"))
             {
                 await DeclarationCallCommand();
+                await new BattleReservation(m_userClanData, m_userMessage).UpdateSystemMessage();
             }
             return;
         }
