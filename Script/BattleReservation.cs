@@ -18,6 +18,8 @@ namespace PriconneBotConsoleApp.Script
         private const int MinBossNumber = 1;
         private const int MaxBossNumber = 5;
 
+        private const int LimitReservationLap = 2;
+
         private ClanData m_userClanData;
         private SocketRole m_userRole;
         private SocketUserMessage m_userMessage;
@@ -212,8 +214,9 @@ namespace PriconneBotConsoleApp.Script
                 return null;
             }
 
-            if (battleLap < userClanData.BattleLap ||
-                (battleLap == userClanData.BattleLap && bossNumber < userClanData.BossNumber ))
+            if (battleLap < userClanData.BattleLap || battleLap > ( userClanData.BattleLap + LimitReservationLap) 
+                || (battleLap == userClanData.BattleLap && bossNumber < userClanData.BossNumber )
+                || (battleLap == (userClanData.BattleLap + LimitReservationLap) && bossNumber > userClanData.BossNumber ))
             {
                 return null;
             }
