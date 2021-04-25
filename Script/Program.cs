@@ -4,14 +4,8 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Reflection;
-using System.Timers;
 using System.Threading;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
 using System.Threading.Tasks;
-
-using PriconneBotConsoleApp.MySQL;
 
 namespace PriconneBotConsoleApp.Script
 {

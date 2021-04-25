@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-
 using Microsoft.EntityFrameworkCore;
-
-using MySql.Data.MySqlClient;
 using PriconneBotConsoleApp.DataTypes;
 
 namespace PriconneBotConsoleApp.MySQL

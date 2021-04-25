@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using System.ComponentModel.DataAnnotations;
-
+﻿using Microsoft.EntityFrameworkCore;
 using PriconneBotConsoleApp.DataTypes;
 using PriconneBotConsoleApp.Script;
 

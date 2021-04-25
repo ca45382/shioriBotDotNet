@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-
 using Discord;
 using Discord.WebSocket;
-using Discord.Rest;
-
 using PriconneBotConsoleApp.DataTypes;
 using PriconneBotConsoleApp.MySQL;
 using System.Threading.Tasks;
