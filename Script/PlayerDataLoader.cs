@@ -122,10 +122,8 @@ namespace PriconneBotConsoleApp.Script
 
                 if (roleCount != 1) { continue; }
 
-                string nickName;
                 var roleID = allUserRoleID.FirstOrDefault();
-
-                nickName = (user.Nickname == null) ? user.Username : user.Nickname;
+                var nickName = user.Nickname ?? user.Username;
 
                 var playerData = new PlayerData
                 {

@@ -302,7 +302,7 @@ namespace PriconneBotConsoleApp.Script
             {
                 m_userClanData.BossNumber += 1;
             }
-            var result = new MySQLClanDataController().UpdateClanData(m_userClanData);
+            new MySQLClanDataController().UpdateClanData(m_userClanData);
 
             await SendDeclarationBotMessage();
 
@@ -397,7 +397,7 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var finishNameList = declarationDataList
-                .Where(d => d.FinishFlag == true)
+                .Where(d => d.FinishFlag)
                 .OrderBy(d => BitConverter.ToUInt64(d.DateTime))
                 .Select(d => d.PlayerData.GuildUserName)
                 .ToList();
@@ -496,9 +496,7 @@ namespace PriconneBotConsoleApp.Script
 
         private string NameListToMessageData(List<string> nameDataSet)
         {
-            if (nameDataSet.Count() == 0) return "";
-
-            string messageData = "";
+            var messageData = string.Empty;
             var nameCount = 0;
 
             foreach (var nameData in nameDataSet)

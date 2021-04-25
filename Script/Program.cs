@@ -16,7 +16,7 @@ namespace PriconneBotConsoleApp.Script
         //public static CommandService commands;
         //public static IServiceProvider services;
 
-        static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
+        static void Main() => new Program().MainAsync().GetAwaiter().GetResult();
 
         /// <summary>
         /// ボットの起動処理

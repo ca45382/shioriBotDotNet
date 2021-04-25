@@ -47,10 +47,8 @@ namespace PriconneBotConsoleApp.MySQL
 
         public List<ReservationData> LoadReservationData(ClanData clanData)
         {
-            var reservationData = new List<ReservationData>();
-
             using var mySQLConnector = new MySQLConnector();
-            var result = mySQLConnector.ReservationData
+            var reservationData = mySQLConnector.ReservationData
                 .Include(b => b.PlayerData)
                 .ThenInclude(d => d.ClanData)
                 .Where(b => b.PlayerData.ClanData.ServerID == clanData.ServerID)
@@ -60,10 +58,6 @@ namespace PriconneBotConsoleApp.MySQL
                 .ThenBy(d => d.BossNumber)
                 .ThenBy(d => d.DateTime)
                 .ToList();
-
-
-            reservationData = result;
-
 
             return reservationData;
         }

@@ -49,7 +49,7 @@ namespace PriconneBotConsoleApp.MySQL
 
         public IEnumerable<DeclarationData> LoadDeclarationData(ClanData clanData)
         {
-            IEnumerable<DeclarationData> declarationDataSet = null;
+            IEnumerable<DeclarationData> declarationDataSet;
 
             using (var mySQLConnector = new MySQLConnector())
             {
@@ -249,7 +249,7 @@ namespace PriconneBotConsoleApp.MySQL
             }
 
             var clanData = playerData.ClanData;
-            ulong playerID = 0;
+            ulong playerID;
 
             using (var mySQLConnector = new MySQLConnector())
             {

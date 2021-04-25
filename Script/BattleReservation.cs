@@ -166,16 +166,10 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            SocketUserMessage serverMessage;
-            serverMessage = socketMessage as SocketUserMessage;
+            var serverMessage = socketMessage as SocketUserMessage;
 
             var messageData = CreateAllReservationDataMessage(userClanData);
             await EditMessage(serverMessage, messageData);
-        }
-
-        public void RegisterReservation()
-        {
-
         }
 
         /// <summary>
@@ -183,7 +177,6 @@ namespace PriconneBotConsoleApp.Script
         /// 例 : 「予約 35 1 1200万程度」
         /// 「予約 周回 ボス メモ(任意)」
         /// </summary>
-        /// <param name="message"></param>
         /// <returns></returns>
         private ReservationData MessageToReservationData()
         {
@@ -261,8 +254,6 @@ namespace PriconneBotConsoleApp.Script
 
         private ReservationData MessageToUserReservationData()
         {
-
-            var userClanData = m_userClanData;
             var userMessage = m_userMessage;
 
             var splitMessageContent =
