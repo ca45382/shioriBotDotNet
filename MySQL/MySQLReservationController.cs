@@ -161,8 +161,6 @@ namespace PriconneBotConsoleApp.MySQL
 
             mySQLConnector.SaveChanges();
             transaction.Commit();
-
-            return;
         }
 
         public void UpdateReservationData(ReservationData reservationData)
@@ -196,8 +194,6 @@ namespace PriconneBotConsoleApp.MySQL
                 transaction.Commit();
 
             }
-
-            return;
         }
 
         public void DeleteReservationData(ReservationData reservationData)

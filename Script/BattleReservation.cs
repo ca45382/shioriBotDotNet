@@ -76,8 +76,6 @@ namespace PriconneBotConsoleApp.Script
 
                 await SuccessAddEmoji();
                 await UpdateSystemMessage();
-                
-                return;
             }
             else if (messageContents.StartsWith("削除"))
             {
@@ -93,7 +91,6 @@ namespace PriconneBotConsoleApp.Script
                     await SuccessAddEmoji();
                     await UpdateSystemMessage();
                 }
-                return;
             }
             else if (messageContents.StartsWith("!rm"))
             {
@@ -110,8 +107,6 @@ namespace PriconneBotConsoleApp.Script
                 }
 
             }
-
-            return;
         }
 
 
@@ -124,7 +119,6 @@ namespace PriconneBotConsoleApp.Script
             {
                 await SendSystemMessage();
             }
-            return;
         }
 
         async public Task SendSystemMessage()
@@ -139,8 +133,6 @@ namespace PriconneBotConsoleApp.Script
             var sendedMessageData = await SendMessageToChannel(resultChannel, messageData);
             new MySQLReservationController().UpdateReservationMessageID(
                 userClanData, sendedMessageData.Id.ToString());
-
-            return;
         }
 
         async public Task UpdateSystemMessage()
@@ -424,7 +416,6 @@ namespace PriconneBotConsoleApp.Script
 
             
             await userMessage.Channel.SendMessageAsync(textMessage);
-            return;
         }
 
         private async Task OutOfReservationTime()
@@ -434,7 +425,6 @@ namespace PriconneBotConsoleApp.Script
 
 
             await userMessage.Channel.SendMessageAsync(textMessage);
-            return;
         }
 
         async private Task SuccessAddEmoji()
@@ -443,7 +433,6 @@ namespace PriconneBotConsoleApp.Script
 
             var successEmoji = new Emoji("🆗");
             await message.AddReactionAsync(successEmoji);
-            return;
         }
 
     }

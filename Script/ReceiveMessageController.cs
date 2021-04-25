@@ -34,9 +34,6 @@ namespace PriconneBotConsoleApp.Script
             {
                 await RunMessageReceive(m_message);
             }
-
-            return;
-
         }
 
         async public Task RunMessageReceive(SocketUserMessage message)
@@ -58,8 +55,6 @@ namespace PriconneBotConsoleApp.Script
             {
                 await new BattleDeclaration(userClanData, message).RunDeclarationCommandByMessage();
             }
-
-            return;
         }
 
     }

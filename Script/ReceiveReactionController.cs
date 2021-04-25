@@ -32,8 +32,6 @@ namespace PriconneBotConsoleApp.Script
             {
                 await RunReactionReceive(m_reaction); 
             }
-
-            return;
         }
 
         async public Task RunReactionReceive(SocketReaction reaction)

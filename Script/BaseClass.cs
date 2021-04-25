@@ -16,7 +16,6 @@ namespace PriconneBotConsoleApp.Script
         async protected Task EditMessage(SocketUserMessage message, string messageData)
         {
             await message.ModifyAsync(msg => msg.Content = messageData);
-            return;
         }
 
         protected string ZenToHan(string textData)

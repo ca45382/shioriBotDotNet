@@ -72,7 +72,6 @@ namespace PriconneBotConsoleApp.Script
             await receiveMessages.RunMessageReceive();
 
             //await message.Channel.SendMessageAsync(message.Content.ToString());
-            return;
         }
 
         /// <summary>
@@ -114,8 +113,6 @@ namespace PriconneBotConsoleApp.Script
             }
             await new ReceiveReactionController(reaction)
                 .RunReactionReceive();
-
-            return;
         }
 
         private async Task test()

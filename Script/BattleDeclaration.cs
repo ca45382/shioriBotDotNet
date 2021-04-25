@@ -53,7 +53,6 @@ namespace PriconneBotConsoleApp.Script
                 await DeclarationCallCommand();
                 await new BattleReservation(m_userClanData, m_userMessage).UpdateSystemMessage();
             }
-            return;
         }
 
         public async Task RunDeclarationCommandByReaction()
@@ -83,8 +82,6 @@ namespace PriconneBotConsoleApp.Script
             await RemoveUserReaction();
 
             await new BattleReservation(m_userClanData, m_userReaction).UpdateSystemMessage();
-        
-            return;
         }
 
         private async Task<bool> DeclarationCallCommand()
@@ -358,8 +355,6 @@ namespace PriconneBotConsoleApp.Script
             {
                 await message.AddReactionsAsync(emojiMatrix);
             }
-            return;
-
         }
 
         async private Task RemoveUserReaction()
@@ -374,8 +369,6 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
             await message.RemoveReactionAsync(m_userReaction.Emote, m_userReaction.User.Value);
-
-            return;
         }
 
         private Embed CreateDeclarationDataEmbed(ClanData clanData)

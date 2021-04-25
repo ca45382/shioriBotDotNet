@@ -22,8 +22,6 @@ namespace PriconneBotConsoleApp.Script
             {
                 Console.WriteLine(e.Message);
             }
-
-            return;
         }
 
 
@@ -96,7 +94,6 @@ namespace PriconneBotConsoleApp.Script
             playerDataControl.CreatePlayerData(createUserData);
             playerDataControl.UpdatePlayerData(updateUserData);
             playerDataControl.DeletePlayerData(deleteUserData);
-            return;
         }
 
         /// <summary>

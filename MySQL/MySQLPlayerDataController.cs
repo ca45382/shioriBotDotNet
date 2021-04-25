@@ -70,8 +70,6 @@ namespace PriconneBotConsoleApp.MySQL
                 mySQLConnector.SaveChanges();
                 transaction.Commit();
             }
-
-            return;
         }
 
         public void UpdatePlayerData(IEnumerable<PlayerData> playersData)
