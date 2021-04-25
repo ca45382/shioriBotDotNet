@@ -81,6 +81,12 @@ namespace PriconneBotConsoleApp.Script
 
                 await SuccessAddEmoji();
                 await UpdateSystemMessage();
+
+                if (m_userClanData.BossNumber == reservationData.BossNumber 
+                    && m_userClanData.BattleLap == reservationData.BattleLap)
+                {
+                    await new BattleDeclaration(m_userClanData,m_userMessage).UpdateDeclarationBotMessage();
+                }
                 
                 return;
             }
@@ -97,6 +103,8 @@ namespace PriconneBotConsoleApp.Script
                 {
                     await SuccessAddEmoji();
                     await UpdateSystemMessage();
+
+
                 }
                 return;
             }
