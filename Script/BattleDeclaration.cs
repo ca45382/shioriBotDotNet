@@ -140,16 +140,16 @@ namespace PriconneBotConsoleApp.Script
             var declarationChannel = userRole.Guild.GetTextChannel(
                 ulong.Parse(userClanData.ChannelIDs.DeclarationChannelID));
 
-            var sendedMessage = await declarationChannel.SendMessageAsync(text:content,embed: embed);
+            var sentMessage = await declarationChannel.SendMessageAsync(text:content,embed: embed);
 
-            if (sendedMessage == null) return false;
+            if (sentMessage == null) return false;
 
             var result = new MySQLDeclarationController().UpdateDeclarationMessageID(
-                userClanData, sendedMessage.Id.ToString());
+                userClanData, sentMessage.Id.ToString());
 
-            await AttacheDefaultReaction(sendedMessage);
+            await AttacheDefaultReaction(sentMessage);
 
-            m_userClanData.MessageIDs.DeclarationMessageID = sendedMessage.Id.ToString();
+            m_userClanData.MessageIDs.DeclarationMessageID = sentMessage.Id.ToString();
 
             return result;
         }
