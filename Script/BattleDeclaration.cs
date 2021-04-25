@@ -26,7 +26,7 @@ namespace PriconneBotConsoleApp.Script
             m_userMessage = message;
 
             var socketGuildChannel = message.Channel as SocketGuildChannel;
-            m_userRole = socketGuildChannel.Guild.GetRole(
+            m_userRole = socketGuildChannel?.Guild.GetRole(
                 ulong.Parse(m_userClanData.ClanRoleID)
             );
         }
@@ -37,7 +37,7 @@ namespace PriconneBotConsoleApp.Script
             m_userReaction = reaction;
 
             var socketGuildChannel = m_userReaction.Channel as SocketGuildChannel;
-            m_userRole = socketGuildChannel.Guild.GetRole(
+            m_userRole = socketGuildChannel?.Guild.GetRole(
                 ulong.Parse(m_userClanData.ClanRoleID)
             );
         }

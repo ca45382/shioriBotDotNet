@@ -29,7 +29,7 @@ namespace PriconneBotConsoleApp.Script
 
             var socketGuildChannel = message.Channel as SocketGuildChannel;
 
-            m_userRole = socketGuildChannel.Guild.GetRole(ulong.Parse(m_userClanData.ClanRoleID));
+            m_userRole = socketGuildChannel?.Guild.GetRole(ulong.Parse(m_userClanData.ClanRoleID));
         }
 
         public BattleReservation(ClanData userClanData, SocketReaction reaction)
@@ -38,7 +38,7 @@ namespace PriconneBotConsoleApp.Script
             m_userReaction = reaction;
             var socketGuildChannel = m_userReaction.Channel as SocketGuildChannel;
 
-            m_userRole = socketGuildChannel.Guild.GetRole(ulong.Parse(m_userClanData.ClanRoleID));
+            m_userRole = socketGuildChannel?.Guild.GetRole(ulong.Parse(m_userClanData.ClanRoleID));
         }
 
         async public Task RunReservationCommand()

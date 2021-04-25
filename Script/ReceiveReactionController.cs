@@ -18,10 +18,10 @@ namespace PriconneBotConsoleApp.Script
             var reactionChannel = reaction.Channel as SocketGuildChannel;
 
             m_playerData = new MySQLPlayerDataController()
-                .LoadPlayerData(reactionChannel.Guild.Id.ToString(),
+                .LoadPlayerData(reactionChannel?.Guild.Id.ToString(),
                     reaction.UserId.ToString());
 
-            var userRole = reactionChannel.Guild
+            var userRole = reactionChannel?.Guild
                 .GetRole(ulong.Parse(m_playerData.ClanData.ClanRoleID));
             m_playerClanData = new MySQLClanDataController().LoadClanData(userRole);
         }

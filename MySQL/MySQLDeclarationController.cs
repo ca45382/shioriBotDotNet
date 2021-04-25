@@ -169,7 +169,10 @@ namespace PriconneBotConsoleApp.MySQL
                     .Where(b => b.DeleteFlag == false)
                     .FirstOrDefault();
 
-                updateData.FinishFlag = declarationData.FinishFlag;
+                if (updateData != null)
+                {
+                    updateData.FinishFlag = declarationData.FinishFlag;
+                }
                 mySQLConnector.SaveChanges();
                 transaction.Commit();
 
