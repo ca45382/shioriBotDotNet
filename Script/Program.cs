@@ -57,7 +57,7 @@ namespace PriconneBotConsoleApp.Script
         /// <summary>
         /// メッセージの受信処理
         /// </summary>
-        /// <param name="msgParam"></param>
+        /// <param name="messageParam"></param>
         /// <returns></returns>
         async private Task CommandRecieved(SocketMessage messageParam)
         {
