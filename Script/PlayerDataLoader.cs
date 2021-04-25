@@ -75,16 +75,16 @@ namespace PriconneBotConsoleApp.Script
             //SQLから削除するデータの抽出
             foreach (PlayerData mySQLUser in usersOnSQLServer)
             {
-                var existFlag = 0;
+                var existFlag = false;
                 foreach (PlayerData discordUser in usersOnDiscord)
                 {
                     if (mySQLUser.UserID == discordUser.UserID &&
                         mySQLUser.ClanData.ClanRoleID == discordUser.ClanData.ClanRoleID)
                     {
-                        existFlag = 1;
+                        existFlag = true;
                     }
                 }
-                if (existFlag == 0)
+                if (!existFlag)
                 {
                     deleteUserData.Add(mySQLUser);
                 }
