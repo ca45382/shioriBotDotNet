@@ -59,7 +59,7 @@ namespace PriconneBotConsoleApp.Script
         /// </summary>
         /// <param name="messageParam"></param>
         /// <returns></returns>
-        async private Task CommandRecieved(SocketMessage messageParam)
+        private async Task CommandRecieved(SocketMessage messageParam)
         {
             var message = messageParam as SocketUserMessage;
             
@@ -103,7 +103,7 @@ namespace PriconneBotConsoleApp.Script
             return Task.CompletedTask;
         }
 
-        async private Task ReactionAdded(
+        private async Task ReactionAdded(
             Cacheable<IUserMessage, ulong> cachedMessage, 
             ISocketMessageChannel channel, SocketReaction reaction)
         {

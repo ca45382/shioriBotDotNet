@@ -41,7 +41,7 @@ namespace PriconneBotConsoleApp.Script
             m_userRole = socketGuildChannel?.Guild.GetRole(ulong.Parse(m_userClanData.ClanRoleID));
         }
 
-        async public Task RunReservationCommand()
+        public async Task RunReservationCommand()
         {
             var userMessage = m_userMessage;
 
@@ -110,7 +110,7 @@ namespace PriconneBotConsoleApp.Script
         }
 
 
-        async public Task RunReservationResultCommand()
+        public async Task RunReservationResultCommand()
         {
             var userMessage = m_userMessage;
 
@@ -121,7 +121,7 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
-        async public Task SendSystemMessage()
+        public async Task SendSystemMessage()
         {
             var userClanData = m_userClanData;
             var userRole = m_userRole;
@@ -135,7 +135,7 @@ namespace PriconneBotConsoleApp.Script
                 userClanData, sendedMessageData.Id.ToString());
         }
 
-        async public Task UpdateSystemMessage()
+        public async Task UpdateSystemMessage()
         {
             var userClanData = m_userClanData;
             var userRole = m_userRole;
@@ -400,7 +400,7 @@ namespace PriconneBotConsoleApp.Script
 
             return true;
         }
-        async private Task FailedToRegisterMessage()
+        private async Task FailedToRegisterMessage()
         {
             var userMessage = m_userMessage;
             var textMessage = "予約に失敗しました。";
@@ -418,7 +418,7 @@ namespace PriconneBotConsoleApp.Script
             await userMessage.Channel.SendMessageAsync(textMessage);
         }
 
-        async private Task SuccessAddEmoji()
+        private async Task SuccessAddEmoji()
         {
             var message = m_userMessage;
 

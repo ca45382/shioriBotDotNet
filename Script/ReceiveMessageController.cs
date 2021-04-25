@@ -28,7 +28,7 @@ namespace PriconneBotConsoleApp.Script
             m_playerClanData = new MySQLClanDataController().LoadClanData(userRole);
         }
 
-        async public Task RunMessageReceive()
+        public async Task RunMessageReceive()
         {
             if (m_message != null)
             {
@@ -36,7 +36,7 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
-        async public Task RunMessageReceive(SocketUserMessage message)
+        public async Task RunMessageReceive(SocketUserMessage message)
         {
             var userClanData = m_playerClanData;
             var messageChannelID = message.Channel.Id.ToString();

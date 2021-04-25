@@ -26,7 +26,7 @@ namespace PriconneBotConsoleApp.Script
             m_playerClanData = new MySQLClanDataController().LoadClanData(userRole);
         }
 
-        async public Task RunReactionReceive()
+        public async Task RunReactionReceive()
         {
             if (m_reaction != null)
             {
@@ -34,7 +34,7 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
-        async public Task RunReactionReceive(SocketReaction reaction)
+        public async Task RunReactionReceive(SocketReaction reaction)
         {
             var userClanData = m_playerClanData;
             var reactionChannelID = reaction.Channel.Id.ToString();

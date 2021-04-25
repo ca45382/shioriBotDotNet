@@ -293,7 +293,7 @@ namespace PriconneBotConsoleApp.Script
         /// 次のボスに行く際のコード
         /// </summary>
         /// <returns></returns>
-        async private Task<bool> NextBossCommand()
+        private async Task<bool> NextBossCommand()
         {
             UserFinishBattleCommand();
 
@@ -351,7 +351,7 @@ namespace PriconneBotConsoleApp.Script
             return declarationData;
         }
 
-        async private Task AttacheDefaultReaction(IUserMessage message)
+        private async Task AttacheDefaultReaction(IUserMessage message)
         {
 
             string[] emojiData = { "⚔️", "✅", "🏁", "❌" };
@@ -363,7 +363,7 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
-        async private Task RemoveUserReaction()
+        private async Task RemoveUserReaction()
         {
             var textChannnel = m_userRole.Guild.GetTextChannel(
                 ulong.Parse(m_userClanData.ChannelIDs.DeclarationChannelID));
