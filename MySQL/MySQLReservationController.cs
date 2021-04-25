@@ -173,7 +173,10 @@ namespace PriconneBotConsoleApp.MySQL
                     .Select(d => d.PlayerID)
                     .FirstOrDefault();
 
-                if (playerID == 0) return;
+                if (playerID == 0)
+                {
+                    return;
+                }
 
                 var updateData = mySQLConnector.ReservationData
                     .Include(d => d.PlayerData)
@@ -213,7 +216,10 @@ namespace PriconneBotConsoleApp.MySQL
                         .Where(b => b.DeleteFlag == false)
                         .FirstOrDefault();
 
-                    if (updateData == null) continue;
+                    if (updateData == null)
+                    {
+                        continue;
+                    }
                     updateData.DeleteFlag = true;
                 }
 

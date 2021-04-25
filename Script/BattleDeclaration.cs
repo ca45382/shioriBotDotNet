@@ -94,7 +94,10 @@ namespace PriconneBotConsoleApp.Script
             var splitMessageContent = massageContent.Split(
                     new string[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
-            if (splitMessageContent.Length != 3) return false;
+            if (splitMessageContent.Length != 3)
+            {
+                return false;
+            }
 
             if (!(int.TryParse(splitMessageContent[1], out int battleLap)
                 && battleLap > 0))
@@ -112,7 +115,10 @@ namespace PriconneBotConsoleApp.Script
 
             var result = new MySQLClanDataController().UpdateClanData(userClanData);
 
-            if (result == false) return false;
+            if (result == false)
+            {
+                return false;
+            }
 
             m_userClanData = userClanData;
 
