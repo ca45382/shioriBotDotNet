@@ -217,7 +217,10 @@ namespace PriconneBotConsoleApp.MySQL
                         .Where(d => d.FinishFlag == declarationData.FinishFlag)
                         .ToList();
 
-                    if (userDeleteDataSet.Count() == 0) continue;
+                    if (!userDeleteDataSet.Any())
+                    {
+                        continue;
+                    }
                     foreach (var updateData in userDeleteDataSet)
                     {
                         updateData.DeleteFlag = true;

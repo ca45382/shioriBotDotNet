@@ -258,11 +258,10 @@ namespace PriconneBotConsoleApp.Script
             var allSqlReservationData =
                 mySQLReservationController.LoadReservationData(reservationData.PlayerData);
 
-            var sqlReservationData = allSqlReservationData
-                .Where(x => x.BossNumber == reservationData.BossNumber)
-                .Where(y => y.BattleLap == reservationData.BattleLap);
+            var isExistReservationData = allSqlReservationData
+                .Any(x => x.BossNumber == reservationData.BossNumber && x.BattleLap == reservationData.BattleLap);
 
-            if (sqlReservationData.Count() == 0)
+            if (!isExistReservationData)
             {
                 mySQLReservationController.CreateReservationData(reservationData);
             }
@@ -326,9 +325,9 @@ namespace PriconneBotConsoleApp.Script
                 mySQLReservationController.LoadReservationData(reservationData.PlayerData);
 
             var sqlReservationData = allSqlReservationData
-                .Where(x => x.BossNumber == reservationData.BossNumber)
-                .Where(y => y.BattleLap == reservationData.BattleLap);
-            if (sqlReservationData.Count() == 0)
+                .Where(x => x.BossNumber == reservationData.BossNumber && x.BattleLap == reservationData.BattleLap);
+
+            if (!sqlReservationData.Any())
             {
                 return false;
             }
@@ -356,7 +355,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var reservationDataSet = new MySQLReservationController().LoadReservationData(playerData);
 
-            if (reservationDataSet.Count() == 0)
+            if (!reservationDataSet.Any())
             {
                 return "予約がありません";
             }
@@ -391,7 +390,7 @@ namespace PriconneBotConsoleApp.Script
                 .ToList();
 
 
-            if (reservationDataSet.Count() == 0)
+            if (!reservationDataSet.Any())
             {
                 return "予約がありません";
             }

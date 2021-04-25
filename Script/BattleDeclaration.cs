@@ -195,17 +195,16 @@ namespace PriconneBotConsoleApp.Script
         private bool UserRegistorDeclareCommand()
         {
             var userReaction = m_userReaction;
+            var userId = userReaction.UserId.ToString();
 
-            var sqlData = DeclareDataOnSQL(userReaction.UserId.ToString())
-                .Where(d => d.FinishFlag == false)
-                .Count();
+            var isExistSqlData = DeclareDataOnSQL(userId) .Any(d => d.FinishFlag == false);
 
-            if (sqlData != 0)
+            if (isExistSqlData)
             {
                 return false;
             }
 
-            var declarationData = UserToDeclareData(userReaction.UserId.ToString());
+            var declarationData = UserToDeclareData(userId);
             var result = new MySQLDeclarationController()
                 .CreateDeclarationData(declarationData);
 
@@ -224,8 +223,7 @@ namespace PriconneBotConsoleApp.Script
 
             // すでに宣言しているか判定
             var sqlData = DeclareDataOnSQL(userReaction.UserId.ToString())
-                .Where(d => d.FinishFlag == false)
-                .Count();
+                .Count(d => d.FinishFlag == false);
 
             if (sqlData != 1)
             {
@@ -245,9 +243,7 @@ namespace PriconneBotConsoleApp.Script
             var mySQLReservationController = new MySQLReservationController();
             var reservationData = mySQLReservationController.LoadReservationData(playerData);
             var finishReservationData = reservationData
-                .Where(d => d.BattleLap == userClanData.BattleLap)
-                .Where(d => d.BossNumber == userClanData.BossNumber)
-                .FirstOrDefault();
+                .FirstOrDefault(d => d.BattleLap == userClanData.BattleLap && d.BossNumber == userClanData.BossNumber);
 
             if (finishReservationData != null)
             {
@@ -268,9 +264,7 @@ namespace PriconneBotConsoleApp.Script
 
             var sqlDataSet = DeclareDataOnSQL(userReaction.UserId.ToString());
 
-            var sqlData = sqlDataSet
-               .Where(d => d.FinishFlag == false)
-               .FirstOrDefault();
+            var sqlData = sqlDataSet.FirstOrDefault(d => d.FinishFlag == false);
 
             if (sqlData != null)
             {
@@ -362,10 +356,7 @@ namespace PriconneBotConsoleApp.Script
         {
 
             string[] emojiData = { "⚔️", "✅", "🏁", "❌" };
-            var emojiMatrix = Enumerable
-                .Range(0, 4)
-                .Select((x) => new Emoji(emojiData[x]))
-                .ToArray();
+            var emojiMatrix = emojiData.Select(x => new Emoji(x)).ToArray();
 
             //foreach (var emoji in emojiMatrix)
             {
