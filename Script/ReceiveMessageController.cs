@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Discord.WebSocket;
 using PriconneBotConsoleApp.DataTypes;
 using PriconneBotConsoleApp.MySQL;
@@ -32,18 +28,15 @@ namespace PriconneBotConsoleApp.Script
             m_playerClanData = new MySQLClanDataController().LoadClanData(userRole);
         }
 
-        async public Task RunMessageReceive()
+        public async Task RunMessageReceive()
         {
             if (m_message != null)
             {
                 await RunMessageReceive(m_message);
             }
-
-            return;
-
         }
 
-        async public Task RunMessageReceive(SocketUserMessage message)
+        public async Task RunMessageReceive(SocketUserMessage message)
         {
             var userClanData = m_playerClanData;
             var messageChannelID = message.Channel.Id.ToString();
@@ -62,8 +55,6 @@ namespace PriconneBotConsoleApp.Script
             {
                 await new BattleDeclaration(userClanData, message).RunDeclarationCommandByMessage();
             }
-
-            return;
         }
 
     }

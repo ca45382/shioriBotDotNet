@@ -4,14 +4,8 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Reflection;
-using System.Timers;
 using System.Threading;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
 using System.Threading.Tasks;
-
-using PriconneBotConsoleApp.MySQL;
 
 namespace PriconneBotConsoleApp.Script
 {
@@ -22,7 +16,7 @@ namespace PriconneBotConsoleApp.Script
         //public static CommandService commands;
         //public static IServiceProvider services;
 
-        static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
+        static void Main() => new Program().MainAsync().GetAwaiter().GetResult();
 
         /// <summary>
         /// ボットの起動処理
@@ -63,9 +57,9 @@ namespace PriconneBotConsoleApp.Script
         /// <summary>
         /// メッセージの受信処理
         /// </summary>
-        /// <param name="msgParam"></param>
+        /// <param name="messageParam"></param>
         /// <returns></returns>
-        async private Task CommandRecieved(SocketMessage messageParam)
+        private async Task CommandRecieved(SocketMessage messageParam)
         {
             var message = messageParam as SocketUserMessage;
             
@@ -78,7 +72,6 @@ namespace PriconneBotConsoleApp.Script
             await receiveMessages.RunMessageReceive();
 
             //await message.Channel.SendMessageAsync(message.Content.ToString());
-            return;
         }
 
         /// <summary>
@@ -110,7 +103,7 @@ namespace PriconneBotConsoleApp.Script
             return Task.CompletedTask;
         }
 
-        async private Task ReactionAdded(
+        private async Task ReactionAdded(
             Cacheable<IUserMessage, ulong> cachedMessage, 
             ISocketMessageChannel channel, SocketReaction reaction)
         {
@@ -120,8 +113,6 @@ namespace PriconneBotConsoleApp.Script
             }
             await new ReceiveReactionController(reaction)
                 .RunReactionReceive();
-
-            return;
         }
 
         private async Task test()

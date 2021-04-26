@@ -1,11 +1,6 @@
 ﻿using Discord.WebSocket;
-using Discord.Rest;
 using Discord;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
-
 using PriconneBotConsoleApp.DataTypes;
 using PriconneBotConsoleApp.MySQL;
 using System.Threading.Tasks;
@@ -34,7 +29,7 @@ namespace PriconneBotConsoleApp.Script
 
             var socketGuildChannel = message.Channel as SocketGuildChannel;
 
-            m_userRole = socketGuildChannel.Guild.GetRole(ulong.Parse(m_userClanData.ClanRoleID));
+            m_userRole = socketGuildChannel?.Guild.GetRole(ulong.Parse(m_userClanData.ClanRoleID));
         }
 
         public BattleReservation(ClanData userClanData, SocketReaction reaction)
@@ -43,10 +38,10 @@ namespace PriconneBotConsoleApp.Script
             m_userReaction = reaction;
             var socketGuildChannel = m_userReaction.Channel as SocketGuildChannel;
 
-            m_userRole = socketGuildChannel.Guild.GetRole(ulong.Parse(m_userClanData.ClanRoleID));
+            m_userRole = socketGuildChannel?.Guild.GetRole(ulong.Parse(m_userClanData.ClanRoleID));
         }
 
-        async public Task RunReservationCommand()
+        public async Task RunReservationCommand()
         {
             var userMessage = m_userMessage;
 
@@ -81,8 +76,12 @@ namespace PriconneBotConsoleApp.Script
 
                 await SuccessAddEmoji();
                 await UpdateSystemMessage();
-                
-                return;
+
+                if (m_userClanData.BossNumber == reservationData.BossNumber 
+                    && m_userClanData.BattleLap == reservationData.BattleLap)
+                {
+                    await new BattleDeclaration(m_userClanData,m_userMessage).UpdateDeclarationBotMessage();
+                }
             }
             else if (messageContents.StartsWith("削除"))
             {
@@ -97,8 +96,9 @@ namespace PriconneBotConsoleApp.Script
                 {
                     await SuccessAddEmoji();
                     await UpdateSystemMessage();
+
+
                 }
-                return;
             }
             else if (messageContents.StartsWith("!rm"))
             {
@@ -115,12 +115,10 @@ namespace PriconneBotConsoleApp.Script
                 }
 
             }
-
-            return;
         }
 
 
-        async public Task RunReservationResultCommand()
+        public async Task RunReservationResultCommand()
         {
             var userMessage = m_userMessage;
 
@@ -129,10 +127,9 @@ namespace PriconneBotConsoleApp.Script
             {
                 await SendSystemMessage();
             }
-            return;
         }
 
-        async public Task SendSystemMessage()
+        public async Task SendSystemMessage()
         {
             var userClanData = m_userClanData;
             var userRole = m_userRole;
@@ -144,11 +141,9 @@ namespace PriconneBotConsoleApp.Script
             var sendedMessageData = await SendMessageToChannel(resultChannel, messageData);
             new MySQLReservationController().UpdateReservationMessageID(
                 userClanData, sendedMessageData.Id.ToString());
-
-            return;
         }
 
-        async public Task UpdateSystemMessage()
+        public async Task UpdateSystemMessage()
         {
             var userClanData = m_userClanData;
             var userRole = m_userRole;
@@ -179,16 +174,10 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            SocketUserMessage serverMessage;
-            serverMessage = socketMessage as SocketUserMessage;
+            var serverMessage = socketMessage as SocketUserMessage;
 
             var messageData = CreateAllReservationDataMessage(userClanData);
             await EditMessage(serverMessage, messageData);
-        }
-
-        public void RegisterReservation()
-        {
-
         }
 
         /// <summary>
@@ -196,7 +185,6 @@ namespace PriconneBotConsoleApp.Script
         /// 例 : 「予約 35 1 1200万程度」
         /// 「予約 周回 ボス メモ(任意)」
         /// </summary>
-        /// <param name="message"></param>
         /// <returns></returns>
         private ReservationData MessageToReservationData()
         {
@@ -208,7 +196,7 @@ namespace PriconneBotConsoleApp.Script
             var splitMessageContent =
                 massageContent.Split(new string[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
-            if ((splitMessageContent.Length >= 3 && splitMessageContent.Length <= 4) == false )
+            if (splitMessageContent.Length < 3)
             { 
                 return null;
             }
@@ -232,13 +220,8 @@ namespace PriconneBotConsoleApp.Script
             }
             
             var userID = userMessage.Author.Id.ToString();
-            string commentData = null;
-
-            if (splitMessageContent.Length == 4)
-            {
-                commentData = splitMessageContent[3];
-            }
-
+            var comments = splitMessageContent.Skip(3);
+            var commentData = string.Join(" ", comments);
 
             return new ReservationData() {
                 PlayerData = new PlayerData()
@@ -258,11 +241,10 @@ namespace PriconneBotConsoleApp.Script
             var allSqlReservationData =
                 mySQLReservationController.LoadReservationData(reservationData.PlayerData);
 
-            var sqlReservationData = allSqlReservationData
-                .Where(x => x.BossNumber == reservationData.BossNumber)
-                .Where(y => y.BattleLap == reservationData.BattleLap);
+            var isExistReservationData = allSqlReservationData
+                .Any(x => x.BossNumber == reservationData.BossNumber && x.BattleLap == reservationData.BattleLap);
 
-            if (sqlReservationData.Count() == 0)
+            if (!isExistReservationData)
             {
                 mySQLReservationController.CreateReservationData(reservationData);
             }
@@ -275,8 +257,6 @@ namespace PriconneBotConsoleApp.Script
 
         private ReservationData MessageToUserReservationData()
         {
-
-            var userClanData = m_userClanData;
             var userMessage = m_userMessage;
 
             var splitMessageContent =
@@ -326,9 +306,9 @@ namespace PriconneBotConsoleApp.Script
                 mySQLReservationController.LoadReservationData(reservationData.PlayerData);
 
             var sqlReservationData = allSqlReservationData
-                .Where(x => x.BossNumber == reservationData.BossNumber)
-                .Where(y => y.BattleLap == reservationData.BattleLap);
-            if (sqlReservationData.Count() == 0)
+                .Where(x => x.BossNumber == reservationData.BossNumber && x.BattleLap == reservationData.BattleLap);
+
+            if (!sqlReservationData.Any())
             {
                 return false;
             }
@@ -356,7 +336,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var reservationDataSet = new MySQLReservationController().LoadReservationData(playerData);
 
-            if (reservationDataSet.Count() == 0)
+            if (!reservationDataSet.Any())
             {
                 return "予約がありません";
             }
@@ -391,7 +371,7 @@ namespace PriconneBotConsoleApp.Script
                 .ToList();
 
 
-            if (reservationDataSet.Count() == 0)
+            if (!reservationDataSet.Any())
             {
                 return "予約がありません";
             }
@@ -423,14 +403,13 @@ namespace PriconneBotConsoleApp.Script
 
             return true;
         }
-        async private Task FailedToRegisterMessage()
+        private async Task FailedToRegisterMessage()
         {
             var userMessage = m_userMessage;
             var textMessage = "予約に失敗しました。";
 
             
             await userMessage.Channel.SendMessageAsync(textMessage);
-            return;
         }
 
         private async Task OutOfReservationTime()
@@ -440,16 +419,14 @@ namespace PriconneBotConsoleApp.Script
 
 
             await userMessage.Channel.SendMessageAsync(textMessage);
-            return;
         }
 
-        async private Task SuccessAddEmoji()
+        private async Task SuccessAddEmoji()
         {
             var message = m_userMessage;
 
             var successEmoji = new Emoji("🆗");
             await message.AddReactionAsync(successEmoji);
-            return;
         }
 
     }
