@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-
 using Microsoft.EntityFrameworkCore;
-
-using MySql.Data.MySqlClient;
 using PriconneBotConsoleApp.DataTypes;
 
 namespace PriconneBotConsoleApp.MySQL
@@ -52,10 +47,8 @@ namespace PriconneBotConsoleApp.MySQL
 
         public List<ReservationData> LoadReservationData(ClanData clanData)
         {
-            var reservationData = new List<ReservationData>();
-
             using var mySQLConnector = new MySQLConnector();
-            var result = mySQLConnector.ReservationData
+            var reservationData = mySQLConnector.ReservationData
                 .Include(b => b.PlayerData)
                 .ThenInclude(d => d.ClanData)
                 .Where(b => b.PlayerData.ClanData.ServerID == clanData.ServerID)
@@ -65,10 +58,6 @@ namespace PriconneBotConsoleApp.MySQL
                 .ThenBy(d => d.BossNumber)
                 .ThenBy(d => d.DateTime)
                 .ToList();
-
-
-            reservationData = result;
-
 
             return reservationData;
         }
@@ -166,8 +155,6 @@ namespace PriconneBotConsoleApp.MySQL
 
             mySQLConnector.SaveChanges();
             transaction.Commit();
-
-            return;
         }
 
         public void UpdateReservationData(ReservationData reservationData)
@@ -186,7 +173,10 @@ namespace PriconneBotConsoleApp.MySQL
                     .Select(d => d.PlayerID)
                     .FirstOrDefault();
 
-                if (playerID == 0) return;
+                if (playerID == 0)
+                {
+                    return;
+                }
 
                 var updateData = mySQLConnector.ReservationData
                     .Include(d => d.PlayerData)
@@ -201,8 +191,6 @@ namespace PriconneBotConsoleApp.MySQL
                 transaction.Commit();
 
             }
-
-            return;
         }
 
         public void DeleteReservationData(ReservationData reservationData)
@@ -228,7 +216,10 @@ namespace PriconneBotConsoleApp.MySQL
                         .Where(b => b.DeleteFlag == false)
                         .FirstOrDefault();
 
-                    if (updateData == null) continue;
+                    if (updateData == null)
+                    {
+                        continue;
+                    }
                     updateData.DeleteFlag = true;
                 }
 

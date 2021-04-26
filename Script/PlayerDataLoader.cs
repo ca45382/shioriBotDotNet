@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-
-using MySql.Data.MySqlClient;
 using PriconneBotConsoleApp.DataTypes;
 using PriconneBotConsoleApp.MySQL;
 using Discord.WebSocket;
@@ -25,8 +22,6 @@ namespace PriconneBotConsoleApp.Script
             {
                 Console.WriteLine(e.Message);
             }
-
-            return;
         }
 
 
@@ -80,16 +75,16 @@ namespace PriconneBotConsoleApp.Script
             //SQLから削除するデータの抽出
             foreach (PlayerData mySQLUser in usersOnSQLServer)
             {
-                var existFlag = 0;
+                var existFlag = false;
                 foreach (PlayerData discordUser in usersOnDiscord)
                 {
                     if (mySQLUser.UserID == discordUser.UserID &&
                         mySQLUser.ClanData.ClanRoleID == discordUser.ClanData.ClanRoleID)
                     {
-                        existFlag = 1;
+                        existFlag = true;
                     }
                 }
-                if (existFlag == 0)
+                if (!existFlag)
                 {
                     deleteUserData.Add(mySQLUser);
                 }
@@ -99,7 +94,6 @@ namespace PriconneBotConsoleApp.Script
             playerDataControl.CreatePlayerData(createUserData);
             playerDataControl.UpdatePlayerData(updateUserData);
             playerDataControl.DeletePlayerData(deleteUserData);
-            return;
         }
 
         /// <summary>
@@ -128,10 +122,8 @@ namespace PriconneBotConsoleApp.Script
 
                 if (roleCount != 1) { continue; }
 
-                string nickName;
-                var roleID = allUserRoleID.First();
-
-                nickName = (user.Nickname == null) ? user.Username : user.Nickname;
+                var roleID = allUserRoleID.FirstOrDefault();
+                var nickName = user.Nickname ?? user.Username;
 
                 var playerData = new PlayerData
                 {

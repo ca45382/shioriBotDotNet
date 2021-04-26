@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.EntityFrameworkCore;
@@ -72,8 +70,6 @@ namespace PriconneBotConsoleApp.MySQL
                 mySQLConnector.SaveChanges();
                 transaction.Commit();
             }
-
-            return;
         }
 
         public void UpdatePlayerData(IEnumerable<PlayerData> playersData)
@@ -89,7 +85,10 @@ namespace PriconneBotConsoleApp.MySQL
                         .Where(d => d.ClanData.ClanRoleID == playerData.ClanData.ClanRoleID)
                         .Where(d => d.UserID == playerData.UserID)
                         .FirstOrDefault();
-                    updateData.GuildUserName = playerData.GuildUserName;
+                    if (updateData != null)
+                    {
+                        updateData.GuildUserName = playerData.GuildUserName;
+                    }
                 }
                 mySQLConnector.SaveChanges();
                 transaction.Commit();
@@ -109,7 +108,10 @@ namespace PriconneBotConsoleApp.MySQL
                         .Where(d => d.ClanData == playerData.ClanData)
                         .Where(d => d.UserID == playerData.UserID)
                         .FirstOrDefault();
-                    mySQLConnector.PlayerData.Remove(removeData);
+                    if (removeData != null)
+                    {
+                        mySQLConnector.PlayerData.Remove(removeData);
+                    }
                 }
                 mySQLConnector.SaveChanges();
                 transaction.Commit();

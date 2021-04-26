@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 using PriconneBotConsoleApp.DataTypes;
@@ -51,7 +49,7 @@ namespace PriconneBotConsoleApp.MySQL
 
         public IEnumerable<DeclarationData> LoadDeclarationData(ClanData clanData)
         {
-            IEnumerable<DeclarationData> declarationDataSet = null;
+            IEnumerable<DeclarationData> declarationDataSet;
 
             using (var mySQLConnector = new MySQLConnector())
             {
@@ -171,7 +169,10 @@ namespace PriconneBotConsoleApp.MySQL
                     .Where(b => b.DeleteFlag == false)
                     .FirstOrDefault();
 
-                updateData.FinishFlag = declarationData.FinishFlag;
+                if (updateData != null)
+                {
+                    updateData.FinishFlag = declarationData.FinishFlag;
+                }
                 mySQLConnector.SaveChanges();
                 transaction.Commit();
 
@@ -217,7 +218,10 @@ namespace PriconneBotConsoleApp.MySQL
                         .Where(d => d.FinishFlag == declarationData.FinishFlag)
                         .ToList();
 
-                    if (userDeleteDataSet.Count() == 0) continue;
+                    if (!userDeleteDataSet.Any())
+                    {
+                        continue;
+                    }
                     foreach (var updateData in userDeleteDataSet)
                     {
                         updateData.DeleteFlag = true;
@@ -245,7 +249,7 @@ namespace PriconneBotConsoleApp.MySQL
             }
 
             var clanData = playerData.ClanData;
-            ulong playerID = 0;
+            ulong playerID;
 
             using (var mySQLConnector = new MySQLConnector())
             {

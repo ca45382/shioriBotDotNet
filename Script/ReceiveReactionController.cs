@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Discord.WebSocket;
 using PriconneBotConsoleApp.DataTypes;
 using PriconneBotConsoleApp.MySQL;
@@ -22,25 +18,23 @@ namespace PriconneBotConsoleApp.Script
             var reactionChannel = reaction.Channel as SocketGuildChannel;
 
             m_playerData = new MySQLPlayerDataController()
-                .LoadPlayerData(reactionChannel.Guild.Id.ToString(),
+                .LoadPlayerData(reactionChannel?.Guild.Id.ToString(),
                     reaction.UserId.ToString());
 
-            var userRole = reactionChannel.Guild
+            var userRole = reactionChannel?.Guild
                 .GetRole(ulong.Parse(m_playerData.ClanData.ClanRoleID));
             m_playerClanData = new MySQLClanDataController().LoadClanData(userRole);
         }
 
-        async public Task RunReactionReceive()
+        public async Task RunReactionReceive()
         {
             if (m_reaction != null)
             {
                 await RunReactionReceive(m_reaction); 
             }
-
-            return;
         }
 
-        async public Task RunReactionReceive(SocketReaction reaction)
+        public async Task RunReactionReceive(SocketReaction reaction)
         {
             var userClanData = m_playerClanData;
             var reactionChannelID = reaction.Channel.Id.ToString();
