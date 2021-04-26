@@ -196,7 +196,7 @@ namespace PriconneBotConsoleApp.Script
             var splitMessageContent =
                 massageContent.Split(new string[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
-            if ((splitMessageContent.Length >= 3 && splitMessageContent.Length <= 4) == false )
+            if (splitMessageContent.Length < 3)
             { 
                 return null;
             }
@@ -220,13 +220,8 @@ namespace PriconneBotConsoleApp.Script
             }
             
             var userID = userMessage.Author.Id.ToString();
-            string commentData = null;
-
-            if (splitMessageContent.Length == 4)
-            {
-                commentData = splitMessageContent[3];
-            }
-
+            var comments = splitMessageContent.Skip(3);
+            var commentData = string.Join(" ", comments);
 
             return new ReservationData() {
                 PlayerData = new PlayerData()
