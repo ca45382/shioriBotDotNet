@@ -378,15 +378,16 @@ namespace PriconneBotConsoleApp.Script
             
 
             var messageData = "```python\n";
-            messageData += $"{battleLap}周目, {bossNumber}ボス以降の予約一覧です. \n";
+            messageData += $"{battleLap:d2}-{bossNumber} 以降の予約一覧です. \n";
 
             var loopNum = 0;
             foreach (var reservationData in reservationDataSet)
             {
                 loopNum += 1;
-                messageData += loopNum.ToString().PadLeft(2) + ". " +
-                    reservationData.BattleLap.ToString().PadLeft(2) + "周目 " +
-                    reservationData.BossNumber.ToString() + "ボス " +
+                messageData += 
+                    //loopNum.ToString().PadLeft(2) + ". " +
+                    reservationData.BattleLap.ToString().PadLeft(2) + "-" +
+                    reservationData.BossNumber.ToString() + " " +
                     reservationData.PlayerData.GuildUserName + " " +
                     reservationData.CommentData +
                     "\n";
