@@ -1,5 +1,5 @@
 # ShioriBot.NET
-C#製のプリコネR クラバト支援ツール
+C#製のプリコネR クラバト支援Discord bot
 
 # Requirement
 
