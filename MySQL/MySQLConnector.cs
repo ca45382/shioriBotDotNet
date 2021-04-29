@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using PriconneBotConsoleApp.DataTypes;
 using PriconneBotConsoleApp.Script;
 
@@ -17,13 +18,16 @@ namespace PriconneBotConsoleApp.MySQL
         
         public JsonDataManager JsonData;
 
+        public MariaDbServerVersion ServerVersion;
+
         public MySQLConnector()
         {
             JsonData = new JsonDataManager();
+            ServerVersion = new MariaDbServerVersion(new Version(10, 3, 27));
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseMySql(JsonData.MySQLConnectionString());
+            => optionsBuilder.UseMySql(JsonData.MySQLConnectionString(), ServerVersion);
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
