@@ -26,24 +26,13 @@ namespace PriconneBotConsoleApp.Script
             Token = m_configData.DiscordSettingValue.DisordToken;
         }
 
-        public string MySQLConnectionString()
-        {
-            var hostName = m_configData.SqlConnectorValue.Host;
-            var portNumber = m_configData.SqlConnectorValue.Port;
-            var userName = m_configData.SqlConnectorValue.User;
-            var password = m_configData.SqlConnectorValue.Password;
-            var databaseName = m_configData.SqlConnectorValue.Database;
-            var sslMode = m_configData.SqlConnectorValue.sslMode;
-
-            var connectionString =
-                $"server = {hostName}; " +
-                $"port = {portNumber}; " +
-                $"user = {userName}; " +
-                $"password = {password};" + 
-                $"database = {databaseName};" +
-                $"SslMode = {sslMode}";
-            return connectionString;
-        }
+        public string MySQLConnectionString() =>
+            $"server = {m_configData.SqlConnectorValue.Host}; " +
+            $"port = {m_configData.SqlConnectorValue.Port}; " +
+            $"user = {m_configData.SqlConnectorValue.User}; " +
+            $"password = {m_configData.SqlConnectorValue.Password};" +
+            $"database = {m_configData.SqlConnectorValue.Database};" +
+            $"SslMode = {m_configData.SqlConnectorValue.sslMode}";
 
         [DataContract]
         private class BotConfigSchema
