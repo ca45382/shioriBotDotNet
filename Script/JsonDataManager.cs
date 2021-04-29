@@ -19,7 +19,6 @@ namespace PriconneBotConsoleApp.Script
 
         public JsonDataManager(string path)
         {
-            //path = @"C:\Users\ca45382\source\repos\PriconneBot\PriconneBot\botConfig.json";
             var sr = new StreamReader(path);
             var jsonData = sr.ReadToEnd();
             m_configData = JsonConvert.DeserializeObject<BotConfigSchema>(jsonData);
