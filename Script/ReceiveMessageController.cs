@@ -22,8 +22,18 @@ namespace PriconneBotConsoleApp.Script
             var userID = message.Author.Id.ToString();
 
             m_playerData = new MySQLPlayerDataController().LoadPlayerData(guildID, userID);
+            
+            if (m_playerData == null)
+            {
+                return;
+            }
 
             var userRole = messageChannel.Guild.GetRole(ulong.Parse(m_playerData.ClanData.ClanRoleID));
+
+            if (userRole == null)
+            {
+                return;
+            }
 
             m_playerClanData = new MySQLClanDataController().LoadClanData(userRole);
         }
@@ -38,6 +48,11 @@ namespace PriconneBotConsoleApp.Script
 
         public async Task RunMessageReceive(SocketUserMessage message)
         {
+            if (m_playerData == null || m_playerClanData == null)
+            {
+                return;
+            }
+
             var userClanData = m_playerClanData;
             var messageChannelID = message.Channel.Id.ToString();
             if (messageChannelID ==
