@@ -378,7 +378,7 @@ namespace PriconneBotConsoleApp.Script
             
 
             var messageData = "```python\n";
-            messageData += $"{battleLap:d2}-{bossNumber} 以降の予約一覧です. \n";
+            messageData += $"{battleLap,2}-{bossNumber} 以降の予約一覧です. \n";
 
             var loopNum = 0;
             foreach (var reservationData in reservationDataSet)
