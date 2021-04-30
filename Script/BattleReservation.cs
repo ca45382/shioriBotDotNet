@@ -376,7 +376,6 @@ namespace PriconneBotConsoleApp.Script
                 return "予約がありません";
             }
             
-
             var messageData = "```python\n";
             messageData += $"{battleLap,2}-{bossNumber} 以降の予約一覧です. \n";
 
