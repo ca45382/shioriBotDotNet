@@ -48,7 +48,7 @@ namespace PriconneBotConsoleApp.Script
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
             await m_client.LoginAsync(TokenType.Bot, jsonSettingData.Token);
             await m_client.StartAsync();
-            await test();
+            await Test();
 
 
             await Task.Delay(-1);
@@ -61,7 +61,7 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private async Task CommandRecieved(SocketMessage messageParam)
         {
-            var message = messageParam as SocketUserMessage;
+            SocketUserMessage message = messageParam as SocketUserMessage;
             
             if (message == null) { return; }
             Console.WriteLine("{0} {1}:{2}", message.Channel.Name, message.Author.Username, message);
@@ -71,7 +71,7 @@ namespace PriconneBotConsoleApp.Script
             var receiveMessages = new ReceiveMessageController(message);
             await receiveMessages.RunMessageReceive();
 
-            //await message.Channel.SendMessageAsync(message.Content.ToString());
+            return;
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace PriconneBotConsoleApp.Script
                 .RunReactionReceive();
         }
 
-        private async Task test()
+        private async Task Test()
         {
             while (true)
             {
