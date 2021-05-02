@@ -7,20 +7,16 @@ namespace PriconneBotConsoleApp.Script
 {
     public class ReceiveMessageController
     {
-
-        private ClanData m_playerClanData;
-        private PlayerData m_playerData;
-        private SocketUserMessage m_message;
+        private readonly ClanData m_playerClanData;
+        private readonly PlayerData m_playerData;
+        private readonly SocketUserMessage m_message;
 
         public ReceiveMessageController(SocketUserMessage message)
         {
             m_message = message;
             var messageChannel = message.Channel as SocketGuildChannel;
-
-
             var guildID = messageChannel.Guild.Id.ToString();
             var userID = message.Author.Id.ToString();
-
             m_playerData = new MySQLPlayerDataController().LoadPlayerData(guildID, userID);
             
             if (m_playerData == null)
@@ -53,24 +49,22 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            var userClanData = m_playerClanData;
             var messageChannelID = message.Channel.Id.ToString();
-            if (messageChannelID ==
-                m_playerClanData.ChannelIDs.ReservationChannelID)
+
+            if (messageChannelID == m_playerClanData.ChannelIDs.ReservationChannelID)
             {
-                await new BattleReservation(userClanData, message).RunReservationCommand();
+                await new BattleReservation(m_playerClanData, message).RunReservationCommand();
             }
-            if (messageChannelID ==
-                m_playerClanData.ChannelIDs.ReservationResultChannelID)
+
+            if (messageChannelID == m_playerClanData.ChannelIDs.ReservationResultChannelID)
             {
-                await new BattleReservation(userClanData, message).RunReservationResultCommand();
+                await new BattleReservation(m_playerClanData, message).RunReservationResultCommand();
             }
-            if (messageChannelID ==
-                m_playerClanData.ChannelIDs.DeclarationChannelID)
+
+            if (messageChannelID == m_playerClanData.ChannelIDs.DeclarationChannelID)
             {
-                await new BattleDeclaration(userClanData, message).RunDeclarationCommandByMessage();
+                await new BattleDeclaration(m_playerClanData, message).RunDeclarationCommandByMessage();
             }
         }
-
     }
 }

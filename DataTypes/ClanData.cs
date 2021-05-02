@@ -7,7 +7,6 @@ namespace PriconneBotConsoleApp.DataTypes
     [Table("clan_info")]
     public class ClanData
     {
-
         [Column("clan_id", TypeName = "bigint(20) unsigned"), Key, Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public ulong ClanID { get; set; }
@@ -30,14 +29,15 @@ namespace PriconneBotConsoleApp.DataTypes
         [Column("boss_role_ready", TypeName = "tinyint(4)")]
         public bool BossRoleReady { get; set; }
 
-        // 外部キー
+        /// <summary>
+        /// 外部キー
+        /// </summary>
         [Column("server_id", TypeName = "varchar(21)"), Required]
         public string ServerID { get; set; }
 
-
         public BotDatabase BotDatabase { get; set; }
 
-        //リレーション
+        // リレーション
         public ChannelIDs ChannelIDs { get; set; }
 
         public MessageIDs MessageIDs { get; set; }
@@ -45,8 +45,6 @@ namespace PriconneBotConsoleApp.DataTypes
         public RoleIDs RoleIDs { get; set; }
 
         public List<PlayerData> PlayerData { get; set; }
-
-        
     }
 
     [Table("clan_channel")]
@@ -96,7 +94,6 @@ namespace PriconneBotConsoleApp.DataTypes
 
         [Column("clan_id", TypeName = "bigint(20) unsigned"), Key]
         public ulong ClanID { get; set; }
-
 
         public ClanData ClanData { get; set; }
     }

@@ -7,10 +7,9 @@ namespace PriconneBotConsoleApp.Script
 {
     class ReceiveReactionController
     {
-
-        private ClanData m_playerClanData;
-        private PlayerData m_playerData;
-        private SocketReaction m_reaction;
+        private readonly ClanData m_playerClanData;
+        private readonly PlayerData m_playerData;
+        private readonly SocketReaction m_reaction;
 
         public ReceiveReactionController(SocketReaction reaction)
         {
@@ -23,6 +22,7 @@ namespace PriconneBotConsoleApp.Script
 
             var userRole = reactionChannel?.Guild
                 .GetRole(ulong.Parse(m_playerData.ClanData.ClanRoleID));
+
             m_playerClanData = new MySQLClanDataController().LoadClanData(userRole);
         }
 
@@ -39,8 +39,7 @@ namespace PriconneBotConsoleApp.Script
             var userClanData = m_playerClanData;
             var reactionChannelID = reaction.Channel.Id.ToString();
             
-            if (reactionChannelID ==
-                m_playerClanData.ChannelIDs.DeclarationChannelID)
+            if (reactionChannelID == m_playerClanData.ChannelIDs.DeclarationChannelID)
             {
                 await new BattleDeclaration(userClanData, reaction)
                     .RunDeclarationCommandByReaction();

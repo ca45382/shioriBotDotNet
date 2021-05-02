@@ -9,7 +9,7 @@ namespace PriconneBotConsoleApp.Script
 {
     class PlayerDataLoader
     {
-        private List<ClanData> m_clanData;
+        private readonly IEnumerable<ClanData> m_clanData;
 
         public PlayerDataLoader()
         {
@@ -24,76 +24,64 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
-
         /// <summary>
-        /// SQLサーバー側とDiscord側の
-        /// プレイヤーデータ同期
+        /// SQLサーバー側とDiscord側のプレイヤーデータ同期
         /// </summary>
         /// <param name="guild"></param>
         public void UpdatePlayerData(SocketGuild guild)
         {
             var createUserData = new List<PlayerData>();
-            var deleteUserData = new List<PlayerData>();
             var updateUserData = new List<PlayerData>();
 
-            //サーバー上のクランメンバー情報の取得
+            // サーバー上のクランメンバー情報の取得
             var usersOnDiscord = GetServerClanMember(guild);
 
             // SQL上のプレイヤーデータを読み取る
             var usersOnSQLServer = new MySQLPlayerDataController().LoadPlayerData(guild.Id.ToString());
 
-            //SQLに追加・更新する情報の抽出
+            // SQLに追加・更新する情報の抽出
             foreach (PlayerData discordUser in usersOnDiscord)
             {
-                var sameNameFlag = 0;
-                var existFlag = 0;
+                var sameNameFlag = false;
+                var existFlag = false;
 
                 foreach (PlayerData mySQLUser in usersOnSQLServer)
                 {
                     if (mySQLUser.UserID == discordUser.UserID &&
                         mySQLUser.ClanData.ClanRoleID == discordUser.ClanData.ClanRoleID)
                     {
-                        existFlag = 1;
+                        existFlag = true;
+
                         if (mySQLUser.GuildUserName == discordUser.GuildUserName)
                         {
-                            sameNameFlag = 1;
+                            sameNameFlag = true;
                         }
                     }
                 }
 
-                if (existFlag == 0)
+                if (!existFlag)
                 {
                     createUserData.Add(discordUser);
-                    continue;
                 }
-                if (sameNameFlag == 0)
+                else if (!sameNameFlag)
                 {
                     updateUserData.Add(discordUser);
                 }
             }
 
-            //SQLから削除するデータの抽出
-            foreach (PlayerData mySQLUser in usersOnSQLServer)
-            {
-                var existFlag = false;
-                foreach (PlayerData discordUser in usersOnDiscord)
-                {
-                    if (mySQLUser.UserID == discordUser.UserID &&
-                        mySQLUser.ClanData.ClanRoleID == discordUser.ClanData.ClanRoleID)
-                    {
-                        existFlag = true;
-                    }
-                }
-                if (!existFlag)
-                {
-                    deleteUserData.Add(mySQLUser);
-                }
-            }
+            // SQLから削除するデータの抽出
+            var deleteUsers =
+                usersOnSQLServer.Where(
+                    mySQLUser => usersOnDiscord.Any(
+                        discordUser => mySQLUser.UserID == discordUser.UserID &&
+                            mySQLUser.ClanData.ClanRoleID == discordUser.ClanData.ClanRoleID
+                    )
+                );
 
             var playerDataControl = new MySQLPlayerDataController();
             playerDataControl.CreatePlayerData(createUserData);
             playerDataControl.UpdatePlayerData(updateUserData);
-            playerDataControl.DeletePlayerData(deleteUserData);
+            playerDataControl.DeletePlayerData(deleteUsers);
         }
 
         /// <summary>
@@ -101,26 +89,31 @@ namespace PriconneBotConsoleApp.Script
         /// </summary>
         /// <param name="guild"></param>
         /// <returns></returns>
-        private List<PlayerData> GetServerClanMember(SocketGuild guild)
+        private IReadOnlyList<PlayerData> GetServerClanMember(SocketGuild guild)
         {
             var clanMember = new List<PlayerData>();
 
             // SQL側の情報から対象のクランロールを抽出
-            var guildClanIDs = ClanIDInServer(guild.Id.ToString());
+            var guildClanIDs = ClanIDsOnServer(guild.Id.ToString());
 
-            //現在のDiscord上の名前を抽出
-            //同一サーバーで複数クランに所属している場合は弾く
+            // 現在のDiscord上の名前を抽出
+            // 同一サーバーで複数クランに所属している場合は弾く
             foreach (SocketGuildUser user in guild.Users)
             {
-                if (user.IsBot) { continue; }
+                if (user.IsBot)
+                {
+                    continue;
+                }
 
                 var allUserRoleID = user.Roles
                     .Where(x => guildClanIDs.Contains(x.Id.ToString()))
-                    .Select(x => x.Id.ToString());
+                    .Select(x => x.Id.ToString())
+                    .ToList();
 
-                var roleCount = allUserRoleID.Count();
-
-                if (roleCount != 1) { continue; }
+                if (allUserRoleID.Count != 1)
+                {
+                    continue;
+                }
 
                 var roleID = allUserRoleID.FirstOrDefault();
                 var nickName = user.Nickname ?? user.Username;
@@ -148,13 +141,10 @@ namespace PriconneBotConsoleApp.Script
         /// </summary>
         /// <param name="guildID"></param>
         /// <returns></returns>
-        private IEnumerable<string> ClanIDInServer(string guildID)
-        {
-            var guildClanIDs = m_clanData
+        private IReadOnlyList<string> ClanIDsOnServer(string guildID)
+            => m_clanData
                 .Where(x => x.ServerID == guildID)
-                .Select(x => x.ClanRoleID);
-
-            return guildClanIDs;
-        }
+                .Select(x => x.ClanRoleID)
+                .ToList();
     }
 }

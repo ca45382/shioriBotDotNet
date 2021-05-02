@@ -1,54 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using PriconneBotConsoleApp.DataTypes;
 using PriconneBotConsoleApp.MySQL;
-using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class BattleDeclaration:BaseClass
+    class BattleDeclaration : BaseClass
     {
         private const int MinBossNumber = 1;
         private const int MaxBossNumber = 5;
 
-        private ClanData m_userClanData;
-        private SocketRole m_userRole;
-        private SocketUserMessage m_userMessage;
-        private SocketReaction m_userReaction;
+        private readonly ClanData m_userClanData;
+        private readonly SocketRole m_userRole;
+        private readonly SocketUserMessage m_userMessage;
+        private readonly SocketReaction m_userReaction;
 
-
-        public BattleDeclaration(ClanData userClanData, SocketUserMessage message)
+        private BattleDeclaration(
+            ClanData userClanData,
+            ISocketMessageChannel channel,
+            SocketUserMessage userMessage = null,
+            SocketReaction userReaction = null)
         {
             m_userClanData = userClanData;
-            m_userMessage = message;
+            m_userRole = (channel as SocketGuildChannel)?.Guild.GetRole(ulong.Parse(m_userClanData.ClanRoleID));
+            m_userMessage = userMessage;
+            m_userReaction = userReaction;
+        }
 
-            var socketGuildChannel = message.Channel as SocketGuildChannel;
-            m_userRole = socketGuildChannel?.Guild.GetRole(
-                ulong.Parse(m_userClanData.ClanRoleID)
-            );
+        public BattleDeclaration(ClanData userClanData, SocketUserMessage message)
+            : this(userClanData, message.Channel, userMessage: message)
+        {
         }
 
         public BattleDeclaration(ClanData userClanData, SocketReaction reaction)
+            : this(userClanData, reaction.Channel, userReaction: reaction)
         {
-            m_userClanData = userClanData;
-            m_userReaction = reaction;
-
-            var socketGuildChannel = m_userReaction.Channel as SocketGuildChannel;
-            m_userRole = socketGuildChannel?.Guild.GetRole(
-                ulong.Parse(m_userClanData.ClanRoleID)
-            );
         }
 
         public async Task RunDeclarationCommandByMessage()
         {
-            var userMessage = m_userMessage;
-            if (userMessage == null) return;
-            var messageContents = userMessage.Content;
-
-            if (messageContents.StartsWith("!call"))
+            if (m_userMessage != null && m_userMessage.Content.StartsWith("!call"))
             {
                 await DeclarationCallCommand();
                 await new BattleReservation(m_userClanData, m_userMessage).UpdateSystemMessage();
@@ -57,98 +52,73 @@ namespace PriconneBotConsoleApp.Script
 
         public async Task RunDeclarationCommandByReaction()
         {
+            switch (m_userReaction.Emote.Name)
+            {
+                case "⚔️":
+                    UserRegistorDeclareCommand();
+                    break;
 
-            if (m_userReaction.Emote.Name == "⚔️")
-            {
-                UserRegistorDeclareCommand();
-            }
-            else if (m_userReaction.Emote.Name == "✅")
-            {
-                UserFinishBattleCommand();
-            }
-            else if(m_userReaction.Emote.Name == "🏁")
-            {
-                await NextBossCommand();
-                await new BattleReservation(m_userClanData, m_userReaction).UpdateSystemMessage();
-                return;
-            }
-            else if (m_userReaction.Emote.Name == "❌")
-            {
-                UserDeleteBattleData();
+                case "✅":
+                    UserFinishBattleCommand();
+                    break;
+
+                case "🏁":
+                    await NextBossCommand();
+                    await new BattleReservation(m_userClanData, m_userReaction).UpdateSystemMessage();
+                    return;
+
+                case "❌":
+                    UserDeleteBattleData();
+                    break;
             }
 
             await UpdateDeclarationBotMessage();
-
             await RemoveUserReaction();
-
             await new BattleReservation(m_userClanData, m_userReaction).UpdateSystemMessage();
         }
 
         private async Task<bool> DeclarationCallCommand()
         {
-            var userMessage = m_userMessage;
-            var userClanData = m_userClanData;
+            var splitMessageContent = ZenToHan(m_userMessage.Content)
+                .Split(new[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
-            var massageContent = ZenToHan(userMessage.Content);
-
-            var splitMessageContent = massageContent.Split(
-                    new string[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
-
-            if (splitMessageContent.Length != 3)
+            if (splitMessageContent.Length != 3
+                || !(int.TryParse(splitMessageContent[1], out int battleLap) && battleLap > 0)
+                || !(int.TryParse(splitMessageContent[2], out int bossNumber) && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber))
             {
                 return false;
             }
 
-            if (!(int.TryParse(splitMessageContent[1], out int battleLap)
-                && battleLap > 0))
-            {
-                return false;
-            }
-            if (!(int.TryParse(splitMessageContent[2], out int bossNumber)
-                && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber))
-            {
-                return false;
-            }
+            m_userClanData.BattleLap = battleLap;
+            m_userClanData.BossNumber = bossNumber;
 
-            userClanData.BattleLap = battleLap;
-            userClanData.BossNumber = bossNumber;
-
-            var result = new MySQLClanDataController().UpdateClanData(userClanData);
-
-            if (result == false)
+            if (!new MySQLClanDataController().UpdateClanData(m_userClanData))
             {
                 return false;
             }
 
-            m_userClanData = userClanData;
-
-            result = await SendDeclarationBotMessage();
-
-            return result;
+            return await SendDeclarationBotMessage();
         }
 
         private async Task<bool> SendDeclarationBotMessage()
         {
-            var userClanData = m_userClanData;
-            var userRole = m_userRole;
+            var embed = CreateDeclarationDataEmbed(m_userClanData);
+            var content = CreateDeclarationDataMessage(m_userClanData);
+            var declarationChannel = m_userRole.Guild.GetTextChannel(ulong.Parse(m_userClanData.ChannelIDs.DeclarationChannelID));
+            var sentMessage = await declarationChannel.SendMessageAsync(text: content, embed: embed);
 
-            var embed = CreateDeclarationDataEmbed(userClanData);
+            if (sentMessage == null)
+            {
+                return false;
+            }
 
-            var content = CreateDeclarationDataMessage(userClanData);
+            var sentMessageId = sentMessage.Id.ToString();
 
-            var declarationChannel = userRole.Guild.GetTextChannel(
-                ulong.Parse(userClanData.ChannelIDs.DeclarationChannelID));
-
-            var sentMessage = await declarationChannel.SendMessageAsync(text:content,embed: embed);
-
-            if (sentMessage == null) return false;
-
-            var result = new MySQLDeclarationController().UpdateDeclarationMessageID(
-                userClanData, sentMessage.Id.ToString());
+            var result = new MySQLDeclarationController()
+                .UpdateDeclarationMessageID(m_userClanData, sentMessageId);
 
             await AttacheDefaultReaction(sentMessage);
-
-            m_userClanData.MessageIDs.DeclarationMessageID = sentMessage.Id.ToString();
+            m_userClanData.MessageIDs.DeclarationMessageID = sentMessageId;
 
             return result;
         }
@@ -159,29 +129,32 @@ namespace PriconneBotConsoleApp.Script
             var userRole = m_userRole;
 
             var declarationMessageID = userClanData.MessageIDs.DeclarationMessageID;
-            if (declarationMessageID == null) return false;
-
-            var guildChannel = userRole.Guild.GetChannel(
-                ulong.Parse(userClanData.ChannelIDs.DeclarationChannelID)) as SocketTextChannel;
-
-            SocketUserMessage declarationBotMessage =
-                guildChannel.GetCachedMessage(ulong.Parse(declarationMessageID)) 
-                as SocketUserMessage;
-
-            if (declarationBotMessage == null)
+            
+            if (declarationMessageID == null)
             {
-                var message = await guildChannel.GetMessageAsync(
-                    ulong.Parse(declarationMessageID));
-                if (message == null) return false;
+                return false;
+            }
+
+            var guildChannel = userRole.Guild.GetChannel(ulong.Parse(userClanData.ChannelIDs.DeclarationChannelID)) as SocketTextChannel;
+
+            if (guildChannel.GetCachedMessage(ulong.Parse(declarationMessageID)) is SocketUserMessage declarationBotMessage)
+            {
+                var embed = CreateDeclarationDataEmbed(userClanData);
+                await declarationBotMessage.ModifyAsync(msg => msg.Embed = embed);
+            }
+            else
+            {
+                var message = await guildChannel
+                    .GetMessageAsync(ulong.Parse(declarationMessageID));
+                
+                if (message == null)
+                {
+                    return false;
+                }
 
                 await guildChannel.DeleteMessageAsync(message);
                 await SendDeclarationBotMessage();
-
-                return true;
             }
-
-            var embed = CreateDeclarationDataEmbed(userClanData);
-            await declarationBotMessage.ModifyAsync(msg => msg.Embed = embed);
 
             return true;
 
