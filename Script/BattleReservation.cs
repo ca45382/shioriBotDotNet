@@ -1,6 +1,7 @@
 ﻿using Discord.WebSocket;
 using Discord;
 using System;
+using System.Text;
 using PriconneBotConsoleApp.DataTypes;
 using PriconneBotConsoleApp.MySQL;
 using System.Threading.Tasks;
@@ -375,26 +376,23 @@ namespace PriconneBotConsoleApp.Script
             {
                 return "予約がありません";
             }
-            
 
-            var messageData = "```python\n";
-            messageData += $"{battleLap}周目, {bossNumber}ボス以降の予約一覧です. \n";
+            var messageData = new StringBuilder();
+            messageData.AppendLine("```python");
+            messageData.AppendLine($"{battleLap,2}-{bossNumber} 以降の予約一覧です. ");
 
-            var loopNum = 0;
             foreach (var reservationData in reservationDataSet)
             {
-                loopNum += 1;
-                messageData += loopNum.ToString().PadLeft(2) + ". " +
-                    reservationData.BattleLap.ToString().PadLeft(2) + "周目 " +
-                    reservationData.BossNumber.ToString() + "ボス " +
-                    reservationData.PlayerData.GuildUserName + " " +
-                    reservationData.CommentData +
-                    "\n";
+                messageData.AppendLine(
+                    $"{reservationData.BattleLap,2}-{reservationData.BossNumber} " +
+                    $"{reservationData.PlayerData.GuildUserName} {reservationData.CommentData}"
+                );
             }
-            messageData += $"以上の{loopNum}件です";
-            messageData += "```";
 
-            return messageData;
+            messageData.Append($"以上の{reservationDataSet.Count}件です");
+            messageData.Append("```");
+
+            return messageData.ToString();
         }
 
         private bool SendDeleteUserReserve(ReservationData reservationData)
