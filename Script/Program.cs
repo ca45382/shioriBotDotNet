@@ -13,8 +13,6 @@ namespace PriconneBotConsoleApp.Script
     {
         private DiscordSocketClient m_client;
         private DiscordSocketConfig m_config;
-        //public static CommandService commands;
-        //public static IServiceProvider services;
 
         static void Main() => new Program().MainAsync().GetAwaiter().GetResult();
 
@@ -32,12 +30,9 @@ namespace PriconneBotConsoleApp.Script
             };
 
             m_client = new DiscordSocketClient(m_config);
-            //var clanBattleInfo = new Script.ClanBattleInfoLoader();
-            //clanBattleInfo.LoadClanBattleScadule();
 
             var commands = new CommandService();
             var services = new ServiceCollection().BuildServiceProvider();
-            //Func<SocketMessage, Task> function = CommandRecieved;
             m_client.MessageReceived += CommandRecieved;
             m_client.GuildMembersDownloaded += GuildMembersDownloaded;
             m_client.UserLeft += UserLeft;
@@ -61,17 +56,17 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private async Task CommandRecieved(SocketMessage messageParam)
         {
-            SocketUserMessage message = messageParam as SocketUserMessage;
-            
-            if (message == null) { return; }
+
+            if (!(messageParam is SocketUserMessage message)) 
+            { 
+                return;
+            }
             Console.WriteLine("{0} {1}:{2}", message.Channel.Name, message.Author.Username, message);
             // コメントがユーザーかBotかの判定
             if (message.Author.IsBot) { return; }
 
             var receiveMessages = new ReceiveMessageController(message);
             await receiveMessages.RunMessageReceive();
-
-            return;
         }
 
         /// <summary>

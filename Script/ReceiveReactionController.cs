@@ -20,6 +20,7 @@ namespace PriconneBotConsoleApp.Script
             m_playerData = new MySQLPlayerDataController()
                 .LoadPlayerData(reactionChannel?.Guild.Id.ToString(),
                     reaction.UserId.ToString());
+
             if (m_playerData == null)
             {
                 return;
@@ -54,8 +55,7 @@ namespace PriconneBotConsoleApp.Script
             var userClanData = m_playerClanData;
             var reactionChannelID = reaction.Channel.Id.ToString();
             
-            if (reactionChannelID ==
-                userClanData.ChannelIDs.DeclarationChannelID)
+            if (reactionChannelID == userClanData.ChannelIDs.DeclarationChannelID)
             {
                 await new BattleDeclaration(userClanData, reaction)
                     .RunDeclarationCommandByReaction();
