@@ -30,22 +30,20 @@ namespace PriconneBotConsoleApp.Script
             };
 
             m_client = new DiscordSocketClient(m_config);
-
-            var commands = new CommandService();
-            var services = new ServiceCollection().BuildServiceProvider();
             m_client.MessageReceived += CommandRecieved;
             m_client.GuildMembersDownloaded += GuildMembersDownloaded;
             m_client.UserLeft += UserLeft;
             m_client.GuildMemberUpdated += GuildMemberUpdated;
             m_client.ReactionAdded += ReactionAdded;
-
             m_client.Log += Log;
+
+            var commands = new CommandService();
+            var services = new ServiceCollection().BuildServiceProvider();
+
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
             await m_client.LoginAsync(TokenType.Bot, jsonSettingData.Token);
             await m_client.StartAsync();
             await Test();
-
-
             await Task.Delay(-1);
         }
 
@@ -56,14 +54,17 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private async Task CommandRecieved(SocketMessage messageParam)
         {
-
             if (!(messageParam is SocketUserMessage message)) 
             { 
                 return;
             }
+
             Console.WriteLine("{0} {1}:{2}", message.Channel.Name, message.Author.Username, message);
-            // コメントがユーザーかBotかの判定
-            if (message.Author.IsBot) { return; }
+            
+            if (message.Author.IsBot) 
+            {
+                return;
+            }
 
             var receiveMessages = new ReceiveMessageController(message);
             await receiveMessages.RunMessageReceive();
@@ -82,7 +83,6 @@ namespace PriconneBotConsoleApp.Script
             return Task.CompletedTask;
         }
 
-
         private Task UserLeft(SocketGuildUser userInfo)
         {
             var playerDataLoader = new PlayerDataLoader();
@@ -100,14 +100,15 @@ namespace PriconneBotConsoleApp.Script
 
         private async Task ReactionAdded(
             Cacheable<IUserMessage, ulong> cachedMessage, 
-            ISocketMessageChannel channel, SocketReaction reaction)
+            ISocketMessageChannel channel,
+            SocketReaction reaction)
         {
             if (reaction.User.Value.IsBot)
             {
                 return;
             }
-            await new ReceiveReactionController(reaction)
-                .RunReactionReceive();
+            
+            await new ReceiveReactionController(reaction).RunReactionReceive();
         }
 
         private async Task Test()
