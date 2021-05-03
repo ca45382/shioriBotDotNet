@@ -28,13 +28,13 @@ namespace PriconneBotConsoleApp.Script
 
         public async Task RunByMessage()
         {
-            var userMessage = m_userMessage;
-            if (userMessage == null || !userMessage.Content.StartsWith("!tl"))
+
+            if (m_userMessage == null || !m_userMessage.Content.StartsWith("!tl"))
             {
                 return;
             }
 
-            var messageData = await LoadTimeLineMessage(userMessage);
+            var messageData = await LoadTimeLineMessage(m_userMessage);
             if (messageData == null)
             {
                 return;
