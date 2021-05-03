@@ -15,8 +15,7 @@ namespace PriconneBotConsoleApp.Script
         {
             try
             {
-                var clanData = new MySQLClanDataController().LoadClanData();
-                m_clanData = clanData;
+                m_clanData = new MySQLClanDataController().LoadClanData();
             }
             catch (Exception e)
             {
