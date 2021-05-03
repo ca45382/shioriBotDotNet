@@ -9,37 +9,22 @@ namespace PriconneBotConsoleApp.MySQL
     {
         public List<PlayerData> LoadPlayerData(string serverID)
         {
-            
-            var playerData = new List<PlayerData>();
+            using var mySQLConnector = new MySQLConnector();
 
-            using (var mySQLConnector = new MySQLConnector())
-            {
-                playerData = mySQLConnector.PlayerData
-                    .Include(b => b.ClanData)
-                    .Where(b => b.ClanData.ServerID == serverID)
-                    .ToList();
-            }
-
-            return playerData;
-
+            return mySQLConnector.PlayerData
+                .Include(b => b.ClanData)
+                .Where(b => b.ClanData.ServerID == serverID)
+                .ToList();
         }
 
         public PlayerData LoadPlayerData(string serverID, string userID)
         {
-            var playerData = new PlayerData();
-
-            using (var mySQLConnector = new MySQLConnector())
-            {
-                playerData = mySQLConnector.PlayerData
-                    .Include(b => b.ClanData)
-                    .ThenInclude(b => b.BotDatabase)
-                    .Where(b => b.UserID == userID)
-                    .Where(b => b.ClanData.ServerID == serverID)
-                    .FirstOrDefault();
-
-            }
-
-            return playerData;
+            using var mySQLConnector = new MySQLConnector();
+            return mySQLConnector.PlayerData
+                .Include(b => b.ClanData)
+                .ThenInclude(b => b.BotDatabase)
+                .Where(b => b.UserID == userID && b.ClanData.ServerID == serverID)
+                .FirstOrDefault();
         }
 
         public void CreatePlayerData(IEnumerable<PlayerData> playersData)
@@ -51,18 +36,16 @@ namespace PriconneBotConsoleApp.MySQL
             {
                 var clanID = mySQLConnector.ClanData
                     .Include(d => d.BotDatabase)
-                    .Where(d => d.ServerID == playerData.ClanData.ServerID)
-                    .Where(d => d.ClanRoleID == playerData.ClanData.ClanRoleID)
+                    .Where(d => d.ServerID == playerData.ClanData.ServerID && d.ClanRoleID == playerData.ClanData.ClanRoleID)
                     .Select(d => d.ClanID)
                     .FirstOrDefault();
 
-                var newPlayerData =
-                    new PlayerData
-                    {
-                        ClanID = clanID,
-                        UserID = playerData.UserID,
-                        GuildUserName = playerData.GuildUserName
-                    };
+                var newPlayerData = new PlayerData
+                {
+                    ClanID = clanID,
+                    UserID = playerData.UserID,
+                    GuildUserName = playerData.GuildUserName
+                };
 
                 mySQLConnector.PlayerData.Add(newPlayerData);
             }
