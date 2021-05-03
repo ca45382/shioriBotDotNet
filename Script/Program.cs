@@ -13,8 +13,6 @@ namespace PriconneBotConsoleApp.Script
     {
         private DiscordSocketClient m_client;
         private DiscordSocketConfig m_config;
-        // public static CommandService commands;
-        // public static IServiceProvider services;
 
         static void Main() => new Program().MainAsync().GetAwaiter().GetResult();
 
@@ -32,9 +30,6 @@ namespace PriconneBotConsoleApp.Script
             };
 
             m_client = new DiscordSocketClient(m_config);
-            // var clanBattleInfo = new Script.ClanBattleInfoLoader();
-            // clanBattleInfo.LoadClanBattleScadule();
-            // Func<SocketMessage, Task> function = CommandRecieved;
             m_client.MessageReceived += CommandRecieved;
             m_client.GuildMembersDownloaded += GuildMembersDownloaded;
             m_client.UserLeft += UserLeft;
@@ -42,11 +37,10 @@ namespace PriconneBotConsoleApp.Script
             m_client.ReactionAdded += ReactionAdded;
             m_client.Log += Log;
 
-            await new CommandService().AddModulesAsync(
-                Assembly.GetEntryAssembly(),
-                new ServiceCollection().BuildServiceProvider()
-            );
+            var commands = new CommandService();
+            var services = new ServiceCollection().BuildServiceProvider();
 
+            await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
             await m_client.LoginAsync(TokenType.Bot, jsonSettingData.Token);
             await m_client.StartAsync();
             await Test();
@@ -67,7 +61,6 @@ namespace PriconneBotConsoleApp.Script
 
             Console.WriteLine($"{message.Channel.Name} {message.Author.Username}:{message}");
 
-            // コメントがユーザーかBotかの判定
             if (message.Author.IsBot)
             {
                 return;
@@ -75,7 +68,6 @@ namespace PriconneBotConsoleApp.Script
 
             var receiveMessages = new ReceiveMessageController(message);
             await receiveMessages.RunMessageReceive();
-            // await message.Channel.SendMessageAsync(message.Content.ToString());
         }
 
         /// <summary>
