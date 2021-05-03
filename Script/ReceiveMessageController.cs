@@ -7,7 +7,6 @@ namespace PriconneBotConsoleApp.Script
 {
     public class ReceiveMessageController
     {
-
         private ClanData m_playerClanData;
         private PlayerData m_playerData;
         private SocketUserMessage m_message;
@@ -16,11 +15,8 @@ namespace PriconneBotConsoleApp.Script
         {
             m_message = message;
             var messageChannel = message.Channel as SocketGuildChannel;
-
-
             var guildID = messageChannel.Guild.Id.ToString();
             var userID = message.Author.Id.ToString();
-
             m_playerData = new MySQLPlayerDataController().LoadPlayerData(guildID, userID);
             
             if (m_playerData == null)
@@ -57,23 +53,24 @@ namespace PriconneBotConsoleApp.Script
 
             var userClanData = m_playerClanData;
             var messageChannelID = message.Channel.Id.ToString();
+
             if (messageChannelID ==
                 m_playerClanData.ChannelIDs.ReservationChannelID)
             {
                 await new BattleReservation(userClanData, message).RunReservationCommand();
             }
+
             if (messageChannelID ==
                 m_playerClanData.ChannelIDs.ReservationResultChannelID)
             {
                 await new BattleReservation(userClanData, message).RunReservationResultCommand();
             }
+
             if (messageChannelID ==
                 m_playerClanData.ChannelIDs.DeclarationChannelID)
             {
                 await new BattleDeclaration(userClanData, message).RunDeclarationCommandByMessage();
             }
-
         }
-
     }
 }
