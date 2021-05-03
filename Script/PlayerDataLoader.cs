@@ -69,12 +69,12 @@ namespace PriconneBotConsoleApp.Script
             }
 
             // SQLから削除するデータの抽出
-            var deleteUsers =
-                usersOnSQLServer.Where(
-                    mySQLUser => usersOnDiscord.Any(
-                        discordUser => mySQLUser.UserID == discordUser.UserID &&
-                            mySQLUser.ClanData.ClanRoleID == discordUser.ClanData.ClanRoleID
-                    )
+            static bool IsSameUser(PlayerData left, PlayerData right)
+                => left.UserID == right.UserID && left.ClanData.ClanRoleID == right.ClanData.ClanRoleID;
+
+            var deleteUsers = usersOnSQLServer
+                .Where(
+                    mySQLUser => !usersOnDiscord.Any(discordUser => IsSameUser(mySQLUser, discordUser))
                 );
 
             var playerDataControl = new MySQLPlayerDataController();
