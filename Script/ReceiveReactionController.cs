@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
 using PriconneBotConsoleApp.DataTypes;
 using PriconneBotConsoleApp.MySQL;
+using System.Threading.Tasks;
 
 namespace PriconneBotConsoleApp.Script
 {

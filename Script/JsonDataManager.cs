@@ -1,6 +1,6 @@
-﻿using System.Runtime.Serialization;
+﻿using Newtonsoft.Json;
 using System.IO;
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
 
 namespace PriconneBotConsoleApp.Script
 {

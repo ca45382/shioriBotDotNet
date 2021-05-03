@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Discord.WebSocket;
 using PriconneBotConsoleApp.DataTypes;
 using PriconneBotConsoleApp.MySQL;
-using Discord.WebSocket;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PriconneBotConsoleApp.Script
 {
