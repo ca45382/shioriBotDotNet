@@ -29,15 +29,12 @@ namespace PriconneBotConsoleApp.Script
         public async Task RunByMessage()
         {
             var userMessage = m_userMessage;
-            if (userMessage == null)
+            if (userMessage == null || !userMessage.Content.StartsWith("!tl"))
             {
                 return;
             }
-            if (!userMessage.Content.StartsWith("!tl"))
-            {
-                return;
-            }
-            var messageData = await loadTimeLineMessage(userMessage);
+
+            var messageData = await LoadTimeLineMessage(userMessage);
             if (messageData == null)
             {
                 return;
@@ -55,40 +52,33 @@ namespace PriconneBotConsoleApp.Script
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        private async Task<ConvertData> loadTimeLineMessage(IMessage message)
+        private async Task<ConvertData> LoadTimeLineMessage(IMessage message)
         {
             var splitMessageContent =
-                message.Content.Split(new string[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
+                message.Content.Split(new[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
-            if (splitMessageContent.Length != 3)
+            if (splitMessageContent.Length != 3 || !int.TryParse(splitMessageContent[2], out int timeData) 
+                || timeData < 20 || timeData > 90 )
             {
                 return null;
             }
 
-            if (!(int.TryParse(splitMessageContent[2], out int timeData)
-                && timeData >= 20 && timeData <= 90
-                ))
-            {
-                return null;
-            }
-
-            var convertData = new ConvertData()
+            var convertData = new ConvertData
             {
                 Time = timeData
             };
 
-            Uri uriData = new Uri(splitMessageContent[1]);
-
+            var uriData = new Uri(splitMessageContent[1]);
             var discordID = uriData.Segments;
 
             if (discordID.Count() != 5)
             {
                 return null;
             }
+
             convertData.MessageGuildID = discordID[2].Replace("/", "");
             convertData.MessageChannelID = discordID[3].Replace("/", "");
             convertData.MessageID = discordID[4];
-
 
             var userChannelData = message.Channel as SocketGuildChannel;
             var timeLineChannelData = userChannelData.Guild.GetChannel(
@@ -106,7 +96,7 @@ namespace PriconneBotConsoleApp.Script
         }
 
         /// <summary>
-        /// TLデータから秒数を変換する機能
+        /// TLデータから秒数を変換する機能, 
         /// 0:00 や 00秒 を持ち越し秒数に変換する
         /// </summary>
         /// <param name="messageData"></param>
@@ -116,7 +106,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var scrapTime = 90 - timeData;
             var messageContent =
-                messageData.Split(new string[] { "\n" }, StringSplitOptions.None);
+                messageData.Split("\n");
 
             var sendMessageContent = new StringBuilder();
 
@@ -128,55 +118,52 @@ namespace PriconneBotConsoleApp.Script
                 {
                     continue;
                 }
-                if (!(Regex.IsMatch(lineMessageContent, @"\d:\d{2}")
-                    || Regex.IsMatch(lineMessageContent, @"\d+秒")
-                    ))
+
+                if (!Regex.IsMatch(lineMessageContent, @"(\d:\d{2}|\d+[秒s])"))
                 {
                     sendMessageContent.AppendLine(lineMessageContent);
                     continue;
                 }
-                var matchData = Regex.Matches(lineMessageContent, @"\d:\d{2}");
 
                 var afterLineMessageContent = lineMessageContent;
 
-                foreach (var matchTimeData in matchData)
+                foreach (Match matchTimeData in Regex.Matches(lineMessageContent, @"\d:\d{2}"))
                 {
-                    var timeDataContent =
-                        matchTimeData.ToString().Split(
-                            new string[] { ":" }, StringSplitOptions.None);
+                    var timeDataContent = matchTimeData.Value.Split(":");
                     var minutes = int.Parse(timeDataContent[0]);
                     var seconds = int.Parse(timeDataContent[1]);
                     var afterSeconds = minutes * 60 + seconds - scrapTime;
                     var afterMinutes = 0;
+
                     if (afterSeconds >= 60)
                     {
                         afterMinutes = 1;
                         afterSeconds -= 60;
                     }
+
                     if (afterSeconds <= 0 && afterSeconds <= 0)
                     {
                         afterSeconds = 0;
                         afterMinutes = 0;
                     }
+
                     afterLineMessageContent = afterLineMessageContent.Replace(
-                        matchTimeData.ToString(), $"{afterMinutes}:{afterSeconds:D2}");
+                        matchTimeData.Value, $"{afterMinutes}:{afterSeconds:D2}");
 
                 }
 
-                matchData = Regex.Matches(lineMessageContent, @"\d{2}秒");
-
-                foreach (var matchTimeData in matchData)
+                foreach (Match matchTimeData in Regex.Matches(lineMessageContent, @"(\d{1,2})([秒s])"))
                 {
-                    var data = Regex.Replace(matchTimeData.ToString(), @"[^0-9]", "");
-                    var seconds =
-                         int.Parse(data);
+                    var seconds = int.Parse(matchTimeData.Groups[1].Value);
                     var afterSeconds = seconds - scrapTime;
+
                     if (afterSeconds <= 0)
                     {
                         afterSeconds = 0;
                     }
+
                     afterLineMessageContent = afterLineMessageContent.Replace(
-                        matchTimeData.ToString(), $"{afterSeconds:D2}秒");
+                        matchTimeData.Value, $"{afterSeconds:D2}{matchTimeData.Groups[2]}");
                 }
 
                 sendMessageContent.AppendLine(afterLineMessageContent);
@@ -184,7 +171,6 @@ namespace PriconneBotConsoleApp.Script
 
             sendMessageContent.AppendLine("```");
 
-            Console.WriteLine(sendMessageContent.ToString());
             return sendMessageContent.ToString();
         }
     }
