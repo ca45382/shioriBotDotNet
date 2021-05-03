@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -7,12 +6,10 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 
-
 namespace PriconneBotConsoleApp.Script
 {
     class TimeLineConversion : BaseClass
     {
-
         private IMessage m_userMessage;
 
         private class ConvertData
@@ -27,7 +24,6 @@ namespace PriconneBotConsoleApp.Script
         public TimeLineConversion(IMessage message)
         {
             m_userMessage = message;
-
         }
 
         public async Task RunByMessage()
@@ -49,7 +45,6 @@ namespace PriconneBotConsoleApp.Script
             var convertMessage = ConversionMessage(
                 messageData.Message.Content, messageData.Time
                 );
-
             var userChannelData = m_userMessage.Channel as ISocketMessageChannel;
             await SendMessageToChannel(userChannelData, convertMessage);
             return;

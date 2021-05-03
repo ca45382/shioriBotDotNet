@@ -48,7 +48,6 @@ namespace PriconneBotConsoleApp.Script
 
         public async Task RunMessageReceive(SocketUserMessage message)
         {
-
             await new TimeLineConversion(message).RunByMessage() ;
 
             if (m_playerData == null || m_playerClanData == null)
@@ -74,7 +73,6 @@ namespace PriconneBotConsoleApp.Script
                 await new BattleDeclaration(userClanData, message).RunDeclarationCommandByMessage();
             }
 
-            
         }
 
     }
