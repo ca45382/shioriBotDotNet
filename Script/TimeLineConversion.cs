@@ -34,13 +34,13 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var messageData = await LoadTimeLineMessage(m_userMessage);
+
             if (messageData == null)
             {
                 return;
             }
-            var convertMessage = ConversionMessage(
-                messageData.Message.Content, messageData.Time
-                );
+
+            var convertMessage = ConversionMessage(messageData.Message.Content, messageData.Time);
             var userChannelData = m_userMessage.Channel as ISocketMessageChannel;
             await SendMessageToChannel(userChannelData, convertMessage);
             return;
@@ -53,8 +53,7 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private async Task<ConvertData> LoadTimeLineMessage(IMessage message)
         {
-            var splitMessageContent =
-                message.Content.Split(new[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
+            var splitMessageContent = message.Content.Split( new[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
             if (splitMessageContent.Length != 3 || !int.TryParse(splitMessageContent[2], out int timeData) 
                 || timeData < 20 || timeData > 90 )
@@ -80,11 +79,8 @@ namespace PriconneBotConsoleApp.Script
             convertData.MessageID = discordID[4];
 
             var userChannelData = message.Channel as SocketGuildChannel;
-            var timeLineChannelData = userChannelData.Guild.GetChannel(
-                ulong.Parse(convertData.MessageChannelID)) as SocketTextChannel;
-            convertData.Message = await timeLineChannelData.GetMessageAsync(
-                ulong.Parse(convertData.MessageID)
-                );
+            var timeLineChannelData = userChannelData.Guild.GetChannel(ulong.Parse(convertData.MessageChannelID)) as SocketTextChannel;
+            convertData.Message = await timeLineChannelData.GetMessageAsync(ulong.Parse(convertData.MessageID));
 
             if (convertData.Message == null)
             {
@@ -104,11 +100,8 @@ namespace PriconneBotConsoleApp.Script
         private string ConversionMessage(string messageData, int timeData)
         {
             var scrapTime = 90 - timeData;
-            var messageContent =
-                messageData.Split("\n");
-
+            var messageContent = messageData.Split("\n");
             var sendMessageContent = new StringBuilder();
-
             sendMessageContent.AppendLine("```Python");
 
             foreach (var lineMessageContent in messageContent)
@@ -146,8 +139,8 @@ namespace PriconneBotConsoleApp.Script
                         afterMinutes = 0;
                     }
 
-                    afterLineMessageContent = afterLineMessageContent.Replace(
-                        matchTimeData.Value, $"{afterMinutes}:{afterSeconds:D2}");
+                    afterLineMessageContent = afterLineMessageContent
+                        .Replace(matchTimeData.Value, $"{afterMinutes}:{afterSeconds:D2}");
 
                 }
 
@@ -161,8 +154,8 @@ namespace PriconneBotConsoleApp.Script
                         afterSeconds = 0;
                     }
 
-                    afterLineMessageContent = afterLineMessageContent.Replace(
-                        matchTimeData.Value, $"{afterSeconds:D2}{matchTimeData.Groups[2]}");
+                    afterLineMessageContent = afterLineMessageContent
+                        .Replace(matchTimeData.Value, $"{afterSeconds:D2}{matchTimeData.Groups[2]}");
                 }
 
                 sendMessageContent.AppendLine(afterLineMessageContent);
