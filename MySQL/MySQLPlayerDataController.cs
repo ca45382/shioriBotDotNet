@@ -20,6 +20,7 @@ namespace PriconneBotConsoleApp.MySQL
         public PlayerData LoadPlayerData(string serverID, string userID)
         {
             using var mySQLConnector = new MySQLConnector();
+
             return mySQLConnector.PlayerData
                 .Include(b => b.ClanData)
                 .ThenInclude(b => b.BotDatabase)
