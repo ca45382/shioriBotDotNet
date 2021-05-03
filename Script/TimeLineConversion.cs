@@ -28,7 +28,6 @@ namespace PriconneBotConsoleApp.Script
 
         public async Task RunByMessage()
         {
-
             if (m_userMessage == null || !m_userMessage.Content.StartsWith("!tl"))
             {
                 return;
