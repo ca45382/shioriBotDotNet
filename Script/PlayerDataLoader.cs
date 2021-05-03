@@ -29,16 +29,18 @@ namespace PriconneBotConsoleApp.Script
         /// <param name="guild"></param>
         public void UpdatePlayerData(SocketGuild guild)
         {
+            var playerDataControler = new MySQLPlayerDataController();
+
+            // サーバー上のクランメンバー
+            var usersOnDiscord = GetServerClanMember(guild);
+
+            // テーブル上のプレイヤーデータ
+            var usersOnSQLServer = new MySQLPlayerDataController().LoadPlayerData(guild.Id.ToString());
+
+            #region テーブルにユーザを追加・更新
             var createUserData = new List<PlayerData>();
             var updateUserData = new List<PlayerData>();
 
-            // サーバー上のクランメンバー情報の取得
-            var usersOnDiscord = GetServerClanMember(guild);
-
-            // SQL上のプレイヤーデータを読み取る
-            var usersOnSQLServer = new MySQLPlayerDataController().LoadPlayerData(guild.Id.ToString());
-
-            // SQLに追加・更新する情報の抽出
             foreach (PlayerData discordUser in usersOnDiscord)
             {
                 var sameNameFlag = false;
@@ -68,7 +70,11 @@ namespace PriconneBotConsoleApp.Script
                 }
             }
 
-            // SQLから削除するデータの抽出
+            playerDataControler.CreatePlayerData(createUserData);
+            playerDataControler.UpdatePlayerData(updateUserData);
+            #endregion
+
+            #region テーブルからユーザを削除
             static bool IsSameUser(PlayerData left, PlayerData right)
                 => left.UserID == right.UserID && left.ClanData.ClanRoleID == right.ClanData.ClanRoleID;
 
@@ -77,10 +83,8 @@ namespace PriconneBotConsoleApp.Script
                     mySQLUser => !usersOnDiscord.Any(discordUser => IsSameUser(mySQLUser, discordUser))
                 );
 
-            var playerDataControl = new MySQLPlayerDataController();
-            playerDataControl.CreatePlayerData(createUserData);
-            playerDataControl.UpdatePlayerData(updateUserData);
-            playerDataControl.DeletePlayerData(deleteUsers);
+            playerDataControler.DeletePlayerData(deleteUsers);
+            #endregion
         }
 
         /// <summary>
