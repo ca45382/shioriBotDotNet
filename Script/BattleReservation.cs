@@ -64,11 +64,13 @@ namespace PriconneBotConsoleApp.Script
                         return;
                 }
 
+#if !DEBUG
                 if (DateTime.Now.Hour < ReservableStartTimeHour)
                 {
                     await OutOfReservationTime();
                     return;
                 }
+#endif
 
                 var reservationData = MessageToReservationData();
 
