@@ -13,8 +13,6 @@ namespace PriconneBotConsoleApp.Script
     {
         private DiscordSocketClient m_client;
         private DiscordSocketConfig m_config;
-        //public static CommandService commands;
-        //public static IServiceProvider services;
 
         static void Main() => new Program().MainAsync().GetAwaiter().GetResult();
 
@@ -32,25 +30,20 @@ namespace PriconneBotConsoleApp.Script
             };
 
             m_client = new DiscordSocketClient(m_config);
-            //var clanBattleInfo = new Script.ClanBattleInfoLoader();
-            //clanBattleInfo.LoadClanBattleScadule();
-
-            var commands = new CommandService();
-            var services = new ServiceCollection().BuildServiceProvider();
-            //Func<SocketMessage, Task> function = CommandRecieved;
             m_client.MessageReceived += CommandRecieved;
             m_client.GuildMembersDownloaded += GuildMembersDownloaded;
             m_client.UserLeft += UserLeft;
             m_client.GuildMemberUpdated += GuildMemberUpdated;
             m_client.ReactionAdded += ReactionAdded;
-
             m_client.Log += Log;
+
+            var commands = new CommandService();
+            var services = new ServiceCollection().BuildServiceProvider();
+
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
             await m_client.LoginAsync(TokenType.Bot, jsonSettingData.Token);
             await m_client.StartAsync();
-            await test();
-
-
+            await Test();
             await Task.Delay(-1);
         }
 
@@ -61,17 +54,20 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private async Task CommandRecieved(SocketMessage messageParam)
         {
-            var message = messageParam as SocketUserMessage;
-            
-            if (message == null) { return; }
+            if (!(messageParam is SocketUserMessage message)) 
+            { 
+                return;
+            }
+
             Console.WriteLine("{0} {1}:{2}", message.Channel.Name, message.Author.Username, message);
-            // コメントがユーザーかBotかの判定
-            if (message.Author.IsBot) { return; }
+            
+            if (message.Author.IsBot) 
+            {
+                return;
+            }
 
             var receiveMessages = new ReceiveMessageController(message);
             await receiveMessages.RunMessageReceive();
-
-            //await message.Channel.SendMessageAsync(message.Content.ToString());
         }
 
         /// <summary>
@@ -86,7 +82,6 @@ namespace PriconneBotConsoleApp.Script
             playerDataLoader.UpdatePlayerData(guild);
             return Task.CompletedTask;
         }
-
 
         private Task UserLeft(SocketGuildUser userInfo)
         {
@@ -105,17 +100,18 @@ namespace PriconneBotConsoleApp.Script
 
         private async Task ReactionAdded(
             Cacheable<IUserMessage, ulong> cachedMessage, 
-            ISocketMessageChannel channel, SocketReaction reaction)
+            ISocketMessageChannel channel,
+            SocketReaction reaction)
         {
             if (reaction.User.Value.IsBot)
             {
                 return;
             }
-            await new ReceiveReactionController(reaction)
-                .RunReactionReceive();
+            
+            await new ReceiveReactionController(reaction).RunReactionReceive();
         }
 
-        private async Task test()
+        private async Task Test()
         {
             while (true)
             {
