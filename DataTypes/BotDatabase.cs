@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PriconneBotConsoleApp.DataTypes
 {
-    
     [Table("server_data")]
     public class BotDatabase
     {
@@ -26,8 +25,6 @@ namespace PriconneBotConsoleApp.DataTypes
         [Column("system_ch_id", TypeName = "varchar(21)")]
         public string SystemCommandChannelID { get; set; }
 
-
         public List<ClanData> ClanData { get; set; }
     }
-
 }

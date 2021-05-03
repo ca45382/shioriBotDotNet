@@ -22,7 +22,7 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         public async Task MainAsync()
         {
-            var jsonSettingData = new JsonDataManager(@"./data/botConfig.json");
+            var jsonSettingData = new JsonDataManager("./data/botConfig.json");
 
             m_config = new DiscordSocketConfig
             {
@@ -54,14 +54,14 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private async Task CommandRecieved(SocketMessage messageParam)
         {
-            if (!(messageParam is SocketUserMessage message)) 
-            { 
+            if (!(messageParam is SocketUserMessage message))
+            {
                 return;
             }
 
-            Console.WriteLine("{0} {1}:{2}", message.Channel.Name, message.Author.Username, message);
-            
-            if (message.Author.IsBot) 
+            Console.WriteLine($"{message.Channel.Name} {message.Author.Username}:{message}");
+
+            if (message.Author.IsBot)
             {
                 return;
             }
@@ -78,23 +78,21 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private Task GuildMembersDownloaded(SocketGuild guild)
         {
-            var playerDataLoader = new PlayerDataLoader();
-            playerDataLoader.UpdatePlayerData(guild);
+            new PlayerDataLoader().UpdatePlayerData(guild);
             return Task.CompletedTask;
         }
 
         private Task UserLeft(SocketGuildUser userInfo)
         {
-            var playerDataLoader = new PlayerDataLoader();
-            playerDataLoader.UpdatePlayerData(userInfo.Guild);
+            new PlayerDataLoader().UpdatePlayerData(userInfo.Guild);
             return Task.CompletedTask;
         }
 
         private Task GuildMemberUpdated(
-            SocketGuildUser oldUserInfo, SocketGuildUser newUserInfo)
+            SocketGuildUser oldUserInfo,
+            SocketGuildUser newUserInfo)
         {
-            var playerDataLoader = new PlayerDataLoader();
-            playerDataLoader.UpdatePlayerData(newUserInfo.Guild);
+            new PlayerDataLoader().UpdatePlayerData(newUserInfo.Guild);
             return Task.CompletedTask;
         }
 
@@ -103,12 +101,11 @@ namespace PriconneBotConsoleApp.Script
             ISocketMessageChannel channel,
             SocketReaction reaction)
         {
-            if (reaction.User.Value.IsBot)
+            if (!reaction.User.Value.IsBot)
             {
-                return;
+                await new ReceiveReactionController(reaction)
+                    .RunReactionReceive();
             }
-            
-            await new ReceiveReactionController(reaction).RunReactionReceive();
         }
 
         private async Task Test()
@@ -117,7 +114,6 @@ namespace PriconneBotConsoleApp.Script
             {
                 await Task.Run(() => Thread.Sleep(2000));
             }
-            
         }
 
         /// <summary>

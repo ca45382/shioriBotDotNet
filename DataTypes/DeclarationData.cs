@@ -6,7 +6,6 @@ namespace PriconneBotConsoleApp.DataTypes
     [Table("declare_data")]
     public class DeclarationData
     {
-
         [Column("declare_id", TypeName = "bigint(20) unsigned"), Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public ulong DeclareID { get; set; }
@@ -29,7 +28,6 @@ namespace PriconneBotConsoleApp.DataTypes
 
         [Column("delete_flag", TypeName = "tinyint(4)")]
         public bool DeleteFlag { get; set; }
-
 
         [Column("player_id", TypeName = "bigint(20) unsigned"), Required]
         public ulong PlayerID { get; set; }

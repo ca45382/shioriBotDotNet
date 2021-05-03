@@ -1,16 +1,15 @@
-﻿using System.Threading.Tasks;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
 using PriconneBotConsoleApp.DataTypes;
 using PriconneBotConsoleApp.MySQL;
+using System.Threading.Tasks;
 
 namespace PriconneBotConsoleApp.Script
 {
     class ReceiveReactionController
     {
-
-        private ClanData m_playerClanData;
-        private PlayerData m_playerData;
-        private SocketReaction m_reaction;
+        private readonly ClanData m_playerClanData;
+        private readonly PlayerData m_playerData;
+        private readonly SocketReaction m_reaction;
 
         public ReceiveReactionController(SocketReaction reaction)
         {

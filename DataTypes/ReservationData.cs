@@ -32,12 +32,9 @@ namespace PriconneBotConsoleApp.DataTypes
         [Column("delete_flag", TypeName = "tinyint(4)")]
         public bool DeleteFlag { get; set; }
 
-
-
         [Column("player_id", TypeName = "bigint(20) unsigned"), Required]
         public ulong PlayerID { get; set; }
 
         public PlayerData PlayerData { get; set; }
-
     }
 }

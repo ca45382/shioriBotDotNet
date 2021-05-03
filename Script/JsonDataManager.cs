@@ -1,8 +1,6 @@
-﻿using System.Runtime.Serialization;
+﻿using Newtonsoft.Json;
 using System.IO;
-
-using Newtonsoft.Json;
-
+using System.Runtime.Serialization;
 
 namespace PriconneBotConsoleApp.Script
 {
@@ -14,7 +12,6 @@ namespace PriconneBotConsoleApp.Script
 
         public JsonDataManager()
         {
-
         }
 
         public JsonDataManager(string path)
@@ -25,7 +22,7 @@ namespace PriconneBotConsoleApp.Script
             Token = m_configData.DiscordSettingValue.DisordToken;
         }
 
-        public string MySQLConnectionString() =>
+        public string MySQLConnectionString =>
             $"server = {m_configData.SqlConnectorValue.Host}; " +
             $"port = {m_configData.SqlConnectorValue.Port}; " +
             $"user = {m_configData.SqlConnectorValue.User}; " +
@@ -42,7 +39,6 @@ namespace PriconneBotConsoleApp.Script
 
             [DataMember(Name = "database")]
             public SqlDatabase SqlConnectorValue;
-
 
             [DataContract]
             public class DiscordSetupData
@@ -65,14 +61,19 @@ namespace PriconneBotConsoleApp.Script
             {
                 [DataMember(Name = "host")]
                 public string Host;
+
                 [DataMember(Name = "port")]
                 public int Port;
+
                 [DataMember(Name = "user")]
                 public string User;
+
                 [DataMember(Name = "password")]
                 public string Password;
+
                 [DataMember(Name = "database")]
                 public string Database;
+
                 [DataMember(Name = "sslmode")]
                 public string sslMode;
             }

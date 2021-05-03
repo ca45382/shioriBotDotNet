@@ -17,13 +17,13 @@ namespace PriconneBotConsoleApp.DataTypes
         [Column("name", TypeName = "varchar(100)")]
         public string GuildUserName { get; set; }
 
-
-        //外部キー
+        /// <summary>
+        /// 外部キー
+        /// </summary>
         [Column("clan_id", TypeName = "bigint(20) unsigned"), Required]
         public ulong ClanID { get; set; }
 
         public ClanData ClanData { get; set; }
-
 
         public List<ReservationData> ReservationData { get; set; }
 

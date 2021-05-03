@@ -1,13 +1,12 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PriconneBotConsoleApp.DataTypes;
 using PriconneBotConsoleApp.Script;
+using System;
 
 namespace PriconneBotConsoleApp.MySQL
 {
     class MySQLConnector : DbContext
     {
-
         public DbSet<BotDatabase> BotDatabase { get; set; }
         public DbSet<ClanData> ClanData { get; set; }
 
@@ -16,22 +15,20 @@ namespace PriconneBotConsoleApp.MySQL
         public DbSet<ReservationData> ReservationData { get; set; }
         public DbSet<DeclarationData> DeclarationData { get; set; }
         
-        public JsonDataManager JsonData;
+        public static readonly JsonDataManager JsonData = new JsonDataManager();
 
-        public MariaDbServerVersion ServerVersion;
+        // TODO: 動的に取得する
+        public static readonly MariaDbServerVersion ServerVersion = new MariaDbServerVersion(new Version(10, 3, 27));
 
         public MySQLConnector()
         {
-            JsonData = new JsonDataManager();
-            ServerVersion = new MariaDbServerVersion(new Version(10, 3, 27));
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseMySql(JsonData.MySQLConnectionString(), ServerVersion);
+            => optionsBuilder.UseMySql(JsonData.MySQLConnectionString, ServerVersion);
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             modelBuilder.Entity<ClanData>()
                 .HasOne(b => b.BotDatabase)
                 .WithMany(i => i.ClanData)
@@ -52,7 +49,6 @@ namespace PriconneBotConsoleApp.MySQL
                 .WithOne(i => i.ClanData)
                 .HasForeignKey<RoleIDs>(b => b.ClanID);
 
-
             modelBuilder.Entity<PlayerData>()
                 .HasOne(b => b.ClanData)
                 .WithMany(i => i.PlayerData)
@@ -67,8 +63,6 @@ namespace PriconneBotConsoleApp.MySQL
                 .HasOne(b => b.PlayerData)
                 .WithMany(i => i.DeclarationData)
                 .HasForeignKey(b => b.PlayerID);
-            
         }
-
     }
 }
