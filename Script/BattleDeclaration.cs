@@ -388,7 +388,7 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var nowBattleNameList = declarationDataList
-                .Where(d => d.FinishFlag == false)
+                .Where(d => !d.FinishFlag)
                 .OrderBy(d => d.DateTime)
                 .Select(d => d.PlayerData.GuildUserName)
                 .ToList();
