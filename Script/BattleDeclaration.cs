@@ -130,7 +130,7 @@ namespace PriconneBotConsoleApp.Script
 
             var declarationMessageID = userClanData.MessageIDs.DeclarationMessageID;
             
-            if (declarationMessageID == null)
+            if (declarationMessageID == 0)
             {
                 return false;
             }

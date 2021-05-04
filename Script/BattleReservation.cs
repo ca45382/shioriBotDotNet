@@ -148,7 +148,7 @@ namespace PriconneBotConsoleApp.Script
             var userRole = m_userRole;
             var reservationMessageID = userClanData.MessageIDs.ReservationMessageID;
 
-            if (reservationMessageID == null)
+            if (reservationMessageID == 0)
             {
                 return;
             }
