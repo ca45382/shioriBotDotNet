@@ -18,12 +18,6 @@ namespace PriconneBotConsoleApp.Script
 
             m_playerData = new MySQLPlayerDataController()
                 .LoadPlayerData((ulong)reactionChannel?.Guild.Id, reaction.UserId);
-
-            if (m_playerData == null)
-            {
-                return;
-            }
-
             var userRole = reactionChannel?.Guild.GetRole((ulong)m_playerData?.ClanData.ClanRoleID);
 
             if (userRole == null)
