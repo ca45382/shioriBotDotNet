@@ -10,7 +10,7 @@ namespace PriconneBotConsoleApp.DataTypes
         [Column("server_id", TypeName = "BIGINT UNSIGNED"), Key]
         public ulong ServerID { get; set; }
 
-        [Column("server_name", TypeName = "varchar(100)")]
+        [Column("server_name", TypeName = "VARCHAR(100)")]
         public string ServerName { get; set; }
 
         [Column("server_owner_id", TypeName = "BIGINT UNSIGNED")]

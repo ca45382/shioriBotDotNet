@@ -14,7 +14,7 @@ namespace PriconneBotConsoleApp.DataTypes
         [Column("user_id", TypeName = "BIGINT UNSIGNED"), Required]
         public ulong UserID { get; set; }
 
-        [Column("name", TypeName = "varchar(100)")]
+        [Column("name", TypeName = "VARCHAR(100)")]
         public string GuildUserName { get; set; }
 
         /// <summary>
