@@ -14,8 +14,7 @@ namespace PriconneBotConsoleApp.MySQL
 
             var clanID = mySQLConnector.ClanData
                 .Include(d => d.ServerData)
-                .Where(d => d.ServerID == clanData.ServerID)
-                .Where(d => d.ClanRoleID == clanData.ClanRoleID)
+                .Where(d => d.ServerID == clanData.ServerID && d.ClanRoleID == clanData.ClanRoleID)
                 .Select(d => d.ClanID)
                 .FirstOrDefault();
 
@@ -48,8 +47,7 @@ namespace PriconneBotConsoleApp.MySQL
 
             var clanID = mySQLConnector.ClanData
                 .Include(d => d.ServerData)
-                .Where(d => d.ServerID == clanData.ServerID)
-                .Where(d => d.ClanRoleID == clanData.ClanRoleID)
+                .Where(d => d.ServerID == clanData.ServerID && d.ClanRoleID == clanData.ClanRoleID)
                 .Select(d => d.ClanID)
                 .FirstOrDefault();
 
@@ -61,10 +59,9 @@ namespace PriconneBotConsoleApp.MySQL
             return mySQLConnector.DeclarationData
                 .Include(b => b.PlayerData)
                 .ThenInclude(d => d.ClanData)
-                .Where(d => d.PlayerData.ClanID == clanID)
-                .Where(b => b.DeleteFlag == false)
-                .Where(b => b.BattleLap == clanData.BattleLap)
-                .Where(b => b.BossNumber == clanData.BossNumber)
+                .Where(d => d.PlayerData.ClanID == clanID && !d.DeleteFlag
+                    && d.BattleLap == clanData.BattleLap && d.BossNumber == clanData.BossNumber
+                )
                 .ToList();
         }
 
@@ -80,10 +77,9 @@ namespace PriconneBotConsoleApp.MySQL
             return mySQLConnector.DeclarationData
                 .Include(b => b.PlayerData)
                 .ThenInclude(d => d.ClanData)
-                .Where(d => d.PlayerData.PlayerID == playerData.PlayerID)
-                .Where(b => b.DeleteFlag == false)
-                .Where(b => b.BattleLap == playerData.ClanData.BattleLap)
-                .Where(b => b.BossNumber == playerData.ClanData.BossNumber)
+                .Where(d => d.PlayerData.PlayerID == playerData.PlayerID && !d.DeleteFlag 
+                    && d.BattleLap == playerData.ClanData.BattleLap && d.BossNumber == playerData.ClanData.BossNumber
+                )
                 .ToList();
         }
 
@@ -126,7 +122,7 @@ namespace PriconneBotConsoleApp.MySQL
         public bool UpdateDeclarationData(DeclarationData declarationData)
         {
             var userData = declarationData.PlayerData;
-            
+
             if (declarationData.PlayerID == 0 && userData == null)
             {
                 return false;
@@ -147,11 +143,10 @@ namespace PriconneBotConsoleApp.MySQL
 
             var updateData = mySQLConnector.DeclarationData
                 .Include(d => d.PlayerData)
-                .Where(d => d.PlayerID == declarationData.PlayerID)
-                .Where(d => d.BattleLap == declarationData.BattleLap)
-                .Where(d => d.BossNumber == declarationData.BossNumber)
-                .Where(d => d.FinishFlag == false)
-                .Where(b => b.DeleteFlag == false)
+                .Where(d =>
+                   d.PlayerID == declarationData.PlayerID && d.BattleLap == declarationData.BattleLap
+                   && d.BossNumber == declarationData.BossNumber && !d.FinishFlag && !d.DeleteFlag
+                )
                 .FirstOrDefault();
 
             if (updateData != null)
@@ -192,11 +187,10 @@ namespace PriconneBotConsoleApp.MySQL
 
                 var userDeleteDataSet = mySQLConnector.DeclarationData
                     .Include(d => d.PlayerData)
-                    .Where(d => d.PlayerID == declarationData.PlayerID)
-                    .Where(b => b.DeleteFlag == false)
-                    .Where(d => d.BossNumber == declarationData.BossNumber)
-                    .Where(d => d.BattleLap == declarationData.BattleLap)
-                    .Where(d => d.FinishFlag == declarationData.FinishFlag);
+                    .Where(d => d.PlayerID == declarationData.PlayerID && !d.DeleteFlag
+                        && d.BossNumber == declarationData.BossNumber && d.BattleLap == declarationData.BattleLap
+                        && d.FinishFlag == declarationData.FinishFlag
+                    );
 
                 foreach (var updateData in userDeleteDataSet)
                 {
@@ -229,9 +223,9 @@ namespace PriconneBotConsoleApp.MySQL
             return mySQLConnector.PlayerData
                 .Include(d => d.ClanData)
                 .ThenInclude(e => e.ServerData)
-                .Where(d => d.ClanData.ServerID == clanData.ServerID)
-                .Where(d => d.ClanData.ClanRoleID == clanData.ClanRoleID)
-                .Where(d => d.UserID == playerData.UserID)
+                .Where(d => d.ClanData.ServerID == clanData.ServerID && d.ClanData.ClanRoleID == clanData.ClanRoleID
+                    && d.UserID == playerData.UserID 
+                )
                 .Select(d => d.PlayerID)
                 .FirstOrDefault();
         }
