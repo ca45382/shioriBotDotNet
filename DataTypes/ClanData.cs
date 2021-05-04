@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -29,11 +30,11 @@ namespace PriconneBotConsoleApp.DataTypes
         [Column("reservation_lap", TypeName = "TINYINT UNSIGNED")]
         public byte ReservationLap { get; set; }
 
-        [Column("reservation_start_time ", TypeName = "TIME")]
-        public byte[] ReservationStartTime { get; set; }
+        [Column("reservation_start_time", TypeName = "TIME")]
+        public TimeSpan ReservationStartTime { get; set; }
 
-        [Column("reservation_end_time ", TypeName = "TIME")]
-        public byte[] ReservationEndTime { get; set; }
+        [Column("reservation_end_time", TypeName = "TIME")]
+        public TimeSpan ReservationEndTime { get; set; }
 
         /// <summary>
         /// 外部キー
@@ -41,7 +42,7 @@ namespace PriconneBotConsoleApp.DataTypes
         [Column("server_id", TypeName = "BIGINT UNSIGNED"), Required]
         public ulong ServerID { get; set; }
 
-        public ServerData BotDatabase { get; set; }
+        public ServerData ServerData { get; set; }
 
         // リレーション
         public ChannelIDs ChannelIDs { get; set; }

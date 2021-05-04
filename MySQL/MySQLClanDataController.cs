@@ -19,7 +19,7 @@ namespace PriconneBotConsoleApp.MySQL
             using var mySQLConnector = new MySQLConnector();
 
             return mySQLConnector.ClanData
-                .Include(b => b.BotDatabase)
+                .Include(b => b.ServerData)
                 .Include(b => b.MessageIDs)
                 .Include(b => b.ChannelIDs)
                 .Include(b => b.RoleIDs)
@@ -34,7 +34,7 @@ namespace PriconneBotConsoleApp.MySQL
             var transaction = mySQLConnector.Database.BeginTransaction();
 
             var mySQLData = mySQLConnector.ClanData
-                .Include(b => b.BotDatabase)
+                .Include(b => b.ServerData)
                 .Where(b => b.ClanID == clanData.ClanID)
                 .FirstOrDefault();
 

@@ -23,7 +23,7 @@ namespace PriconneBotConsoleApp.MySQL
 
             return mySQLConnector.PlayerData
                 .Include(b => b.ClanData)
-                .ThenInclude(b => b.BotDatabase)
+                .ThenInclude(b => b.ServerData)
                 .Where(b => b.UserID == userID && b.ClanData.ServerID == serverID)
                 .FirstOrDefault();
         }
@@ -36,7 +36,7 @@ namespace PriconneBotConsoleApp.MySQL
             foreach (PlayerData playerData in playersData)
             {
                 var clanID = mySQLConnector.ClanData
-                    .Include(d => d.BotDatabase)
+                    .Include(d => d.ServerData)
                     .Where(d => d.ServerID == playerData.ClanData.ServerID && d.ClanRoleID == playerData.ClanData.ClanRoleID)
                     .Select(d => d.ClanID)
                     .FirstOrDefault();

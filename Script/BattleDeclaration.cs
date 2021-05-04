@@ -363,7 +363,7 @@ namespace PriconneBotConsoleApp.Script
             var updateTimeString = updateTime.ToString("T");
 
             var reservationNameList = reservationDataList
-                .OrderBy(d => BitConverter.ToUInt64(d.CreateDateTime))
+                .OrderBy(d => d.CreateDateTime)
                 .Select(d => d.PlayerData.GuildUserName)
                 .ToList();
 
@@ -376,7 +376,7 @@ namespace PriconneBotConsoleApp.Script
 
             var finishNameList = declarationDataList
                 .Where(d => d.FinishFlag)
-                .OrderBy(d => BitConverter.ToUInt64(d.DateTime))
+                .OrderBy(d => d.DateTime)
                 .Select(d => d.PlayerData.GuildUserName)
                 .ToList();
 
@@ -389,7 +389,7 @@ namespace PriconneBotConsoleApp.Script
 
             var nowBattleNameList = declarationDataList
                 .Where(d => d.FinishFlag == false)
-                .OrderBy(d => BitConverter.ToUInt64(d.DateTime))
+                .OrderBy(d => d.DateTime)
                 .Select(d => d.PlayerData.GuildUserName)
                 .ToList();
 
@@ -457,7 +457,7 @@ namespace PriconneBotConsoleApp.Script
                 new MySQLReservationController().LoadBossLapReservationData(clanData);
 
             var reservationIDList = reservationDataList
-               .OrderBy(d => BitConverter.ToUInt64(d.CreateDateTime))
+               .OrderBy(d => d.CreateDateTime)
                .Select(d => d.PlayerData.UserID)
                .ToList();
 

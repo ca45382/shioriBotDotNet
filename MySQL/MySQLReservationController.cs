@@ -13,7 +13,7 @@ namespace PriconneBotConsoleApp.MySQL
             var transaction = mySQLConnector.Database.BeginTransaction();
 
             var clanID = mySQLConnector.ClanData
-                .Include(d => d.BotDatabase)
+                .Include(d => d.ServerData)
                 .Where(d => d.ServerID == clanData.ServerID)
                 .Where(d => d.ClanRoleID == clanData.ClanRoleID)
                 .Select(d => d.ClanID)
@@ -70,7 +70,7 @@ namespace PriconneBotConsoleApp.MySQL
 
             var playerDataOnSQL = mySQLConnector.PlayerData
                 .Include(b => b.ClanData)
-                .ThenInclude(b => b.BotDatabase)
+                .ThenInclude(b => b.ServerData)
                 .Where(b => b.ClanData.ServerID == playerData.ClanData.ServerID
                     && b.ClanData.ClanRoleID == playerData.ClanData.ClanRoleID
                     && b.UserID == playerData.UserID);
@@ -91,7 +91,7 @@ namespace PriconneBotConsoleApp.MySQL
             using var mySQLConnector = new MySQLConnector();
 
             var clanID = mySQLConnector.ClanData
-                .Include(d => d.BotDatabase)
+                .Include(d => d.ServerData)
                 .Where(d => d.ServerID == clanData.ServerID)
                 .Where(d => d.ClanRoleID == clanData.ClanRoleID)
                 .Select(d => d.ClanID)

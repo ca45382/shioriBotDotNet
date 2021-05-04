@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PriconneBotConsoleApp.DataTypes
@@ -12,11 +13,11 @@ namespace PriconneBotConsoleApp.DataTypes
 
         [Column("create_date_time"), Required]
         [Timestamp]
-        public byte[] CreateDateTime { get; set; }
+        public DateTime CreateDateTime { get; set; }
 
         [Column("update_date_time"), Required]
         [Timestamp]
-        public byte[] UpdateDateTime { get; set; }
+        public DateTime UpdateDateTime { get; set; }
 
         [Column("boss_num", TypeName = "TINYINT UNSIGNED")]
         public byte BossNumber { get; set; }
