@@ -7,7 +7,7 @@ namespace PriconneBotConsoleApp.MySQL
 {
     class MySQLConnector : DbContext
     {
-        public DbSet<BotDatabase> BotDatabase { get; set; }
+        public DbSet<ServerData> ServerData { get; set; }
         public DbSet<ClanData> ClanData { get; set; }
 
         public DbSet<MessageIDs> MessageIDs { get; set; }
@@ -30,7 +30,7 @@ namespace PriconneBotConsoleApp.MySQL
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ClanData>()
-                .HasOne(b => b.BotDatabase)
+                .HasOne(b => b.ServerData)
                 .WithMany(i => i.ClanData)
                 .HasForeignKey(b => b.ServerID);
 

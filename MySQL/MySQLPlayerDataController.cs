@@ -7,7 +7,7 @@ namespace PriconneBotConsoleApp.MySQL
 {
     class MySQLPlayerDataController
     {
-        public List<PlayerData> LoadPlayerData(string serverID)
+        public List<PlayerData> LoadPlayerData(ulong serverID)
         {
             using var mySQLConnector = new MySQLConnector();
 
@@ -17,13 +17,13 @@ namespace PriconneBotConsoleApp.MySQL
                 .ToList();
         }
 
-        public PlayerData LoadPlayerData(string serverID, string userID)
+        public PlayerData LoadPlayerData(ulong serverID, ulong userID)
         {
             using var mySQLConnector = new MySQLConnector();
 
             return mySQLConnector.PlayerData
                 .Include(b => b.ClanData)
-                .ThenInclude(b => b.BotDatabase)
+                .ThenInclude(b => b.ServerData)
                 .Where(b => b.UserID == userID && b.ClanData.ServerID == serverID)
                 .FirstOrDefault();
         }
@@ -36,7 +36,7 @@ namespace PriconneBotConsoleApp.MySQL
             foreach (PlayerData playerData in playersData)
             {
                 var clanID = mySQLConnector.ClanData
-                    .Include(d => d.BotDatabase)
+                    .Include(d => d.ServerData)
                     .Where(d => d.ServerID == playerData.ClanData.ServerID && d.ClanRoleID == playerData.ClanData.ClanRoleID)
                     .Select(d => d.ClanID)
                     .FirstOrDefault();

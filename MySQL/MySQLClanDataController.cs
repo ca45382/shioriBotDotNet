@@ -19,12 +19,12 @@ namespace PriconneBotConsoleApp.MySQL
             using var mySQLConnector = new MySQLConnector();
 
             return mySQLConnector.ClanData
-                .Include(b => b.BotDatabase)
+                .Include(b => b.ServerData)
                 .Include(b => b.MessageIDs)
                 .Include(b => b.ChannelIDs)
                 .Include(b => b.RoleIDs)
-                .Where(b => b.ServerID == role.Guild.Id.ToString())
-                .Where(b => b.ClanRoleID == role.Id.ToString())
+                .Where(b => b.ServerID == role.Guild.Id)
+                .Where(b => b.ClanRoleID == role.Id)
                 .FirstOrDefault();
         }
 
@@ -34,7 +34,7 @@ namespace PriconneBotConsoleApp.MySQL
             var transaction = mySQLConnector.Database.BeginTransaction();
 
             var mySQLData = mySQLConnector.ClanData
-                .Include(b => b.BotDatabase)
+                .Include(b => b.ServerData)
                 .Where(b => b.ClanID == clanData.ClanID)
                 .FirstOrDefault();
 
@@ -47,7 +47,7 @@ namespace PriconneBotConsoleApp.MySQL
             mySQLData.BattleLap = clanData.BattleLap;
             mySQLData.BossNumber = clanData.BossNumber;
             mySQLData.ProgressiveFlag = clanData.ProgressiveFlag;
-            mySQLData.BossRoleReady = clanData.BossRoleReady;
+            //mySQLData.BossRoleReady = clanData.BossRoleReady;
             mySQLData.ClanName = clanData.ClanName;
             mySQLConnector.SaveChanges();
             transaction.Commit();

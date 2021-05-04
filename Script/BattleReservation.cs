@@ -30,7 +30,7 @@ namespace PriconneBotConsoleApp.Script
             SocketReaction userReaction = null)
         {
             m_userClanData = userClanData;
-            m_userRole = (channel as SocketGuildChannel)?.Guild.GetRole(ulong.Parse(m_userClanData.ClanRoleID));
+            m_userRole = (channel as SocketGuildChannel)?.Guild.GetRole(m_userClanData.ClanRoleID);
             m_userMessage = userMessage;
             m_userReaction = userReaction;
         }
@@ -134,12 +134,12 @@ namespace PriconneBotConsoleApp.Script
             var messageData = CreateAllReservationDataMessage(userClanData);
 
             var resultChannel = userRole.Guild
-                .GetTextChannel(ulong.Parse(userClanData.ChannelIDs.ReservationResultChannelID));
+                .GetTextChannel(userClanData.ChannelIDs.ReservationResultChannelID);
 
             var sendedMessageData = await SendMessageToChannel(resultChannel, messageData);
 
             new MySQLReservationController()
-                .UpdateReservationMessageID(userClanData, sendedMessageData.Id.ToString());
+                .UpdateReservationMessageID(userClanData, sendedMessageData.Id);
         }
 
         public async Task UpdateSystemMessage()
@@ -148,20 +148,19 @@ namespace PriconneBotConsoleApp.Script
             var userRole = m_userRole;
             var reservationMessageID = userClanData.MessageIDs.ReservationMessageID;
 
-            if (reservationMessageID == null)
+            if (reservationMessageID == 0)
             {
                 return;
             }
 
-            var guildChannel = userRole.Guild.GetChannel(
-                ulong.Parse(userClanData.ChannelIDs.ReservationResultChannelID)) as SocketTextChannel;
+            var guildChannel = userRole.Guild
+                .GetChannel(userClanData.ChannelIDs.ReservationResultChannelID) as SocketTextChannel;
 
-            var socketMessage = guildChannel.GetCachedMessage(
-                ulong.Parse(reservationMessageID));
+            var socketMessage = guildChannel.GetCachedMessage(reservationMessageID);
 
             if (socketMessage == null || !(socketMessage is SocketUserMessage))
             {
-                var message = await guildChannel.GetMessageAsync( ulong.Parse(reservationMessageID));
+                var message = await guildChannel.GetMessageAsync(reservationMessageID);
 
                 if (message != null)
                 {
@@ -192,8 +191,8 @@ namespace PriconneBotConsoleApp.Script
                 ZenToHan(userMessage.Content).Split(new string[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
             if (splitMessageContent.Length < 3
-                || !(int.TryParse(splitMessageContent[1], out int battleLap) && battleLap > 0)
-                || !(int.TryParse(splitMessageContent[2], out int bossNumber) && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber)
+                || !(byte.TryParse(splitMessageContent[1], out byte battleLap) && battleLap > 0)
+                || !(byte.TryParse(splitMessageContent[2], out byte bossNumber) && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber)
                 || battleLap < userClanData.BattleLap
                 || battleLap > userClanData.BattleLap + LimitReservationLap
                 || battleLap == userClanData.BattleLap && bossNumber < userClanData.BossNumber
@@ -206,7 +205,7 @@ namespace PriconneBotConsoleApp.Script
                 PlayerData = new PlayerData
                 {
                     ClanData = userClanData,
-                    UserID = userMessage.Author.Id.ToString()
+                    UserID = userMessage.Author.Id
                 },
                 BattleLap = battleLap,
                 BossNumber = bossNumber,
@@ -241,14 +240,14 @@ namespace PriconneBotConsoleApp.Script
 
             if (splitMessageContent.Length != 4
                 || !ulong.TryParse(splitMessageContent[1], out ulong userID)
-                || !(int.TryParse(splitMessageContent[2], out int battleLap) && battleLap > 0)
-                || !(int.TryParse(splitMessageContent[3], out int bossNumber) && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber))
+                || !(byte.TryParse(splitMessageContent[2], out byte battleLap) && battleLap > 0)
+                || !(byte.TryParse(splitMessageContent[3], out byte bossNumber) && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber))
             {
                 return null;
             }
 
             var playerData = new MySQLPlayerDataController()
-                .LoadPlayerData(m_userClanData.ServerID, userID.ToString());
+                .LoadPlayerData(m_userClanData.ServerID, userID);
 
             if (playerData == null)
             {
@@ -281,7 +280,7 @@ namespace PriconneBotConsoleApp.Script
 
         private string CreateUserReservationDataMessage()
             => CreateUserReservationDataMessage(
-                new MySQLPlayerDataController().LoadPlayerData(m_userClanData.ServerID, m_userMessage.Author.Id.ToString())
+                new MySQLPlayerDataController().LoadPlayerData(m_userClanData.ServerID, m_userMessage.Author.Id)
             );
 
         private string CreateUserReservationDataMessage(PlayerData playerData)

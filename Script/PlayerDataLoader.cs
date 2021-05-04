@@ -35,7 +35,7 @@ namespace PriconneBotConsoleApp.Script
             var usersOnDiscord = GetServerClanMember(guild);
 
             // テーブル上のプレイヤーデータ
-            var usersOnSQLServer = new MySQLPlayerDataController().LoadPlayerData(guild.Id.ToString());
+            var usersOnSQLServer = new MySQLPlayerDataController().LoadPlayerData(guild.Id);
 
             #region テーブルにユーザを追加・更新
             var createUserData = new List<PlayerData>();
@@ -97,7 +97,7 @@ namespace PriconneBotConsoleApp.Script
             var clanMember = new List<PlayerData>();
 
             // SQL側の情報から対象のクランロールを抽出
-            var guildClanIDs = ClanIDsOnServer(guild.Id.ToString());
+            var guildClanIDs = ClanIDsOnServer(guild.Id);
 
             // 現在のDiscord上の名前を抽出
             // 同一サーバーで複数クランに所属している場合は弾く
@@ -109,8 +109,8 @@ namespace PriconneBotConsoleApp.Script
                 }
 
                 var allUserRoleID = user.Roles
-                    .Where(x => guildClanIDs.Contains(x.Id.ToString()))
-                    .Select(x => x.Id.ToString())
+                    .Where(x => guildClanIDs.Contains(x.Id))
+                    .Select(x => x.Id)
                     .ToList();
 
                 if (allUserRoleID.Count != 1)
@@ -125,11 +125,11 @@ namespace PriconneBotConsoleApp.Script
                 {
                     ClanData = new ClanData() 
                     {
-                        ServerID = user.Guild.Id.ToString(),
+                        ServerID = user.Guild.Id,
                         ClanRoleID = roleID
                     },
 
-                    UserID = user.Id.ToString(),
+                    UserID = user.Id,
                     GuildUserName = nickName
                 };
 
@@ -144,7 +144,7 @@ namespace PriconneBotConsoleApp.Script
         /// </summary>
         /// <param name="guildID"></param>
         /// <returns></returns>
-        private IReadOnlyList<string> ClanIDsOnServer(string guildID)
+        private IReadOnlyList<ulong> ClanIDsOnServer(ulong guildID)
             => m_clanData
                 .Where(x => x.ServerID == guildID)
                 .Select(x => x.ClanRoleID)
