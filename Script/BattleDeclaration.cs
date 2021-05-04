@@ -364,7 +364,7 @@ namespace PriconneBotConsoleApp.Script
             var updateTimeString = updateTime.ToString("T");
 
             var reservationNameList = reservationDataList
-                .OrderBy(d => BitConverter.ToUInt64(d.DateTime))
+                .OrderBy(d => BitConverter.ToUInt64(d.CreateDateTime))
                 .Select(d => d.PlayerData.GuildUserName)
                 .ToList();
 
@@ -458,7 +458,7 @@ namespace PriconneBotConsoleApp.Script
                 new MySQLReservationController().LoadBossLapReservationData(clanData);
 
             var reservationIDList = reservationDataList
-               .OrderBy(d => BitConverter.ToUInt64(d.DateTime))
+               .OrderBy(d => BitConverter.ToUInt64(d.CreateDateTime))
                .Select(d => d.PlayerData.UserID)
                .ToList();
 

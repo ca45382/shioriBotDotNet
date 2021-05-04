@@ -55,7 +55,7 @@ namespace PriconneBotConsoleApp.MySQL
                 .Where(b => b.DeleteFlag == false)
                 .OrderBy(o => o.BattleLap)
                 .ThenBy(d => d.BossNumber)
-                .ThenBy(d => d.DateTime)
+                .ThenBy(d => d.CreateDateTime)
                 .ToList();
         }
 
@@ -109,7 +109,7 @@ namespace PriconneBotConsoleApp.MySQL
                 .Where(b => b.DeleteFlag == false)
                 .Where(b => b.BattleLap == clanData.BattleLap)
                 .Where(b => b.BossNumber == clanData.BossNumber)
-                .OrderBy(d => d.DateTime)
+                .OrderBy(d => d.CreateDateTime)
                 .ToList();
         }
 

@@ -7,23 +7,23 @@ namespace PriconneBotConsoleApp.DataTypes
     [Table("server_data")]
     public class BotDatabase
     {
-        [Column("server_id", TypeName = "varchar(21)"), Key]
-        public string ServerID { get; set; }
+        [Column("server_id", TypeName = "BIGINT UNSIGNED"), Key]
+        public ulong ServerID { get; set; }
 
         [Column("server_name", TypeName = "varchar(100)")]
         public string ServerName { get; set; }
 
-        [Column("server_owner_id", TypeName = "varchar(21)")]
-        public string ServerOwnerID { get; set; }
+        [Column("server_owner_id", TypeName = "BIGINT UNSIGNED")]
+        public ulong ServerOwnerID { get; set; }
 
-        [Column("admin_role_id", TypeName = "varchar(21)")]
-        public string AdminRoleID { get; set; }
+        [Column("admin_role_id", TypeName = "BIGINT UNSIGNED")]
+        public ulong AdminRoleID { get; set; }
 
-        [Column("system_msg_ch_id", TypeName = "varchar(21)")]
-        public string SystemMessageChannelID { get; set; }
+        [Column("system_msg_ch_id", TypeName = "BIGINT UNSIGNED")]
+        public ulong SystemMessageChannelID { get; set; }
 
-        [Column("system_ch_id", TypeName = "varchar(21)")]
-        public string SystemCommandChannelID { get; set; }
+        [Column("system_ch_id", TypeName = "BIGINT UNSIGNED")]
+        public ulong SystemCommandChannelID { get; set; }
 
         public List<ClanData> ClanData { get; set; }
     }
