@@ -7,7 +7,7 @@ namespace PriconneBotConsoleApp.MySQL
 {
     class MySQLConnector : DbContext
     {
-        public DbSet<BotDatabase> BotDatabase { get; set; }
+        public DbSet<ServerData> BotDatabase { get; set; }
         public DbSet<ClanData> ClanData { get; set; }
 
         public DbSet<MessageIDs> MessageIDs { get; set; }

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace PriconneBotConsoleApp.DataTypes
 {
     [Table("server_data")]
-    public class BotDatabase
+    public class ServerData
     {
         [Column("server_id", TypeName = "BIGINT UNSIGNED"), Key]
         public ulong ServerID { get; set; }

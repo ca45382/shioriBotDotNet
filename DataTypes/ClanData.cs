@@ -41,7 +41,7 @@ namespace PriconneBotConsoleApp.DataTypes
         [Column("server_id", TypeName = "BIGINT UNSIGNED"), Required]
         public ulong ServerID { get; set; }
 
-        public BotDatabase BotDatabase { get; set; }
+        public ServerData BotDatabase { get; set; }
 
         // リレーション
         public ChannelIDs ChannelIDs { get; set; }
