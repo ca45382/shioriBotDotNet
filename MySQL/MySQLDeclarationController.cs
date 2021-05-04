@@ -7,7 +7,7 @@ namespace PriconneBotConsoleApp.MySQL
 {
     class MySQLDeclarationController
     {
-        public bool UpdateDeclarationMessageID(ClanData clanData, string messageID)
+        public bool UpdateDeclarationMessageID(ClanData clanData, ulong messageID)
         {
             using var mySQLConnector = new MySQLConnector();
             var transaction = mySQLConnector.Database.BeginTransaction();

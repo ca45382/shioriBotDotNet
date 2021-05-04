@@ -26,7 +26,7 @@ namespace PriconneBotConsoleApp.Script
             SocketReaction userReaction = null)
         {
             m_userClanData = userClanData;
-            m_userRole = (channel as SocketGuildChannel)?.Guild.GetRole(ulong.Parse(m_userClanData.ClanRoleID));
+            m_userRole = (channel as SocketGuildChannel)?.Guild.GetRole(m_userClanData.ClanRoleID);
             m_userMessage = userMessage;
             m_userReaction = userReaction;
         }
@@ -83,8 +83,8 @@ namespace PriconneBotConsoleApp.Script
                 .Split(new[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
             if (splitMessageContent.Length != 3
-                || !(int.TryParse(splitMessageContent[1], out int battleLap) && battleLap > 0)
-                || !(int.TryParse(splitMessageContent[2], out int bossNumber) && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber))
+                || !(byte.TryParse(splitMessageContent[1], out byte battleLap) && battleLap > 0)
+                || !(byte.TryParse(splitMessageContent[2], out byte bossNumber) && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber))
             {
                 return false;
             }
@@ -104,7 +104,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var embed = CreateDeclarationDataEmbed(m_userClanData);
             var content = CreateDeclarationDataMessage(m_userClanData);
-            var declarationChannel = m_userRole.Guild.GetTextChannel(ulong.Parse(m_userClanData.ChannelIDs.DeclarationChannelID));
+            var declarationChannel = m_userRole.Guild.GetTextChannel(m_userClanData.ChannelIDs.DeclarationChannelID);
             var sentMessage = await declarationChannel.SendMessageAsync(text: content, embed: embed);
 
             if (sentMessage == null)
@@ -112,7 +112,7 @@ namespace PriconneBotConsoleApp.Script
                 return false;
             }
 
-            var sentMessageId = sentMessage.Id.ToString();
+            var sentMessageId = sentMessage.Id;
 
             var result = new MySQLDeclarationController()
                 .UpdateDeclarationMessageID(m_userClanData, sentMessageId);
@@ -135,9 +135,9 @@ namespace PriconneBotConsoleApp.Script
                 return false;
             }
 
-            var guildChannel = userRole.Guild.GetChannel(ulong.Parse(userClanData.ChannelIDs.DeclarationChannelID)) as SocketTextChannel;
+            var guildChannel = userRole.Guild.GetChannel(userClanData.ChannelIDs.DeclarationChannelID) as SocketTextChannel;
 
-            if (guildChannel.GetCachedMessage(ulong.Parse(declarationMessageID)) is SocketUserMessage declarationBotMessage)
+            if (guildChannel.GetCachedMessage(declarationMessageID) is SocketUserMessage declarationBotMessage)
             {
                 var embed = CreateDeclarationDataEmbed(userClanData);
                 await declarationBotMessage.ModifyAsync(msg => msg.Embed = embed);
@@ -145,7 +145,7 @@ namespace PriconneBotConsoleApp.Script
             else
             {
                 var message = await guildChannel
-                    .GetMessageAsync(ulong.Parse(declarationMessageID));
+                    .GetMessageAsync(declarationMessageID);
                 
                 if (message == null)
                 {
@@ -167,7 +167,7 @@ namespace PriconneBotConsoleApp.Script
         private bool UserRegistorDeclareCommand()
         {
             var userReaction = m_userReaction;
-            var userId = userReaction.UserId.ToString();
+            var userId = userReaction.UserId;
 
             var isExistSqlData = DeclareDataOnSQL(userId) .Any(d => d.FinishFlag == false);
 
@@ -194,7 +194,7 @@ namespace PriconneBotConsoleApp.Script
             var userReaction = m_userReaction;
 
             // すでに宣言しているか判定
-            var sqlData = DeclareDataOnSQL(userReaction.UserId.ToString())
+            var sqlData = DeclareDataOnSQL(userReaction.UserId)
                 .Count(d => d.FinishFlag == false);
 
             if (sqlData != 1)
@@ -203,14 +203,14 @@ namespace PriconneBotConsoleApp.Script
             }
 
             // 宣言終了
-            var declarationData = UserToDeclareData(userReaction.UserId.ToString());
+            var declarationData = UserToDeclareData(userReaction.UserId);
             declarationData.FinishFlag = true;
             var result = new MySQLDeclarationController()
                 .UpdateDeclarationData(declarationData);
 
             // 予約の削除
             var playerData = new MySQLPlayerDataController().LoadPlayerData(
-                userRole.Guild.Id.ToString(), userReaction.UserId.ToString());
+                userRole.Guild.Id, userReaction.UserId);
 
             var mySQLReservationController = new MySQLReservationController();
             var reservationData = mySQLReservationController.LoadReservationData(playerData);
@@ -234,7 +234,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var userReaction = m_userReaction;
 
-            var sqlDataSet = DeclareDataOnSQL(userReaction.UserId.ToString());
+            var sqlDataSet = DeclareDataOnSQL(userReaction.UserId);
 
             var sqlData = sqlDataSet.FirstOrDefault(d => d.FinishFlag == false);
 
@@ -294,13 +294,13 @@ namespace PriconneBotConsoleApp.Script
         /// </summary>
         /// <param name="userID"></param>
         /// <returns></returns>
-        private DeclarationData UserToDeclareData(string userID)
+        private DeclarationData UserToDeclareData(ulong userID)
         {
             var userClanData = m_userClanData;
             var userRole = m_userRole;
 
             var playerData = new MySQLPlayerDataController().LoadPlayerData(
-                userRole.Guild.Id.ToString(), userID);
+                userRole.Guild.Id, userID);
 
             return new DeclarationData()
             {
@@ -311,12 +311,12 @@ namespace PriconneBotConsoleApp.Script
             };
         }
 
-        private IEnumerable<DeclarationData> DeclareDataOnSQL(string userID)
+        private IEnumerable<DeclarationData> DeclareDataOnSQL(ulong userID)
         {
             var userRole = m_userRole;
 
             var playerData = new MySQLPlayerDataController().LoadPlayerData(
-                userRole.Guild.Id.ToString(), userID);
+                userRole.Guild.Id, userID);
 
             var declarationData = new MySQLDeclarationController()
                 .LoadDeclarationData(playerData);
@@ -338,8 +338,7 @@ namespace PriconneBotConsoleApp.Script
 
         private async Task RemoveUserReaction()
         {
-            var textChannnel = m_userRole.Guild.GetTextChannel(
-                ulong.Parse(m_userClanData.ChannelIDs.DeclarationChannelID));
+            var textChannnel = m_userRole.Guild.GetTextChannel(m_userClanData.ChannelIDs.DeclarationChannelID);
 
             var message = await textChannnel.GetMessageAsync(m_userReaction.MessageId);
 
@@ -465,7 +464,7 @@ namespace PriconneBotConsoleApp.Script
             var messageData = "";
             foreach ( var reservationID in reservationIDList)
             {
-                messageData += MentionUtils.MentionUser(ulong.Parse(reservationID));
+                messageData += MentionUtils.MentionUser(reservationID);
                 messageData += " ";
             }
 

@@ -7,7 +7,7 @@ namespace PriconneBotConsoleApp.MySQL
 {
     class MySQLPlayerDataController
     {
-        public List<PlayerData> LoadPlayerData(string serverID)
+        public List<PlayerData> LoadPlayerData(ulong serverID)
         {
             using var mySQLConnector = new MySQLConnector();
 
@@ -17,7 +17,7 @@ namespace PriconneBotConsoleApp.MySQL
                 .ToList();
         }
 
-        public PlayerData LoadPlayerData(string serverID, string userID)
+        public PlayerData LoadPlayerData(ulong serverID, ulong userID)
         {
             using var mySQLConnector = new MySQLConnector();
 

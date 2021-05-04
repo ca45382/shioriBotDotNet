@@ -7,7 +7,7 @@ namespace PriconneBotConsoleApp.MySQL
 {
     class MySQLReservationController
     {
-        public bool UpdateReservationMessageID(ClanData clanData, string messageID)
+        public bool UpdateReservationMessageID(ClanData clanData, ulong messageID)
         {
             using var mySQLConnector = new MySQLConnector();
             var transaction = mySQLConnector.Database.BeginTransaction();
