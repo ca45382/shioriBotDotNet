@@ -13,6 +13,11 @@ namespace PriconneBotConsoleApp.Script
         protected static async Task EditMessage(SocketUserMessage message, string messageData)
             => await message.ModifyAsync(msg => msg.Content = messageData);
 
+        /// <summary>
+        /// 文字列の0-9,a-z,A-Zを全角から半角に強制的に変更する。
+        /// </summary>
+        /// <param name="textData"></param>
+        /// <returns></returns>
         protected static string ZenToHan(string textData)
         {
             var convertText = textData;
