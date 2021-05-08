@@ -100,6 +100,10 @@ namespace PriconneBotConsoleApp.Script
             return await SendDeclarationBotMessage();
         }
 
+        /// <summary>
+        /// 宣言データを送信するためのコード
+        /// </summary>
+        /// <returns></returns>
         private async Task<bool> SendDeclarationBotMessage()
         {
             var embed = CreateDeclarationDataEmbed(m_userClanData);
@@ -123,6 +127,10 @@ namespace PriconneBotConsoleApp.Script
             return result;
         }
 
+        /// <summary>
+        /// 宣言データをアップデートするためのコード
+        /// </summary>
+        /// <returns></returns>
         public async Task<bool> UpdateDeclarationBotMessage()
         {
             var userClanData = m_userClanData;
