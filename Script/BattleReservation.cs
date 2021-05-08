@@ -243,6 +243,10 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
+        /// <summary>
+        /// 個人が予約しているデータの取得
+        /// </summary>
+        /// <returns></returns>
         private ReservationData MessageToUserReservationData()
         {
             var splitMessageContent = m_userMessage.Content
