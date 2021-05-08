@@ -52,6 +52,13 @@ namespace PriconneBotConsoleApp.Script
 
         public async Task RunDeclarationCommandByReaction()
         {
+            var declarationMessageID = m_userClanData.MessageIDs.DeclarationMessageID;
+
+            if (declarationMessageID == 0 || m_userReaction.MessageId != declarationMessageID)
+            {
+                return;
+            }
+
             switch (m_userReaction.Emote.Name)
             {
                 case "⚔️":
