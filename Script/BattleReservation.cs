@@ -131,6 +131,17 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
+        public async Task RunReservationResultReaction()
+        {
+            switch (m_userReaction.Emote.Name)
+            {
+                case "🔄":
+                    await UpdateSystemMessage();
+                    break;
+            }
+            await RemoveUserReaction();
+        }
+
         public async Task SendSystemMessage()
         {
             var userClanData = m_userClanData;
@@ -144,6 +155,7 @@ namespace PriconneBotConsoleApp.Script
 
             new MySQLReservationController()
                 .UpdateReservationMessageID(userClanData, sendedMessageData.Id);
+            await AttacheDefaultReaction(sendedMessageData);
         }
 
         public async Task UpdateSystemMessage()
@@ -359,6 +371,26 @@ namespace PriconneBotConsoleApp.Script
             return messageData.ToString();
         }
 
+        private async Task AttacheDefaultReaction(IUserMessage message)
+        {
+            string[] emojiData = { "🔄" };
+            var emojiMatrix = emojiData.Select(x => new Emoji(x)).ToArray();
+            await message.AddReactionsAsync(emojiMatrix);
+        }
+
+        private async Task RemoveUserReaction()
+        {
+            var textChannnel = m_userRole.Guild.GetTextChannel(m_userClanData.ChannelIDs.DeclarationChannelID);
+
+            var message = await textChannnel.GetMessageAsync(m_userReaction.MessageId);
+
+            if (message == null)
+            {
+                return;
+            }
+            await message.RemoveReactionAsync(m_userReaction.Emote, m_userReaction.User.Value);
+        }
+        
         private async Task SendErrorMessage(ErrorType type, params string[] parameters)
         {
             var descriptionAttribute = type.GetType().GetField(type.ToString()).GetCustomAttribute<DescriptionAttribute>(false);

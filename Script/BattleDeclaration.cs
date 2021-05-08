@@ -77,6 +77,10 @@ namespace PriconneBotConsoleApp.Script
                 case "❌":
                     UserDeleteBattleData();
                     break;
+
+                case "🔄":
+                    await UpdateDeclarationBotMessage();
+                    break;
             }
 
             await UpdateDeclarationBotMessage();
@@ -342,7 +346,7 @@ namespace PriconneBotConsoleApp.Script
         private async Task AttacheDefaultReaction(IUserMessage message)
         {
 
-            string[] emojiData = { "⚔️", "✅", "🏁", "❌" };
+            string[] emojiData = { "⚔️", "✅", "🏁", "❌", "🔄" };
             var emojiMatrix = emojiData.Select(x => new Emoji(x)).ToArray();
 
             //foreach (var emoji in emojiMatrix)
