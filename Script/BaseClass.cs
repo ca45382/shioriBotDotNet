@@ -7,7 +7,7 @@ namespace PriconneBotConsoleApp.Script
 {
     class BaseClass
     {
-        protected static async Task<RestMessage> SendMessageToChannel(ISocketMessageChannel channel, string messageData)
+        protected static async Task<RestUserMessage> SendMessageToChannel(ISocketMessageChannel channel, string messageData)
             => await channel.SendMessageAsync(messageData);
 
         protected static async Task EditMessage(SocketUserMessage message, string messageData)
