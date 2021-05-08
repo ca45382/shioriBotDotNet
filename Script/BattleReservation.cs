@@ -18,6 +18,8 @@ namespace PriconneBotConsoleApp.Script
 
         private const int ReservableStartTimeHour = 18;
 
+        private const int MaxCommentLength = 30;
+
         private readonly ClanData m_userClanData;
         private readonly SocketRole m_userRole;
         private readonly SocketUserMessage m_userMessage;
@@ -186,7 +188,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var userClanData = m_userClanData;
             var userMessage = m_userMessage;
-            
+
             var splitMessageContent =
                 ZenToHan(userMessage.Content).Split(new string[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -200,8 +202,16 @@ namespace PriconneBotConsoleApp.Script
             {
                 return null;
             }
-            
-            return new ReservationData() {
+            var commentData = string.Join(" ",splitMessageContent.Skip(3));
+
+            if (commentData.Length > MaxCommentLength)
+            {
+                commentData = commentData.Substring(0,MaxCommentLength);
+                userMessage.Channel.SendMessageAsync("長い");
+            }
+           
+            return new ReservationData()
+            {
                 PlayerData = new PlayerData
                 {
                     ClanData = userClanData,
@@ -209,7 +219,7 @@ namespace PriconneBotConsoleApp.Script
                 },
                 BattleLap = battleLap,
                 BossNumber = bossNumber,
-                CommentData = string.Join(" ", splitMessageContent.Skip(3))
+                CommentData = commentData
             };
         }
 
