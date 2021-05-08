@@ -380,7 +380,7 @@ namespace PriconneBotConsoleApp.Script
 
         private async Task RemoveUserReaction()
         {
-            var textChannnel = m_userRole.Guild.GetTextChannel(m_userClanData.ChannelIDs.DeclarationChannelID);
+            var textChannnel = m_userRole.Guild.GetTextChannel(m_userClanData.ChannelIDs.ReservationResultChannelID);
 
             var message = await textChannnel.GetMessageAsync(m_userReaction.MessageId);
 
