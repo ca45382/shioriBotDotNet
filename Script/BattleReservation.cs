@@ -6,6 +6,8 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
+using System.ComponentModel;
 
 namespace PriconneBotConsoleApp.Script
 {
@@ -69,7 +71,7 @@ namespace PriconneBotConsoleApp.Script
 #if !DEBUG
                 if (DateTime.Now.Hour < ReservableStartTimeHour)
                 {
-                    await OutOfReservationTime();
+                    await SendErrorMessage(ErrorType.OutOfReservationTime, $"{ReservableStartTimeHour}:00", "24:00");
                     return;
                 }
 #endif
@@ -78,7 +80,7 @@ namespace PriconneBotConsoleApp.Script
 
                 if (reservationData is null)
                 {
-                    await FailedToRegisterMessage();
+                    await SendErrorMessage(ErrorType.FailedReservation);
                     return;
                 }
 
@@ -357,11 +359,20 @@ namespace PriconneBotConsoleApp.Script
             return messageData.ToString();
         }
 
-        private async Task FailedToRegisterMessage()
-            => await m_userMessage.Channel.SendMessageAsync("予約に失敗しました。");
-
-        private async Task OutOfReservationTime()
-            => await m_userMessage.Channel.SendMessageAsync("予約できません。予約可能時間は18:00～23:59です。");
+        private async Task SendErrorMessage(ErrorType type, params string[] parameters)
+        {
+            var descriptionAttribute = type.GetType().GetField(type.ToString()).GetCustomAttribute<DescriptionAttribute>(false);
+            var sendMessage = string.Empty;
+            if (descriptionAttribute == null)
+            {
+                sendMessage = type.ToString();
+            }
+            else
+            {
+                sendMessage = string.Format(descriptionAttribute.Description, parameters);
+            }
+            await m_userMessage.Channel.SendMessageAsync(sendMessage);
+        }
 
         private async Task SuccessAddEmoji()
             => await m_userMessage.AddReactionAsync(new Emoji("🆗"));
