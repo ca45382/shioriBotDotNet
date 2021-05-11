@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace PriconneBotConsoleApp.Script
         private DiscordSocketClient m_client;
         private DiscordSocketConfig m_config;
 
+        private readonly static string ConfigPath = Path.Combine("data", "botConfig.json");
         static void Main() => new Program().MainAsync().GetAwaiter().GetResult();
 
         /// <summary>
@@ -22,7 +24,8 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         public async Task MainAsync()
         {
-            var jsonSettingData = new JsonDataManager("./data/botConfig.json");
+
+            var jsonSettingData = new JsonDataManager(ConfigPath);
 
             m_config = new DiscordSocketConfig
             {
