@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+using Brotli;
+
 namespace PriconneBotConsoleApp.Script
 {
     class BotInitialize
@@ -22,6 +24,31 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
+        public bool DecompressDB()
+        {
+            try
+            {
+                using var rediveDataFile = new FileStream(
+                    Path.Combine(CacheFolderPath, "redive_jp.db.br"),
+                    FileMode.Open,
+                    FileAccess.Read
+                );
 
+                using var rediveDecompressedFile = new FileStream(
+                    Path.Combine(DataFolderPath, "redive_jp.db"),
+                    FileMode.Create,
+                    FileAccess.Write
+                );
+
+                using var bs = new BrotliStream(rediveDataFile, System.IO.Compression.CompressionMode.Decompress);
+                bs.CopyTo(rediveDecompressedFile);
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }
