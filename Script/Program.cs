@@ -32,6 +32,9 @@ namespace PriconneBotConsoleApp.Script
                 MessageCacheSize = 10
             };
 
+            var initialize = new BotInitialize();
+            var data = initialize.DecompressDB();
+
             m_client = new DiscordSocketClient(m_config);
             m_client.MessageReceived += CommandRecieved;
             m_client.GuildMembersDownloaded += GuildMembersDownloaded;
