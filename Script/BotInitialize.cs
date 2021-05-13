@@ -32,6 +32,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var webClient = new WebClient();
             var updateRediveString = webClient.DownloadString(rediveURL + RediveJsonName);
+            var rediveJsonPath = Path.Combine(DataFolderPath, RediveJsonName);
 
             if (updateRediveString == null)
             {
@@ -40,33 +41,26 @@ namespace PriconneBotConsoleApp.Script
 
             var updateRediveData = LoadJson<RediveUpdateJsonData>(updateRediveString);
 
-            if (File.Exists(Path.Combine(DataFolderPath, RediveJsonName)))
+            if (File.Exists(rediveJsonPath))
             {
-                var preRediveData = LoadJson<RediveUpdateJsonData>(
-                    File.ReadAllText(Path.Combine(DataFolderPath, RediveJsonName))
-                );
+                var preRediveData = LoadJson<RediveUpdateJsonData>(File.ReadAllText(rediveJsonPath));
 
                 if (updateRediveData == null 
-                    || ( preRediveData != null && preRediveData.TruthVersion == updateRediveData.TruthVersion) 
-                    )
+                    || ( preRediveData != null && preRediveData.TruthVersion == updateRediveData.TruthVersion) )
                 {
                     return;
                 }
             }
 
-            File.WriteAllText(Path.Combine(DataFolderPath, RediveJsonName), updateRediveString);
+            File.WriteAllText(rediveJsonPath, updateRediveString);
 
-            webClient.DownloadFile(
-                rediveURL + "db/" + RediveDBName + ".br",
-                Path.Combine(TempFolderPath, RediveDBName + ".br")
-                );
+            var rediveDBURL = rediveURL + "db/" + RediveDBName + ".br";
+            var rediveDBBrotliPath = Path.Combine(TempFolderPath, RediveDBName + ".br");
+            var rediveDBPath = Path.Combine(DataFolderPath, RediveDBName);
 
-            DecompressDB(
-                Path.Combine(TempFolderPath, RediveDBName + ".br"),
-                Path.Combine(DataFolderPath, RediveDBName)
-                );
-
-            File.Delete(Path.Combine(TempFolderPath, RediveDBName + ".br"));
+            webClient.DownloadFile(rediveDBURL, rediveDBBrotliPath);
+            DecompressDB(rediveDBBrotliPath, rediveDBPath);
+            File.Delete(rediveDBBrotliPath);
 
             return;
         }
