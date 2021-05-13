@@ -33,7 +33,7 @@ namespace PriconneBotConsoleApp.Script
             };
 
             var initialize = new BotInitialize();
-            var data = initialize.DecompressDB();
+            initialize.UpdateRediveDB();
 
             m_client = new DiscordSocketClient(m_config);
             m_client.MessageReceived += CommandRecieved;
