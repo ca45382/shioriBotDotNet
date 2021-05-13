@@ -4,6 +4,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 
 using Brotli;
+using PriconneBotConsoleApp.DataTypes;
 
 namespace PriconneBotConsoleApp.Script
 {
@@ -118,13 +119,5 @@ namespace PriconneBotConsoleApp.Script
             var instance = JsonSerializer.Deserialize<T>(json, options);
             return instance;
         }
-    }
-
-
-    public class RediveUpdateJsonData
-    {
-        public string TruthVersion { get; set; }
-        public string Hash { get; set; }
-        public string PrefabVer { get; set; }
     }
 }
