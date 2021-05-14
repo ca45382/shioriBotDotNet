@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PriconneBotConsoleApp.DataTypes
 {
-    public class RediveUpdateJsonData
+    public class RediveVersionData
     {
         public string TruthVersion { get; set; }
         public string Hash { get; set; }

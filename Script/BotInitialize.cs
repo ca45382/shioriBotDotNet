@@ -14,7 +14,7 @@ namespace PriconneBotConsoleApp.Script
         private readonly string DataFolderPath = Path.Combine("data");
         private readonly string TempFolderPath = Path.Combine("temp");
         private readonly string RediveJsonName = "last_version_jp.json";
-        private readonly string RediveDBName = "redive_jp.db";
+        private readonly string RediveDatabaseName = "redive_jp.db";
 
         public BotInitialize()
         {
@@ -32,19 +32,29 @@ namespace PriconneBotConsoleApp.Script
         public void UpdateRediveDB()
         {
             var webClient = new WebClient();
-            var updateRediveString = webClient.DownloadString(rediveURL + RediveJsonName);
-            var rediveJsonPath = Path.Combine(DataFolderPath, RediveJsonName);
+            string updateRediveString;
 
-            if (updateRediveString == null)
+            try
+            {
+                updateRediveString = webClient.DownloadString(rediveURL + RediveJsonName);
+            }
+            catch
             {
                 return;
             }
 
-            var updateRediveData = LoadJson<RediveUpdateJsonData>(updateRediveString);
+            var rediveJsonPath = Path.Combine(DataFolderPath, RediveJsonName);
+
+            if (string.IsNullOrEmpty(updateRediveString))
+            {
+                return;
+            }
+
+            var updateRediveData = LoadJson<RediveVersionData>(updateRediveString);
 
             if (File.Exists(rediveJsonPath))
             {
-                var preRediveData = LoadJson<RediveUpdateJsonData>(File.ReadAllText(rediveJsonPath));
+                var preRediveData = LoadJson<RediveVersionData>(File.ReadAllText(rediveJsonPath));
 
                 if (updateRediveData == null 
                     || ( preRediveData != null && preRediveData.TruthVersion == updateRediveData.TruthVersion) )
@@ -55,9 +65,9 @@ namespace PriconneBotConsoleApp.Script
 
             File.WriteAllText(rediveJsonPath, updateRediveString);
 
-            var rediveDBURL = rediveURL + "db/" + RediveDBName + ".br";
-            var rediveDBBrotliPath = Path.Combine(TempFolderPath, RediveDBName + ".br");
-            var rediveDBPath = Path.Combine(DataFolderPath, RediveDBName);
+            var rediveDBURL = rediveURL + "db/" + RediveDatabaseName + ".br";
+            var rediveDBBrotliPath = Path.Combine(TempFolderPath, RediveDatabaseName + ".br");
+            var rediveDBPath = Path.Combine(DataFolderPath, RediveDatabaseName);
 
             webClient.DownloadFile(rediveDBURL, rediveDBBrotliPath);
             DecompressDB(rediveDBBrotliPath, rediveDBPath);
@@ -103,8 +113,7 @@ namespace PriconneBotConsoleApp.Script
 
         private T LoadJson<T>(string jsonString)
         {
-            var json = jsonString;
-            if (string.IsNullOrEmpty(json))
+            if (string.IsNullOrEmpty(jsonString))
             {
                 return default;
             }
@@ -116,7 +125,7 @@ namespace PriconneBotConsoleApp.Script
                 PropertyNameCaseInsensitive = true,
             };
 
-            var instance = JsonSerializer.Deserialize<T>(json, options);
+            var instance = JsonSerializer.Deserialize<T>(jsonString, options);
             return instance;
         }
     }
