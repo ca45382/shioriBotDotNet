@@ -1,29 +1,35 @@
-﻿using System.Threading.Tasks;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
 using PriconneBotConsoleApp.DataTypes;
 using PriconneBotConsoleApp.MySQL;
+using System.Threading.Tasks;
 
 namespace PriconneBotConsoleApp.Script
 {
     public class ReceiveMessageController
     {
-
-        private ClanData m_playerClanData;
-        private PlayerData m_playerData;
-        private SocketUserMessage m_message;
+        private readonly ClanData m_playerClanData;
+        private readonly PlayerData m_playerData;
+        private readonly SocketUserMessage m_message;
 
         public ReceiveMessageController(SocketUserMessage message)
         {
             m_message = message;
             var messageChannel = message.Channel as SocketGuildChannel;
-
-
-            var guildID = messageChannel.Guild.Id.ToString();
-            var userID = message.Author.Id.ToString();
-
+            var guildID = messageChannel.Guild.Id;
+            var userID = message.Author.Id;
             m_playerData = new MySQLPlayerDataController().LoadPlayerData(guildID, userID);
+            
+            if (m_playerData == null)
+            {
+                return;
+            }
 
-            var userRole = messageChannel.Guild.GetRole(ulong.Parse(m_playerData.ClanData.ClanRoleID));
+            var userRole = messageChannel.Guild.GetRole(m_playerData.ClanData.ClanRoleID);
+
+            if (userRole == null)
+            {
+                return;
+            }
 
             m_playerClanData = new MySQLClanDataController().LoadClanData(userRole);
         }
@@ -38,24 +44,29 @@ namespace PriconneBotConsoleApp.Script
 
         public async Task RunMessageReceive(SocketUserMessage message)
         {
-            var userClanData = m_playerClanData;
-            var messageChannelID = message.Channel.Id.ToString();
-            if (messageChannelID ==
-                m_playerClanData.ChannelIDs.ReservationChannelID)
+            await new TimeLineConversion(message).RunByMessage() ;
+
+            if (m_playerData == null || m_playerClanData == null)
             {
-                await new BattleReservation(userClanData, message).RunReservationCommand();
+                return;
             }
-            if (messageChannelID ==
-                m_playerClanData.ChannelIDs.ReservationResultChannelID)
+
+            var messageChannelID = message.Channel.Id;
+
+            if (messageChannelID == m_playerClanData.ChannelIDs.ReservationChannelID)
             {
-                await new BattleReservation(userClanData, message).RunReservationResultCommand();
+                await new BattleReservation(m_playerClanData, message).RunReservationCommand();
             }
-            if (messageChannelID ==
-                m_playerClanData.ChannelIDs.DeclarationChannelID)
+
+            if (messageChannelID == m_playerClanData.ChannelIDs.ReservationResultChannelID)
             {
-                await new BattleDeclaration(userClanData, message).RunDeclarationCommandByMessage();
+                await new BattleReservation(m_playerClanData, message).RunReservationResultCommand();
+            }
+
+            if (messageChannelID == m_playerClanData.ChannelIDs.DeclarationChannelID)
+            {
+                await new BattleDeclaration(m_playerClanData, message).RunDeclarationCommandByMessage();
             }
         }
-
     }
 }

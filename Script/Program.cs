@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,9 +14,8 @@ namespace PriconneBotConsoleApp.Script
     {
         private DiscordSocketClient m_client;
         private DiscordSocketConfig m_config;
-        //public static CommandService commands;
-        //public static IServiceProvider services;
 
+        private readonly static string ConfigPath = Path.Combine("data", "botConfig.json");
         static void Main() => new Program().MainAsync().GetAwaiter().GetResult();
 
         /// <summary>
@@ -24,33 +24,32 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         public async Task MainAsync()
         {
-            var jsonSettingData = new JsonDataManager(@"./data/botConfig.json");
+
+            var jsonSettingData = new JsonDataManager(ConfigPath);
 
             m_config = new DiscordSocketConfig
             {
                 MessageCacheSize = 10
             };
 
-            m_client = new DiscordSocketClient(m_config);
-            //var clanBattleInfo = new Script.ClanBattleInfoLoader();
-            //clanBattleInfo.LoadClanBattleScadule();
+            var initialize = new BotInitialize();
+            initialize.UpdateRediveDatabase();
 
-            var commands = new CommandService();
-            var services = new ServiceCollection().BuildServiceProvider();
-            //Func<SocketMessage, Task> function = CommandRecieved;
+            m_client = new DiscordSocketClient(m_config);
             m_client.MessageReceived += CommandRecieved;
             m_client.GuildMembersDownloaded += GuildMembersDownloaded;
             m_client.UserLeft += UserLeft;
             m_client.GuildMemberUpdated += GuildMemberUpdated;
             m_client.ReactionAdded += ReactionAdded;
-
             m_client.Log += Log;
+
+            var commands = new CommandService();
+            var services = new ServiceCollection().BuildServiceProvider();
+
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
             await m_client.LoginAsync(TokenType.Bot, jsonSettingData.Token);
             await m_client.StartAsync();
-            await test();
-
-
+            await RefreshInUpdateDate();
             await Task.Delay(-1);
         }
 
@@ -61,17 +60,20 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private async Task CommandRecieved(SocketMessage messageParam)
         {
-            var message = messageParam as SocketUserMessage;
-            
-            if (message == null) { return; }
-            Console.WriteLine("{0} {1}:{2}", message.Channel.Name, message.Author.Username, message);
-            // コメントがユーザーかBotかの判定
-            if (message.Author.IsBot) { return; }
+            if (!(messageParam is SocketUserMessage message))
+            {
+                return;
+            }
+
+            Console.WriteLine($"{message.Channel.Name} {message.Author.Username}:{message}");
+
+            if (message.Author.IsBot)
+            {
+                return;
+            }
 
             var receiveMessages = new ReceiveMessageController(message);
             await receiveMessages.RunMessageReceive();
-
-            //await message.Channel.SendMessageAsync(message.Content.ToString());
         }
 
         /// <summary>
@@ -82,46 +84,62 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private Task GuildMembersDownloaded(SocketGuild guild)
         {
-            var playerDataLoader = new PlayerDataLoader();
-            playerDataLoader.UpdatePlayerData(guild);
+            new PlayerDataLoader().UpdatePlayerData(guild);
             return Task.CompletedTask;
         }
 
-
         private Task UserLeft(SocketGuildUser userInfo)
         {
-            var playerDataLoader = new PlayerDataLoader();
-            playerDataLoader.UpdatePlayerData(userInfo.Guild);
+            new PlayerDataLoader().UpdatePlayerData(userInfo.Guild);
             return Task.CompletedTask;
         }
 
         private Task GuildMemberUpdated(
-            SocketGuildUser oldUserInfo, SocketGuildUser newUserInfo)
+            SocketGuildUser oldUserInfo,
+            SocketGuildUser newUserInfo)
         {
-            var playerDataLoader = new PlayerDataLoader();
-            playerDataLoader.UpdatePlayerData(newUserInfo.Guild);
+            new PlayerDataLoader().UpdatePlayerData(newUserInfo.Guild);
             return Task.CompletedTask;
         }
 
         private async Task ReactionAdded(
             Cacheable<IUserMessage, ulong> cachedMessage, 
-            ISocketMessageChannel channel, SocketReaction reaction)
+            ISocketMessageChannel channel,
+            SocketReaction reaction)
         {
-            if (reaction.User.Value.IsBot)
+            if (!reaction.User.Value.IsBot)
             {
-                return;
+                await new ReceiveReactionController(reaction)
+                    .RunReactionReceive();
             }
-            await new ReceiveReactionController(reaction)
-                .RunReactionReceive();
         }
 
-        private async Task test()
+        private async Task RefreshInUpdateDate()
         {
+            DateTime nowDateTime;
+            TimeSpan nowTime;
+            TimeSpan updateTimeSpan;
+
+            var initialize = new BotInitialize();
+            var updateTime = new TimeSpan(5, 0, 0);
+
             while (true)
             {
-                await Task.Run(() => Thread.Sleep(2000));
-            }
-            
+                nowDateTime = DateTime.Now;
+                nowTime = nowDateTime.TimeOfDay;
+
+                if (updateTime - nowTime < new TimeSpan(0, 0, 0))
+                {
+                    updateTimeSpan = updateTime - nowTime + new TimeSpan(1, 0, 0, 0);
+                }
+                else
+                {
+                    updateTimeSpan = updateTime - nowTime;
+                }
+
+                await Task.Run(() => Thread.Sleep(updateTimeSpan));
+                initialize.UpdateRediveDatabase();
+;            }
         }
 
         /// <summary>

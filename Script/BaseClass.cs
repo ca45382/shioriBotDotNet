@@ -1,24 +1,24 @@
-﻿using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Discord.Rest;
+﻿using Discord.Rest;
 using Discord.WebSocket;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace PriconneBotConsoleApp.Script
 {
     class BaseClass
     {
-        protected async Task<RestMessage> SendMessageToChannel(ISocketMessageChannel channel, string messageData)
-        {
-            var result = await channel.SendMessageAsync(messageData);
-            return result;
-        }
+        protected static async Task<RestUserMessage> SendMessageToChannel(ISocketMessageChannel channel, string messageData)
+            => await channel.SendMessageAsync(messageData);
 
-        protected async Task EditMessage(SocketUserMessage message, string messageData)
-        {
-            await message.ModifyAsync(msg => msg.Content = messageData);
-        }
+        protected static async Task EditMessage(SocketUserMessage message, string messageData)
+            => await message.ModifyAsync(msg => msg.Content = messageData);
 
-        protected string ZenToHan(string textData)
+        /// <summary>
+        /// 文字列の0-9,a-z,A-Zを全角から半角に強制的に変更する。
+        /// </summary>
+        /// <param name="textData"></param>
+        /// <returns></returns>
+        protected static string ZenToHan(string textData)
         {
             var convertText = textData;
             convertText = Regex.Replace(convertText, "　", p => ((char)(p.Value[0] - '　' + ' ')).ToString());
@@ -27,7 +27,5 @@ namespace PriconneBotConsoleApp.Script
             convertText = Regex.Replace(convertText, "[Ａ-Ｚ]", p => ((char)(p.Value[0] - 'Ａ' + 'A')).ToString());
             return convertText;
         }
-
-        
     }
 }

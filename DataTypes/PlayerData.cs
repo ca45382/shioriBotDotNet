@@ -7,23 +7,23 @@ namespace PriconneBotConsoleApp.DataTypes
     [Table("player_data")]
     public class PlayerData
     {
-        [Column("player_id", TypeName = "bigint(20) unsigned"), Key]
+        [Column("player_id", TypeName = "BIGINT UNSIGNED"), Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public ulong PlayerID { get; set; }
 
-        [Column("user_id", TypeName = "varchar(21)"), Required]
-        public string UserID { get; set; }
+        [Column("user_id", TypeName = "BIGINT UNSIGNED"), Required]
+        public ulong UserID { get; set; }
 
-        [Column("name", TypeName = "varchar(100)")]
+        [Column("name", TypeName = "VARCHAR(100)")]
         public string GuildUserName { get; set; }
 
-
-        //外部キー
-        [Column("clan_id", TypeName = "bigint(20) unsigned"), Required]
+        /// <summary>
+        /// 外部キー
+        /// </summary>
+        [Column("clan_id", TypeName = "BIGINT UNSIGNED"), Required]
         public ulong ClanID { get; set; }
 
         public ClanData ClanData { get; set; }
-
 
         public List<ReservationData> ReservationData { get; set; }
 
