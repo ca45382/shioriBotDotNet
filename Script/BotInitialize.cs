@@ -29,7 +29,7 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
-        public void UpdateRediveDB()
+        public void UpdateRediveDatabase()
         {
             var webClient = new WebClient();
             string updateRediveString;
@@ -70,7 +70,7 @@ namespace PriconneBotConsoleApp.Script
             var rediveDBPath = Path.Combine(DataFolderPath, RediveDatabaseName);
 
             webClient.DownloadFile(rediveDBURL, rediveDBBrotliPath);
-            DecompressDB(rediveDBBrotliPath, rediveDBPath);
+            DecompressBrotli(rediveDBBrotliPath, rediveDBPath);
             File.Delete(rediveDBBrotliPath);
 
             return;
@@ -84,7 +84,7 @@ namespace PriconneBotConsoleApp.Script
         /// <param name="preDecompressFilePath">解凍するファイルのパス</param>
         /// <param name="decompressedFilePath">解凍した後のファイルのパス</param>
         /// <returns></returns>
-        private bool DecompressDB(string preDecompressFilePath, string decompressedFilePath)
+        private bool DecompressBrotli(string preDecompressFilePath, string decompressedFilePath)
         {
             try
             {
