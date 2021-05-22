@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace PriconneBotConsoleApp.Script
         private DiscordSocketClient m_client;
         private DiscordSocketConfig m_config;
 
+        private readonly static string ConfigPath = Path.Combine("data", "botConfig.json");
         static void Main() => new Program().MainAsync().GetAwaiter().GetResult();
 
         /// <summary>
@@ -22,12 +24,16 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         public async Task MainAsync()
         {
-            var jsonSettingData = new JsonDataManager("./data/botConfig.json");
+
+            var jsonSettingData = new JsonDataManager(ConfigPath);
 
             m_config = new DiscordSocketConfig
             {
                 MessageCacheSize = 10
             };
+
+            var initialize = new BotInitialize();
+            initialize.UpdateRediveDatabase();
 
             m_client = new DiscordSocketClient(m_config);
             m_client.MessageReceived += CommandRecieved;
@@ -43,7 +49,7 @@ namespace PriconneBotConsoleApp.Script
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
             await m_client.LoginAsync(TokenType.Bot, jsonSettingData.Token);
             await m_client.StartAsync();
-            await Test();
+            await RefreshInUpdateDate();
             await Task.Delay(-1);
         }
 
@@ -108,12 +114,32 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
-        private async Task Test()
+        private async Task RefreshInUpdateDate()
         {
+            DateTime nowDateTime;
+            TimeSpan nowTime;
+            TimeSpan updateTimeSpan;
+
+            var initialize = new BotInitialize();
+            var updateTime = new TimeSpan(5, 0, 0);
+
             while (true)
             {
-                await Task.Run(() => Thread.Sleep(2000));
-            }
+                nowDateTime = DateTime.Now;
+                nowTime = nowDateTime.TimeOfDay;
+
+                if (updateTime - nowTime < new TimeSpan(0, 0, 0))
+                {
+                    updateTimeSpan = updateTime - nowTime + new TimeSpan(1, 0, 0, 0);
+                }
+                else
+                {
+                    updateTimeSpan = updateTime - nowTime;
+                }
+
+                await Task.Run(() => Thread.Sleep(updateTimeSpan));
+                initialize.UpdateRediveDatabase();
+;            }
         }
 
         /// <summary>
