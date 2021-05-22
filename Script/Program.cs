@@ -49,7 +49,7 @@ namespace PriconneBotConsoleApp.Script
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
             await m_client.LoginAsync(TokenType.Bot, jsonSettingData.Token);
             await m_client.StartAsync();
-            await Test();
+            await RefreshInUpdateDate();
             await Task.Delay(-1);
         }
 
@@ -114,12 +114,32 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
-        private async Task Test()
+        private async Task RefreshInUpdateDate()
         {
+            DateTime nowDateTime;
+            TimeSpan nowTime;
+            TimeSpan updateTimeSpan;
+
+            var initialize = new BotInitialize();
+            var updateTime = new TimeSpan(5, 0, 0);
+
             while (true)
             {
-                await Task.Run(() => Thread.Sleep(2000));
-            }
+                nowDateTime = DateTime.Now;
+                nowTime = nowDateTime.TimeOfDay;
+
+                if ( (updateTime - nowTime) < new TimeSpan(0,0,0) )
+                {
+                    updateTimeSpan = updateTime - nowTime + new TimeSpan(1, 0, 0, 0);
+                }
+                else
+                {
+                    updateTimeSpan = updateTime - nowTime;
+                }
+
+                await Task.Run(() => Thread.Sleep(updateTimeSpan));
+                initialize.UpdateRediveDatabase();
+;            }
         }
 
         /// <summary>
