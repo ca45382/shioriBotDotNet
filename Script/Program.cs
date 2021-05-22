@@ -128,7 +128,7 @@ namespace PriconneBotConsoleApp.Script
                 nowDateTime = DateTime.Now;
                 nowTime = nowDateTime.TimeOfDay;
 
-                if ( (updateTime - nowTime) < new TimeSpan(0,0,0) )
+                if (updateTime - nowTime < new TimeSpan(0, 0, 0))
                 {
                     updateTimeSpan = updateTime - nowTime + new TimeSpan(1, 0, 0, 0);
                 }
