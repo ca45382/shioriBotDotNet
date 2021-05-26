@@ -60,7 +60,7 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private async Task CommandRecieved(SocketMessage messageParam)
         {
-            if (!(messageParam is SocketUserMessage message))
+            if (messageParam is not SocketUserMessage message)
             {
                 return;
             }
