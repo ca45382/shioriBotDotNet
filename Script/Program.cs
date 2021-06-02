@@ -84,7 +84,7 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private Task GuildMembersDownloaded(SocketGuild guild)
         {
-            var discordDataLoader = new PlayerDataLoader();
+            var discordDataLoader = new DiscordDataLoader();
             discordDataLoader.UpdateServerData(guild);
             discordDataLoader.UpdatePlayerData(guild);
             return Task.CompletedTask;
@@ -92,7 +92,7 @@ namespace PriconneBotConsoleApp.Script
 
         private Task UserLeft(SocketGuildUser userInfo)
         {
-            new PlayerDataLoader().UpdatePlayerData(userInfo.Guild);
+            new DiscordDataLoader().UpdatePlayerData(userInfo.Guild);
             return Task.CompletedTask;
         }
 
@@ -100,7 +100,7 @@ namespace PriconneBotConsoleApp.Script
             SocketGuildUser oldUserInfo,
             SocketGuildUser newUserInfo)
         {
-            new PlayerDataLoader().UpdatePlayerData(newUserInfo.Guild);
+            new DiscordDataLoader().UpdatePlayerData(newUserInfo.Guild);
             return Task.CompletedTask;
         }
 

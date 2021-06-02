@@ -7,11 +7,11 @@ using System.Linq;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class PlayerDataLoader
+    class DiscordDataLoader
     {
         private readonly IEnumerable<ClanData> m_clanData;
 
-        public PlayerDataLoader()
+        public DiscordDataLoader()
         {
             try
             {
