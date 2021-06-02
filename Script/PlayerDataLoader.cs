@@ -45,7 +45,7 @@ namespace PriconneBotConsoleApp.Script
         /// <param name="guild"></param>
         public void UpdatePlayerData(SocketGuild guild)
         {
-            var playerDataControler = new MySQLPlayerDataController();
+            var playerDataController = new MySQLPlayerDataController();
 
             // サーバー上のクランメンバー
             var usersOnDiscord = GetServerClanMember(guild);
@@ -86,8 +86,8 @@ namespace PriconneBotConsoleApp.Script
                 }
             }
 
-            playerDataControler.CreatePlayerData(createUserData);
-            playerDataControler.UpdatePlayerData(updateUserData);
+            playerDataController.CreatePlayerData(createUserData);
+            playerDataController.UpdatePlayerData(updateUserData);
             #endregion
 
             #region テーブルからユーザを削除
@@ -99,7 +99,7 @@ namespace PriconneBotConsoleApp.Script
                     mySQLUser => !usersOnDiscord.Any(discordUser => IsSameUser(mySQLUser, discordUser))
                 );
 
-            playerDataControler.DeletePlayerData(deleteUsers);
+            playerDataController.DeletePlayerData(deleteUsers);
             #endregion
         }
 
