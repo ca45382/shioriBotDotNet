@@ -84,7 +84,9 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private Task GuildMembersDownloaded(SocketGuild guild)
         {
-            new PlayerDataLoader().UpdatePlayerData(guild);
+            var discordDataLoader = new PlayerDataLoader();
+            discordDataLoader.UpdateServerData(guild);
+            discordDataLoader.UpdatePlayerData(guild);
             return Task.CompletedTask;
         }
 
