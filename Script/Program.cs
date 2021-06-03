@@ -92,7 +92,9 @@ namespace PriconneBotConsoleApp.Script
 
         private Task UserLeft(SocketGuildUser userInfo)
         {
-            new DiscordDataLoader().UpdatePlayerData(userInfo.Guild);
+            var discordDataLoader = new DiscordDataLoader();
+            discordDataLoader.UpdateServerData(userInfo.Guild);
+            discordDataLoader.UpdatePlayerData(userInfo.Guild);
             return Task.CompletedTask;
         }
 
@@ -100,7 +102,9 @@ namespace PriconneBotConsoleApp.Script
             SocketGuildUser oldUserInfo,
             SocketGuildUser newUserInfo)
         {
-            new DiscordDataLoader().UpdatePlayerData(newUserInfo.Guild);
+            var discordDataLoader = new DiscordDataLoader();
+            discordDataLoader.UpdateServerData(newUserInfo.Guild);
+            discordDataLoader.UpdatePlayerData(newUserInfo.Guild);
             return Task.CompletedTask;
         }
 
