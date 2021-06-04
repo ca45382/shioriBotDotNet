@@ -7,11 +7,11 @@ using System.Linq;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class PlayerDataLoader
+    class DiscordDataLoader
     {
         private readonly IEnumerable<ClanData> m_clanData;
 
-        public PlayerDataLoader()
+        public DiscordDataLoader()
         {
             try
             {
@@ -23,13 +23,28 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
+        public void UpdateServerData(SocketGuild guild)
+        {
+            var serverDataController = new MySQLServerDataController();
+            var serverData = serverDataController.LoadServerData(guild);
+
+            if (serverData == null)
+            {
+                serverDataController.CreateServerData(guild);
+            }
+            else
+            {
+                serverDataController.UpdateServerData(guild);
+            }
+        }
+
         /// <summary>
         /// SQLサーバー側とDiscord側のプレイヤーデータ同期
         /// </summary>
         /// <param name="guild"></param>
         public void UpdatePlayerData(SocketGuild guild)
         {
-            var playerDataControler = new MySQLPlayerDataController();
+            var playerDataController = new MySQLPlayerDataController();
 
             // サーバー上のクランメンバー
             var usersOnDiscord = GetServerClanMember(guild);
@@ -70,8 +85,8 @@ namespace PriconneBotConsoleApp.Script
                 }
             }
 
-            playerDataControler.CreatePlayerData(createUserData);
-            playerDataControler.UpdatePlayerData(updateUserData);
+            playerDataController.CreatePlayerData(createUserData);
+            playerDataController.UpdatePlayerData(updateUserData);
             #endregion
 
             #region テーブルからユーザを削除
@@ -83,7 +98,7 @@ namespace PriconneBotConsoleApp.Script
                     mySQLUser => !usersOnDiscord.Any(discordUser => IsSameUser(mySQLUser, discordUser))
                 );
 
-            playerDataControler.DeletePlayerData(deleteUsers);
+            playerDataController.DeletePlayerData(deleteUsers);
             #endregion
         }
 

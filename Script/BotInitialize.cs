@@ -76,8 +76,6 @@ namespace PriconneBotConsoleApp.Script
             return;
         }
 
-
-
         /// <summary>
         /// 指定されたパスのファイルを解凍する。
         /// </summary>
