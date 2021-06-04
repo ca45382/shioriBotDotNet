@@ -30,7 +30,7 @@ namespace PriconneBotConsoleApp.MySQL
             var mySQLServerData = mySQLConnector.ServerData
                 .FirstOrDefault(b => b.ServerID == guild.Id);
 
-            if (mySQLServerData is not null)
+            if (mySQLServerData != null)
             {
                 return;
             }
@@ -56,7 +56,7 @@ namespace PriconneBotConsoleApp.MySQL
             var mySQLServerData = mySQLConnector.ServerData
                 .FirstOrDefault(b => b.ServerID == guild.Id);
 
-            if (mySQLServerData is null)
+            if (mySQLServerData == null)
             {
                 return;
             }
