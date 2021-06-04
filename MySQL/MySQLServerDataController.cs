@@ -10,13 +10,14 @@ namespace PriconneBotConsoleApp.MySQL
         public IEnumerable<ServerData> LoadServerData()
         {
             using var mySQLConnector = new MySQLConnector();
-            return mySQLConnector.ServerData
-                .ToArray();
+
+            return mySQLConnector.ServerData.ToArray();
         }
 
         public ServerData LoadServerData(IGuild guild)
         {
             using var mySQLConnector = new MySQLConnector();
+
             return mySQLConnector.ServerData
                 .FirstOrDefault(b => b.ServerID == guild.Id);
         }

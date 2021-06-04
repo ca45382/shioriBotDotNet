@@ -26,7 +26,6 @@ namespace PriconneBotConsoleApp.Script
         public void UpdateServerData(SocketGuild guild)
         {
             var serverDataController = new MySQLServerDataController();
-
             var serverData = serverDataController.LoadServerData(guild);
 
             if (serverData == null)
