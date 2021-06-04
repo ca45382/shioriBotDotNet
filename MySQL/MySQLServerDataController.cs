@@ -20,9 +20,7 @@ namespace PriconneBotConsoleApp.MySQL
             using var mySQLConnector = new MySQLConnector();
 
             return mySQLConnector.ServerData
-                .AsEnumerable()
-                .Where(b => b.ServerID == guild.Id)
-                .FirstOrDefault();
+                .FirstOrDefault(b => b.ServerID == guild.Id);
         }
 
         public void CreateServerData(IGuild guild)
@@ -31,9 +29,7 @@ namespace PriconneBotConsoleApp.MySQL
             var transaction = mySQLConnector.Database.BeginTransaction();
 
             var mySQLServerData = mySQLConnector.ServerData
-                .AsEnumerable()
-                .Where(b => b.ServerID == guild.Id)
-                .FirstOrDefault();
+                .FirstOrDefault(b => b.ServerID == guild.Id);
 
             if (mySQLServerData is not null)
             {
@@ -60,9 +56,7 @@ namespace PriconneBotConsoleApp.MySQL
             var transaction = mySQLConnector.Database.BeginTransaction();
 
             var mySQLServerData = mySQLConnector.ServerData
-                .AsEnumerable()
-                .Where(b => b.ServerID == guild.Id)
-                .FirstOrDefault();
+                .FirstOrDefault(b => b.ServerID == guild.Id);
 
             if (mySQLServerData is null)
             {
