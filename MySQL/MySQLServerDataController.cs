@@ -10,7 +10,6 @@ namespace PriconneBotConsoleApp.MySQL
         public IEnumerable<ServerData> LoadServerData()
         {
             using var mySQLConnector = new MySQLConnector();
-
             return mySQLConnector.ServerData
                 .ToArray();
         }
@@ -18,7 +17,6 @@ namespace PriconneBotConsoleApp.MySQL
         public ServerData LoadServerData(IGuild guild)
         {
             using var mySQLConnector = new MySQLConnector();
-
             return mySQLConnector.ServerData
                 .FirstOrDefault(b => b.ServerID == guild.Id);
         }
@@ -44,7 +42,6 @@ namespace PriconneBotConsoleApp.MySQL
             };
 
             mySQLConnector.ServerData.Add(newServerData);
-
             mySQLConnector.SaveChanges();
             transaction.Commit();
 
