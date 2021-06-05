@@ -3,16 +3,16 @@ using PriconneBotConsoleApp.DataTypes;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PriconneBotConsoleApp.MySQL
+namespace PriconneBotConsoleApp.Database
 {
-    class MySQLDeclarationController
+    class DatabaseDeclarationController
     {
         public bool UpdateDeclarationMessageID(ClanData clanData, ulong messageID)
         {
-            using var mySQLConnector = new MySQLConnector();
-            var transaction = mySQLConnector.Database.BeginTransaction();
+            using var databaseConnector = new DatabaseConnector();
+            var transaction = databaseConnector.Database.BeginTransaction();
 
-            var clanID = mySQLConnector.ClanData
+            var clanID = databaseConnector.ClanData
                 .Include(d => d.ServerData)
                 .Where(d => d.ServerID == clanData.ServerID && d.ClanRoleID == clanData.ClanRoleID)
                 .Select(d => d.ClanID)
@@ -24,7 +24,7 @@ namespace PriconneBotConsoleApp.MySQL
                 return false;
             }
 
-            var updateData = mySQLConnector.MessageIDs
+            var updateData = databaseConnector.MessageIDs
                 .Include(d => d.ClanData)
                 .Where(d => d.ClanID == clanID)
                 .FirstOrDefault();
@@ -36,16 +36,16 @@ namespace PriconneBotConsoleApp.MySQL
             }
 
             updateData.DeclarationMessageID = messageID;
-            mySQLConnector.SaveChanges();
+            databaseConnector.SaveChanges();
             transaction.Commit();
             return true;
         }
 
         public IEnumerable<DeclarationData> LoadDeclarationData(ClanData clanData)
         {
-            var mySQLConnector = new MySQLConnector();
+            var databaseConnector = new DatabaseConnector();
 
-            var clanID = mySQLConnector.ClanData
+            var clanID = databaseConnector.ClanData
                 .Include(d => d.ServerData)
                 .Where(d => d.ServerID == clanData.ServerID && d.ClanRoleID == clanData.ClanRoleID)
                 .Select(d => d.ClanID)
@@ -56,7 +56,7 @@ namespace PriconneBotConsoleApp.MySQL
                 return null;
             }
 
-            return mySQLConnector.DeclarationData
+            return databaseConnector.DeclarationData
                 .Include(b => b.PlayerData)
                 .ThenInclude(d => d.ClanData)
                 .Where(d => d.PlayerData.ClanID == clanID && !d.DeleteFlag
@@ -67,14 +67,14 @@ namespace PriconneBotConsoleApp.MySQL
 
         public IEnumerable<DeclarationData> LoadDeclarationData(PlayerData playerData)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var databaseConnector = new DatabaseConnector();
 
-            playerData = mySQLConnector.PlayerData
+            playerData = databaseConnector.PlayerData
                 .Include(d => d.ClanData)
                 .Where(d => d.PlayerID == playerData.PlayerID)
                 .FirstOrDefault();
 
-            return mySQLConnector.DeclarationData
+            return databaseConnector.DeclarationData
                 .Include(b => b.PlayerData)
                 .ThenInclude(d => d.ClanData)
                 .Where(d => d.PlayerData.PlayerID == playerData.PlayerID && !d.DeleteFlag 
@@ -92,8 +92,8 @@ namespace PriconneBotConsoleApp.MySQL
                 return false;
             }
 
-            using var mySQLConnector = new MySQLConnector();
-            var transaction = mySQLConnector.Database.BeginTransaction();
+            using var databaseConnector = new DatabaseConnector();
+            var transaction = databaseConnector.Database.BeginTransaction();
 
             if (declarationData.PlayerID == 0)
             {
@@ -107,8 +107,8 @@ namespace PriconneBotConsoleApp.MySQL
 
             try
             {
-                mySQLConnector.Add(declarationData);
-                mySQLConnector.SaveChanges();
+                databaseConnector.Add(declarationData);
+                databaseConnector.SaveChanges();
                 transaction.Commit();
                 return true;
             }
@@ -128,8 +128,8 @@ namespace PriconneBotConsoleApp.MySQL
                 return false;
             }
 
-            using var mySQLConnector = new MySQLConnector();
-            var transaction = mySQLConnector.Database.BeginTransaction();
+            using var databaseConnector = new DatabaseConnector();
+            var transaction = databaseConnector.Database.BeginTransaction();
 
             if (declarationData.PlayerID == 0)
             {
@@ -141,7 +141,7 @@ namespace PriconneBotConsoleApp.MySQL
                 }
             }
 
-            var updateData = mySQLConnector.DeclarationData
+            var updateData = databaseConnector.DeclarationData
                 .Include(d => d.PlayerData)
                 .Where(d =>
                    d.PlayerID == declarationData.PlayerID && d.BattleLap == declarationData.BattleLap
@@ -154,7 +154,7 @@ namespace PriconneBotConsoleApp.MySQL
                 updateData.FinishFlag = declarationData.FinishFlag;
             }
 
-            mySQLConnector.SaveChanges();
+            databaseConnector.SaveChanges();
             transaction.Commit();
 
             return true;
@@ -170,8 +170,8 @@ namespace PriconneBotConsoleApp.MySQL
         /// <returns></returns>
         public bool DeleteDeclarationData(IEnumerable<DeclarationData> declarationDataSet)
         {
-            using var mySQLConnector = new MySQLConnector();
-            var transaction = mySQLConnector.Database.BeginTransaction();
+            using var databaseConnector = new DatabaseConnector();
+            var transaction = databaseConnector.Database.BeginTransaction();
 
             foreach (var declarationData in declarationDataSet)
             {
@@ -185,7 +185,7 @@ namespace PriconneBotConsoleApp.MySQL
                     }
                 }
 
-                var userDeleteDataSet = mySQLConnector.DeclarationData
+                var userDeleteDataSet = databaseConnector.DeclarationData
                     .Include(d => d.PlayerData)
                     .Where(d => d.PlayerID == declarationData.PlayerID && !d.DeleteFlag
                         && d.BossNumber == declarationData.BossNumber && d.BattleLap == declarationData.BattleLap
@@ -198,7 +198,7 @@ namespace PriconneBotConsoleApp.MySQL
                 }
             }
 
-            mySQLConnector.SaveChanges();
+            databaseConnector.SaveChanges();
             transaction.Commit();
 
             return true;
@@ -218,9 +218,9 @@ namespace PriconneBotConsoleApp.MySQL
             }
 
             var clanData = playerData.ClanData;
-            using var mySQLConnector = new MySQLConnector();
+            using var databaseConnector = new DatabaseConnector();
 
-            return mySQLConnector.PlayerData
+            return databaseConnector.PlayerData
                 .Include(d => d.ClanData)
                 .ThenInclude(e => e.ServerData)
                 .Where(d => d.ClanData.ServerID == clanData.ServerID && d.ClanData.ClanRoleID == clanData.ClanRoleID

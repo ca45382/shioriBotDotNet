@@ -4,21 +4,21 @@ using PriconneBotConsoleApp.DataTypes;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PriconneBotConsoleApp.MySQL
+namespace PriconneBotConsoleApp.Database
 {
-    class MySQLClanDataController
+    class DatabaseClanDataController
     {
         public List<ClanData> LoadClanData()
         {
-            using var mySQLConnector = new MySQLConnector();
-            return mySQLConnector.ClanData.ToList();
+            using var databaseConnector = new DatabaseConnector();
+            return databaseConnector.ClanData.ToList();
         }
 
         public ClanData LoadClanData(SocketRole role)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var databaseConnector = new DatabaseConnector();
 
-            return mySQLConnector.ClanData
+            return databaseConnector.ClanData
                 .Include(b => b.ServerData)
                 .Include(b => b.MessageIDs)
                 .Include(b => b.ChannelIDs)
@@ -30,26 +30,26 @@ namespace PriconneBotConsoleApp.MySQL
 
         public bool UpdateClanData (ClanData clanData)
         {
-            using var mySQLConnector = new MySQLConnector();
-            var transaction = mySQLConnector.Database.BeginTransaction();
+            using var databaseConnector = new DatabaseConnector();
+            var transaction = databaseConnector.Database.BeginTransaction();
 
-            var mySQLData = mySQLConnector.ClanData
+            var databaseClanData = databaseConnector.ClanData
                 .Include(b => b.ServerData)
                 .Where(b => b.ClanID == clanData.ClanID)
                 .FirstOrDefault();
 
-            if (mySQLData == null)
+            if (databaseClanData == null)
             {
                 transaction.Rollback();
                 return false;
             }
 
-            mySQLData.BattleLap = clanData.BattleLap;
-            mySQLData.BossNumber = clanData.BossNumber;
-            mySQLData.ProgressiveFlag = clanData.ProgressiveFlag;
-            //mySQLData.BossRoleReady = clanData.BossRoleReady;
-            mySQLData.ClanName = clanData.ClanName;
-            mySQLConnector.SaveChanges();
+            databaseClanData.BattleLap = clanData.BattleLap;
+            databaseClanData.BossNumber = clanData.BossNumber;
+            databaseClanData.ProgressiveFlag = clanData.ProgressiveFlag;
+            //databaseClanData.BossRoleReady = clanData.BossRoleReady;
+            databaseClanData.ClanName = clanData.ClanName;
+            databaseConnector.SaveChanges();
             transaction.Commit();
 
             return true;

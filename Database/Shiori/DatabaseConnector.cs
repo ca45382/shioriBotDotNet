@@ -3,9 +3,9 @@ using PriconneBotConsoleApp.DataTypes;
 using PriconneBotConsoleApp.Script;
 using System;
 
-namespace PriconneBotConsoleApp.MySQL
+namespace PriconneBotConsoleApp.Database
 {
-    class MySQLConnector : DbContext
+    class DatabaseConnector : DbContext
     {
         public DbSet<ServerData> ServerData { get; set; }
         public DbSet<ClanData> ClanData { get; set; }
@@ -20,7 +20,7 @@ namespace PriconneBotConsoleApp.MySQL
         // TODO: 動的に取得する
         public static readonly MariaDbServerVersion ServerVersion = new MariaDbServerVersion(new Version(10, 3, 27));
 
-        public MySQLConnector()
+        public DatabaseConnector()
         {
         }
 

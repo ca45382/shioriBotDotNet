@@ -1,6 +1,6 @@
 ﻿using Discord.WebSocket;
 using PriconneBotConsoleApp.DataTypes;
-using PriconneBotConsoleApp.MySQL;
+using PriconneBotConsoleApp.Database;
 using System.Threading.Tasks;
 
 namespace PriconneBotConsoleApp.Script
@@ -16,7 +16,7 @@ namespace PriconneBotConsoleApp.Script
             m_reaction = reaction;
             var reactionChannel = reaction.Channel as SocketGuildChannel;
 
-            m_playerData = new MySQLPlayerDataController()
+            m_playerData = new DatabasePlayerDataController()
                 .LoadPlayerData((ulong)reactionChannel?.Guild.Id, reaction.UserId);
             var userRole = reactionChannel?.Guild.GetRole((ulong)m_playerData?.ClanData.ClanRoleID);
 
@@ -25,7 +25,7 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            m_playerClanData = new MySQLClanDataController().LoadClanData(userRole);
+            m_playerClanData = new DatabaseClanDataController().LoadClanData(userRole);
         }
 
         public async Task RunReactionReceive()

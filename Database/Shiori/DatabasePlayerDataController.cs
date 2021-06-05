@@ -3,15 +3,15 @@ using PriconneBotConsoleApp.DataTypes;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PriconneBotConsoleApp.MySQL
+namespace PriconneBotConsoleApp.Database
 {
-    class MySQLPlayerDataController
+    class DatabasePlayerDataController
     {
         public List<PlayerData> LoadPlayerData(ulong serverID)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var databaseConnector = new DatabaseConnector();
 
-            return mySQLConnector.PlayerData
+            return databaseConnector.PlayerData
                 .Include(b => b.ClanData)
                 .Where(b => b.ClanData.ServerID == serverID)
                 .ToList();
@@ -19,9 +19,9 @@ namespace PriconneBotConsoleApp.MySQL
 
         public PlayerData LoadPlayerData(ulong serverID, ulong userID)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var databaseConnector = new DatabaseConnector();
 
-            return mySQLConnector.PlayerData
+            return databaseConnector.PlayerData
                 .Include(b => b.ClanData)
                 .ThenInclude(b => b.ServerData)
                 .Where(b => b.UserID == userID && b.ClanData.ServerID == serverID)
@@ -30,12 +30,12 @@ namespace PriconneBotConsoleApp.MySQL
 
         public void CreatePlayerData(IEnumerable<PlayerData> playersData)
         {
-            using var mySQLConnector = new MySQLConnector();
-            var transaction = mySQLConnector.Database.BeginTransaction();
+            using var databaseConnector = new DatabaseConnector();
+            var transaction = databaseConnector.Database.BeginTransaction();
             
             foreach (PlayerData playerData in playersData)
             {
-                var clanID = mySQLConnector.ClanData
+                var clanID = databaseConnector.ClanData
                     .Include(d => d.ServerData)
                     .Where(d => d.ServerID == playerData.ClanData.ServerID && d.ClanRoleID == playerData.ClanData.ClanRoleID)
                     .Select(d => d.ClanID)
@@ -48,21 +48,21 @@ namespace PriconneBotConsoleApp.MySQL
                     GuildUserName = playerData.GuildUserName
                 };
 
-                mySQLConnector.PlayerData.Add(newPlayerData);
+                databaseConnector.PlayerData.Add(newPlayerData);
             }
 
-            mySQLConnector.SaveChanges();
+            databaseConnector.SaveChanges();
             transaction.Commit();
         }
 
         public void UpdatePlayerData(IEnumerable<PlayerData> playersData)
         {
-            using var mySQLConnector = new MySQLConnector();
-            var transaction = mySQLConnector.Database.BeginTransaction();
+            using var databaseConnector = new DatabaseConnector();
+            var transaction = databaseConnector.Database.BeginTransaction();
             
             foreach (PlayerData playerData in playersData)
             {
-                var updateData = mySQLConnector.PlayerData
+                var updateData = databaseConnector.PlayerData
                     .Include(d => d.ClanData)
                     .Where(d => d.ClanData.ServerID == playerData.ClanData.ServerID)
                     .Where(d => d.ClanData.ClanRoleID == playerData.ClanData.ClanRoleID)
@@ -75,18 +75,18 @@ namespace PriconneBotConsoleApp.MySQL
                 }
             }
 
-            mySQLConnector.SaveChanges();
+            databaseConnector.SaveChanges();
             transaction.Commit();
         }
 
         public void DeletePlayerData(IEnumerable<PlayerData> playersData)
         {
-            using var mySQLConnector = new MySQLConnector();
-            var transaction = mySQLConnector.Database.BeginTransaction();
+            using var databaseConnector = new DatabaseConnector();
+            var transaction = databaseConnector.Database.BeginTransaction();
             
             foreach (PlayerData playerData in playersData)
             {
-                var removeData = mySQLConnector.PlayerData
+                var removeData = databaseConnector.PlayerData
                     .Include(d => d.ClanData)
                     .Where(d => d.ClanData == playerData.ClanData)
                     .Where(d => d.UserID == playerData.UserID)
@@ -94,11 +94,11 @@ namespace PriconneBotConsoleApp.MySQL
 
                 if (removeData != null)
                 {
-                    mySQLConnector.PlayerData.Remove(removeData);
+                    databaseConnector.PlayerData.Remove(removeData);
                 }
             }
 
-            mySQLConnector.SaveChanges();
+            databaseConnector.SaveChanges();
             transaction.Commit();
         }
     }
