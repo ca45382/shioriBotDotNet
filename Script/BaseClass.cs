@@ -1,7 +1,7 @@
-﻿using Discord.Rest;
-using Discord.WebSocket;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Discord.Rest;
+using Discord.WebSocket;
 
 namespace PriconneBotConsoleApp.Script
 {

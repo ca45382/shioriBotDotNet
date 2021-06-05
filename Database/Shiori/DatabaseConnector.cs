@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using PriconneBotConsoleApp.DataTypes;
 using PriconneBotConsoleApp.Script;
-using System;
 
 namespace PriconneBotConsoleApp.Database
 {
