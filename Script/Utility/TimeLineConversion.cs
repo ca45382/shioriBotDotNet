@@ -48,7 +48,7 @@ namespace PriconneBotConsoleApp.Script
 
         /// <summary>
         /// 引用するタイムラインデータの確定.
-        /// DIscordのメッセージからURLから引用する
+        /// DiscordのメッセージからURLから引用する
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
