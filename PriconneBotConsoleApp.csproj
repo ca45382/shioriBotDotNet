@@ -32,4 +32,8 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DataModel\Shiori\" />
+  </ItemGroup>
+
 </Project>
