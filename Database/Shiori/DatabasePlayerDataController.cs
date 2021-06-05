@@ -36,10 +36,14 @@ namespace PriconneBotConsoleApp.Database
             foreach (PlayerData playerData in playersData)
             {
                 var clanID = databaseConnector.ClanData
-                    .Include(d => d.ServerData)
-                    .Where(d => d.ServerID == playerData.ClanData.ServerID && d.ClanRoleID == playerData.ClanData.ClanRoleID)
-                    .Select(d => d.ClanID)
-                    .FirstOrDefault();
+                    .FirstOrDefault(d => d.ServerID == playerData.ClanData.ServerID && d.ClanRoleID == playerData.ClanData.ClanRoleID)
+                    ?.ClanID ?? 0;
+
+                if (clanID == 0)
+                {
+                    transaction.Rollback();
+                    return;
+                }
 
                 var newPlayerData = new PlayerData
                 {
