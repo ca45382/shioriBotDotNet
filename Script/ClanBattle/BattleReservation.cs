@@ -1,12 +1,12 @@
-﻿using Discord;
-using Discord.WebSocket;
-using System;
+﻿using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.ComponentModel;
-using PriconneBotConsoleApp.DataTypes;
+using Discord;
+using Discord.WebSocket;
+using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.Enum;
 using PriconneBotConsoleApp.Database;
 

@@ -1,7 +1,7 @@
-﻿using Discord.WebSocket;
-using PriconneBotConsoleApp.DataTypes;
+﻿using System.Threading.Tasks;
+using Discord.WebSocket;
+using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.Database;
-using System.Threading.Tasks;
 
 namespace PriconneBotConsoleApp.Script
 {

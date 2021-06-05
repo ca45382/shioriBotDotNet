@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PriconneBotConsoleApp.DataTypes
+namespace PriconneBotConsoleApp.DataModel
 {
     [Table("clan_info")]
     public class ClanData
