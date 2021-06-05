@@ -33,7 +33,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DataModel\Shiori\" />
+    <Folder Include="Database\Redive\" />
+    <Folder Include="DataModel\Redive\" />
   </ItemGroup>
 
 </Project>

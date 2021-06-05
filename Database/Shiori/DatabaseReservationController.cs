@@ -9,10 +9,10 @@ namespace PriconneBotConsoleApp.Database
     {
         public bool UpdateReservationMessageID(ClanData clanData, ulong messageID)
         {
-            using var mySQLConnector = new DatabaseConnector();
-            var transaction = mySQLConnector.Database.BeginTransaction();
+            using var databaseConnector = new DatabaseConnector();
+            var transaction = databaseConnector.Database.BeginTransaction();
 
-            var clanID = mySQLConnector.ClanData
+            var clanID = databaseConnector.ClanData
                 .Include(d => d.ServerData)
                 .Where(d => d.ServerID == clanData.ServerID)
                 .Where(d => d.ClanRoleID == clanData.ClanRoleID)
@@ -25,7 +25,7 @@ namespace PriconneBotConsoleApp.Database
                 return false;
             }
 
-            var updateData = mySQLConnector.MessageIDs
+            var updateData = databaseConnector.MessageIDs
                 .Include(d => d.ClanData)
                 .Where(d => d.ClanID == clanID)
                 .FirstOrDefault();
@@ -37,7 +37,7 @@ namespace PriconneBotConsoleApp.Database
             }
 
             updateData.ReservationMessageID = messageID;
-            mySQLConnector.SaveChanges();
+            databaseConnector.SaveChanges();
             transaction.Commit();
 
             return true;
@@ -45,9 +45,9 @@ namespace PriconneBotConsoleApp.Database
 
         public List<ReservationData> LoadReservationData(ClanData clanData)
         {
-            using var mySQLConnector = new DatabaseConnector();
+            using var databaseConnector = new DatabaseConnector();
 
-            return mySQLConnector.ReservationData
+            return databaseConnector.ReservationData
                 .Include(b => b.PlayerData)
                 .ThenInclude(d => d.ClanData)
                 .Where(b => b.PlayerData.ClanData.ServerID == clanData.ServerID)
@@ -66,9 +66,9 @@ namespace PriconneBotConsoleApp.Database
                 return null;
             }
 
-            using var mySQLConnector = new DatabaseConnector();
+            using var databaseConnector = new DatabaseConnector();
 
-            var playerDataOnSQL = mySQLConnector.PlayerData
+            var playerDataOnSQL = databaseConnector.PlayerData
                 .Include(b => b.ClanData)
                 .ThenInclude(b => b.ServerData)
                 .Where(b => b.ClanData.ServerID == playerData.ClanData.ServerID
@@ -77,7 +77,7 @@ namespace PriconneBotConsoleApp.Database
 
             var playerID = playerDataOnSQL.FirstOrDefault()?.PlayerID;
 
-            return mySQLConnector.ReservationData
+            return databaseConnector.ReservationData
                 .Include(b => b.PlayerData)
                 .Where(b => b.PlayerID == playerID)
                 .Where(b => b.DeleteFlag == false)
@@ -88,9 +88,9 @@ namespace PriconneBotConsoleApp.Database
 
         public List<ReservationData> LoadBossLapReservationData(ClanData clanData)
         {
-            using var mySQLConnector = new DatabaseConnector();
+            using var databaseConnector = new DatabaseConnector();
 
-            var clanID = mySQLConnector.ClanData
+            var clanID = databaseConnector.ClanData
                 .Include(d => d.ServerData)
                 .Where(d => d.ServerID == clanData.ServerID)
                 .Where(d => d.ClanRoleID == clanData.ClanRoleID)
@@ -102,7 +102,7 @@ namespace PriconneBotConsoleApp.Database
                 return null;
             }
 
-            return mySQLConnector.ReservationData
+            return databaseConnector.ReservationData
                 .Include(b => b.PlayerData)
                 .ThenInclude(d => d.ClanData)
                 .Where(d => d.PlayerData.ClanID == clanID)
@@ -116,10 +116,10 @@ namespace PriconneBotConsoleApp.Database
         public void CreateReservationData(ReservationData reservationData)
         {
             var userData = reservationData.PlayerData;
-            using var mySQLConnector = new DatabaseConnector();
-            var transaction = mySQLConnector.Database.BeginTransaction();
+            using var databaseConnector = new DatabaseConnector();
+            var transaction = databaseConnector.Database.BeginTransaction();
 
-            var playerID = mySQLConnector.PlayerData
+            var playerID = databaseConnector.PlayerData
                 .Include(d => d.ClanData)
                 .Where(d => d.ClanData.ServerID == userData.ClanData.ServerID)
                 .Where(d => d.ClanData.ClanRoleID == userData.ClanData.ClanRoleID)
@@ -128,7 +128,7 @@ namespace PriconneBotConsoleApp.Database
                 .FirstOrDefault();
 
             
-            mySQLConnector.ReservationData.Add(
+            databaseConnector.ReservationData.Add(
                 new ReservationData()
                 {
                     PlayerID = playerID,
@@ -137,17 +137,17 @@ namespace PriconneBotConsoleApp.Database
                     CommentData = reservationData.CommentData
                 });
 
-            mySQLConnector.SaveChanges();
+            databaseConnector.SaveChanges();
             transaction.Commit();
         }
 
         public void UpdateReservationData(ReservationData reservationData)
         {
             var userData = reservationData.PlayerData;
-            using var mySQLConnector = new DatabaseConnector();
-            var transaction = mySQLConnector.Database.BeginTransaction();
+            using var databaseConnector = new DatabaseConnector();
+            var transaction = databaseConnector.Database.BeginTransaction();
 
-            var playerID = mySQLConnector.PlayerData
+            var playerID = databaseConnector.PlayerData
                 .Include(d => d.ClanData)
                 .Where(d => d.ClanData.ServerID == userData.ClanData.ServerID)
                 .Where(d => d.ClanData.ClanRoleID == userData.ClanData.ClanRoleID)
@@ -160,7 +160,7 @@ namespace PriconneBotConsoleApp.Database
                 return;
             }
 
-            var updateData = mySQLConnector.ReservationData
+            var updateData = databaseConnector.ReservationData
                 .Include(d => d.PlayerData)
                 .Where(d => d.PlayerID == playerID)
                 .Where(d => d.BattleLap == reservationData.BattleLap)
@@ -169,7 +169,7 @@ namespace PriconneBotConsoleApp.Database
                 .FirstOrDefault();
 
             updateData.CommentData = reservationData.CommentData;
-            mySQLConnector.SaveChanges();
+            databaseConnector.SaveChanges();
             transaction.Commit();
         }
 
@@ -178,13 +178,13 @@ namespace PriconneBotConsoleApp.Database
 
         public void DeleteReservationData(IEnumerable<ReservationData> reservationDataSet)
         {
-            using var mySQLConnector = new DatabaseConnector();
-            var transaction = mySQLConnector.Database.BeginTransaction();
+            using var databaseConnector = new DatabaseConnector();
+            var transaction = databaseConnector.Database.BeginTransaction();
 
             foreach (var reservationData in reservationDataSet)
             {
 
-                var updateData = mySQLConnector.ReservationData
+                var updateData = databaseConnector.ReservationData
                     .Include(d => d.PlayerData)
                     .Where(d => d.PlayerID == reservationData.PlayerID)
                     .Where(d => d.BossNumber == reservationData.BossNumber)
@@ -198,7 +198,7 @@ namespace PriconneBotConsoleApp.Database
                 }
             }
 
-            mySQLConnector.SaveChanges();
+            databaseConnector.SaveChanges();
             transaction.Commit();
         }
     }
