@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PriconneBotConsoleApp.DataTypes
+namespace PriconneBotConsoleApp.DataModel
 {
     [Table("declare_data")]
     public class DeclarationData

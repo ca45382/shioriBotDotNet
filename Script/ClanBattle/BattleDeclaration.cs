@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using PriconneBotConsoleApp.DataTypes;
+using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.Database;
 
 namespace PriconneBotConsoleApp.Script

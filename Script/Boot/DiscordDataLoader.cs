@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Discord.WebSocket;
-using PriconneBotConsoleApp.DataTypes;
+using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.Database;
 
 namespace PriconneBotConsoleApp.Script
