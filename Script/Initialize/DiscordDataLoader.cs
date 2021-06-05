@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PriconneBotConsoleApp.Script
+namespace PriconneBotConsoleApp.Script.Initialize
 {
     class DiscordDataLoader
     {

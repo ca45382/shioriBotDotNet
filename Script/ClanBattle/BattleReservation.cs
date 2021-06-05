@@ -10,7 +10,7 @@ using PriconneBotConsoleApp.DataTypes;
 using PriconneBotConsoleApp.MySQL;
 using PriconneBotConsoleApp.TextContents;
 
-namespace PriconneBotConsoleApp.Script
+namespace PriconneBotConsoleApp.Script.ClanBattle
 {
     class BattleReservation : BaseClass
     {

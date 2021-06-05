@@ -1,6 +1,8 @@
 ﻿using Discord.WebSocket;
 using PriconneBotConsoleApp.DataTypes;
 using PriconneBotConsoleApp.MySQL;
+using PriconneBotConsoleApp.Script.ClanBattle;
+using PriconneBotConsoleApp.Script.Tools;
 using System.Threading.Tasks;
 
 namespace PriconneBotConsoleApp.Script

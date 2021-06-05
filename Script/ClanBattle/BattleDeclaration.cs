@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PriconneBotConsoleApp.Script
+namespace PriconneBotConsoleApp.Script.ClanBattle
 {
     class BattleDeclaration : BaseClass
     {

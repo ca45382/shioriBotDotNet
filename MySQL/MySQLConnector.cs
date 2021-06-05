@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PriconneBotConsoleApp.DataTypes;
-using PriconneBotConsoleApp.Script;
+using PriconneBotConsoleApp.Script.Initialize;
 using System;
 
 namespace PriconneBotConsoleApp.MySQL

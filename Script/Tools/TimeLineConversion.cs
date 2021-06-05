@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace PriconneBotConsoleApp.Script
+namespace PriconneBotConsoleApp.Script.Tools
 {
     class TimeLineConversion : BaseClass
     {
