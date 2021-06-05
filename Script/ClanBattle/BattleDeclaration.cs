@@ -1,13 +1,13 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using PriconneBotConsoleApp.DataTypes;
-using PriconneBotConsoleApp.MySQL;
+using PriconneBotConsoleApp.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PriconneBotConsoleApp.Script.ClanBattle
+namespace PriconneBotConsoleApp.Script
 {
     class BattleDeclaration : BaseClass
     {
@@ -103,7 +103,7 @@ namespace PriconneBotConsoleApp.Script.ClanBattle
             m_userClanData.BattleLap = battleLap;
             m_userClanData.BossNumber = bossNumber;
 
-            if (!new MySQLClanDataController().UpdateClanData(m_userClanData))
+            if (!new DatabaseClanDataController().UpdateClanData(m_userClanData))
             {
                 return false;
             }
@@ -129,7 +129,7 @@ namespace PriconneBotConsoleApp.Script.ClanBattle
 
             var sentMessageId = sentMessage.Id;
 
-            var result = new MySQLDeclarationController()
+            var result = new DatabaseDeclarationController()
                 .UpdateDeclarationMessageID(m_userClanData, sentMessageId);
 
             await AttacheDefaultReaction(sentMessage);
@@ -196,7 +196,7 @@ namespace PriconneBotConsoleApp.Script.ClanBattle
             }
 
             var declarationData = UserToDeclareData(userId);
-            var result = new MySQLDeclarationController()
+            var result = new DatabaseDeclarationController()
                 .CreateDeclarationData(declarationData);
 
             return result;
@@ -224,14 +224,14 @@ namespace PriconneBotConsoleApp.Script.ClanBattle
             // 宣言終了
             var declarationData = UserToDeclareData(userReaction.UserId);
             declarationData.FinishFlag = true;
-            var result = new MySQLDeclarationController()
+            var result = new DatabaseDeclarationController()
                 .UpdateDeclarationData(declarationData);
 
             // 予約の削除
-            var playerData = new MySQLPlayerDataController().LoadPlayerData(
+            var playerData = new DatabasePlayerDataController().LoadPlayerData(
                 userRole.Guild.Id, userReaction.UserId);
 
-            var mySQLReservationController = new MySQLReservationController();
+            var mySQLReservationController = new DatabaseReservationController();
             var reservationData = mySQLReservationController.LoadReservationData(playerData);
             var finishReservationData = reservationData
                 .FirstOrDefault(d => d.BattleLap == userClanData.BattleLap && d.BossNumber == userClanData.BossNumber);
@@ -259,7 +259,7 @@ namespace PriconneBotConsoleApp.Script.ClanBattle
 
             if (sqlData != null)
             {
-                new MySQLDeclarationController().DeleteDeclarationData(sqlData);
+                new DatabaseDeclarationController().DeleteDeclarationData(sqlData);
             }
 
             return true;
@@ -273,7 +273,7 @@ namespace PriconneBotConsoleApp.Script.ClanBattle
         {
             var userClanData = m_userClanData;
 
-            var mySQLDeclaration = new MySQLDeclarationController();
+            var mySQLDeclaration = new DatabaseDeclarationController();
             var declarationData = mySQLDeclaration.LoadDeclarationData(userClanData);
 
             var result = mySQLDeclaration.DeleteDeclarationData(declarationData);
@@ -300,7 +300,7 @@ namespace PriconneBotConsoleApp.Script.ClanBattle
             {
                 m_userClanData.BossNumber += 1;
             }
-            new MySQLClanDataController().UpdateClanData(m_userClanData);
+            new DatabaseClanDataController().UpdateClanData(m_userClanData);
 
             await SendDeclarationBotMessage();
 
@@ -318,7 +318,7 @@ namespace PriconneBotConsoleApp.Script.ClanBattle
             var userClanData = m_userClanData;
             var userRole = m_userRole;
 
-            var playerData = new MySQLPlayerDataController().LoadPlayerData(
+            var playerData = new DatabasePlayerDataController().LoadPlayerData(
                 userRole.Guild.Id, userID);
 
             return new DeclarationData()
@@ -334,10 +334,10 @@ namespace PriconneBotConsoleApp.Script.ClanBattle
         {
             var userRole = m_userRole;
 
-            var playerData = new MySQLPlayerDataController().LoadPlayerData(
+            var playerData = new DatabasePlayerDataController().LoadPlayerData(
                 userRole.Guild.Id, userID);
 
-            var declarationData = new MySQLDeclarationController()
+            var declarationData = new DatabaseDeclarationController()
                 .LoadDeclarationData(playerData);
 
             return declarationData;
@@ -371,9 +371,9 @@ namespace PriconneBotConsoleApp.Script.ClanBattle
         private Embed CreateDeclarationDataEmbed(ClanData clanData)
         {
             var reservationDataList =
-                new MySQLReservationController().LoadBossLapReservationData(clanData);
+                new DatabaseReservationController().LoadBossLapReservationData(clanData);
             var declarationDataList =
-                new MySQLDeclarationController().LoadDeclarationData(clanData);
+                new DatabaseDeclarationController().LoadDeclarationData(clanData);
 
             var bossNumber = clanData.BossNumber;
             var battleLap = clanData.BattleLap;
@@ -473,7 +473,7 @@ namespace PriconneBotConsoleApp.Script.ClanBattle
         private string CreateDeclarationDataMessage(ClanData clanData)
         {
             var reservationDataList =
-                new MySQLReservationController().LoadBossLapReservationData(clanData);
+                new DatabaseReservationController().LoadBossLapReservationData(clanData);
 
             var reservationIDList = reservationDataList
                .OrderBy(d => d.CreateDateTime)

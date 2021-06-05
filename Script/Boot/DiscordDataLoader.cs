@@ -1,11 +1,11 @@
 ﻿using Discord.WebSocket;
 using PriconneBotConsoleApp.DataTypes;
-using PriconneBotConsoleApp.MySQL;
+using PriconneBotConsoleApp.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PriconneBotConsoleApp.Script.Initialize
+namespace PriconneBotConsoleApp.Script
 {
     class DiscordDataLoader
     {
@@ -15,7 +15,7 @@ namespace PriconneBotConsoleApp.Script.Initialize
         {
             try
             {
-                m_clanData = new MySQLClanDataController().LoadClanData();
+                m_clanData = new DatabaseClanDataController().LoadClanData();
             }
             catch (Exception e)
             {
@@ -25,7 +25,7 @@ namespace PriconneBotConsoleApp.Script.Initialize
 
         public void UpdateServerData(SocketGuild guild)
         {
-            var serverDataController = new MySQLServerDataController();
+            var serverDataController = new DatabaseServerDataController();
             var serverData = serverDataController.LoadServerData(guild);
 
             if (serverData == null)
@@ -44,13 +44,13 @@ namespace PriconneBotConsoleApp.Script.Initialize
         /// <param name="guild"></param>
         public void UpdatePlayerData(SocketGuild guild)
         {
-            var playerDataController = new MySQLPlayerDataController();
+            var playerDataController = new DatabasePlayerDataController();
 
             // サーバー上のクランメンバー
             var usersOnDiscord = GetServerClanMember(guild);
 
             // テーブル上のプレイヤーデータ
-            var usersOnSQLServer = new MySQLPlayerDataController().LoadPlayerData(guild.Id);
+            var usersOnSQLServer = new DatabasePlayerDataController().LoadPlayerData(guild.Id);
 
             #region テーブルにユーザを追加・更新
             var createUserData = new List<PlayerData>();

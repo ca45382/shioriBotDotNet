@@ -3,13 +3,13 @@ using PriconneBotConsoleApp.DataTypes;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PriconneBotConsoleApp.MySQL
+namespace PriconneBotConsoleApp.Database
 {
-    class MySQLPlayerDataController
+    class DatabasePlayerDataController
     {
         public List<PlayerData> LoadPlayerData(ulong serverID)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
 
             return mySQLConnector.PlayerData
                 .Include(b => b.ClanData)
@@ -19,7 +19,7 @@ namespace PriconneBotConsoleApp.MySQL
 
         public PlayerData LoadPlayerData(ulong serverID, ulong userID)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
 
             return mySQLConnector.PlayerData
                 .Include(b => b.ClanData)
@@ -30,7 +30,7 @@ namespace PriconneBotConsoleApp.MySQL
 
         public void CreatePlayerData(IEnumerable<PlayerData> playersData)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
             var transaction = mySQLConnector.Database.BeginTransaction();
             
             foreach (PlayerData playerData in playersData)
@@ -57,7 +57,7 @@ namespace PriconneBotConsoleApp.MySQL
 
         public void UpdatePlayerData(IEnumerable<PlayerData> playersData)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
             var transaction = mySQLConnector.Database.BeginTransaction();
             
             foreach (PlayerData playerData in playersData)
@@ -81,7 +81,7 @@ namespace PriconneBotConsoleApp.MySQL
 
         public void DeletePlayerData(IEnumerable<PlayerData> playersData)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
             var transaction = mySQLConnector.Database.BeginTransaction();
             
             foreach (PlayerData playerData in playersData)

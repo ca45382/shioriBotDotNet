@@ -3,13 +3,13 @@ using PriconneBotConsoleApp.DataTypes;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PriconneBotConsoleApp.MySQL
+namespace PriconneBotConsoleApp.Database
 {
-    class MySQLReservationController
+    class DatabaseReservationController
     {
         public bool UpdateReservationMessageID(ClanData clanData, ulong messageID)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
             var transaction = mySQLConnector.Database.BeginTransaction();
 
             var clanID = mySQLConnector.ClanData
@@ -45,7 +45,7 @@ namespace PriconneBotConsoleApp.MySQL
 
         public List<ReservationData> LoadReservationData(ClanData clanData)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
 
             return mySQLConnector.ReservationData
                 .Include(b => b.PlayerData)
@@ -66,7 +66,7 @@ namespace PriconneBotConsoleApp.MySQL
                 return null;
             }
 
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
 
             var playerDataOnSQL = mySQLConnector.PlayerData
                 .Include(b => b.ClanData)
@@ -88,7 +88,7 @@ namespace PriconneBotConsoleApp.MySQL
 
         public List<ReservationData> LoadBossLapReservationData(ClanData clanData)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
 
             var clanID = mySQLConnector.ClanData
                 .Include(d => d.ServerData)
@@ -116,7 +116,7 @@ namespace PriconneBotConsoleApp.MySQL
         public void CreateReservationData(ReservationData reservationData)
         {
             var userData = reservationData.PlayerData;
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
             var transaction = mySQLConnector.Database.BeginTransaction();
 
             var playerID = mySQLConnector.PlayerData
@@ -144,7 +144,7 @@ namespace PriconneBotConsoleApp.MySQL
         public void UpdateReservationData(ReservationData reservationData)
         {
             var userData = reservationData.PlayerData;
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
             var transaction = mySQLConnector.Database.BeginTransaction();
 
             var playerID = mySQLConnector.PlayerData
@@ -178,7 +178,7 @@ namespace PriconneBotConsoleApp.MySQL
 
         public void DeleteReservationData(IEnumerable<ReservationData> reservationDataSet)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
             var transaction = mySQLConnector.Database.BeginTransaction();
 
             foreach (var reservationData in reservationDataSet)

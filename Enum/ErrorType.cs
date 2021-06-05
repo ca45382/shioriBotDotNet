@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
 
-namespace PriconneBotConsoleApp.TextContents
+namespace PriconneBotConsoleApp.Enum
 {
     public enum ErrorType
     {

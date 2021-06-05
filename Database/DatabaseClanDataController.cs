@@ -4,19 +4,19 @@ using PriconneBotConsoleApp.DataTypes;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PriconneBotConsoleApp.MySQL
+namespace PriconneBotConsoleApp.Database
 {
-    class MySQLClanDataController
+    class DatabaseClanDataController
     {
         public List<ClanData> LoadClanData()
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
             return mySQLConnector.ClanData.ToList();
         }
 
         public ClanData LoadClanData(SocketRole role)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
 
             return mySQLConnector.ClanData
                 .Include(b => b.ServerData)
@@ -30,7 +30,7 @@ namespace PriconneBotConsoleApp.MySQL
 
         public bool UpdateClanData (ClanData clanData)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
             var transaction = mySQLConnector.Database.BeginTransaction();
 
             var mySQLData = mySQLConnector.ClanData

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.ComponentModel;
 using PriconneBotConsoleApp.DataTypes;
-using PriconneBotConsoleApp.MySQL;
-using PriconneBotConsoleApp.TextContents;
+using PriconneBotConsoleApp.Enum;
+using PriconneBotConsoleApp.Database;
 
-namespace PriconneBotConsoleApp.Script.ClanBattle
+namespace PriconneBotConsoleApp.Script
 {
     class BattleReservation : BaseClass
     {
@@ -154,7 +154,7 @@ namespace PriconneBotConsoleApp.Script.ClanBattle
 
             var sendedMessageData = await SendMessageToChannel(resultChannel, messageData);
 
-            new MySQLReservationController()
+            new DatabaseReservationController()
                 .UpdateReservationMessageID(userClanData, sendedMessageData.Id);
             await AttacheDefaultReaction(sendedMessageData);
         }
@@ -240,7 +240,7 @@ namespace PriconneBotConsoleApp.Script.ClanBattle
 
         private void RegisterReservationData(ReservationData reservationData)
         {
-            var mySQLReservationController = new MySQLReservationController();
+            var mySQLReservationController = new DatabaseReservationController();
 
             var allSqlReservationData = mySQLReservationController
                 .LoadReservationData(reservationData.PlayerData);
@@ -275,7 +275,7 @@ namespace PriconneBotConsoleApp.Script.ClanBattle
                 return null;
             }
 
-            var playerData = new MySQLPlayerDataController()
+            var playerData = new DatabasePlayerDataController()
                 .LoadPlayerData(m_userClanData.ServerID, userID);
 
             if (playerData == null)
@@ -283,14 +283,14 @@ namespace PriconneBotConsoleApp.Script.ClanBattle
                 return null;
             }
 
-            return new MySQLReservationController()
+            return new DatabaseReservationController()
                 .LoadReservationData(playerData)
                 .FirstOrDefault(d => d.BattleLap == battleLap && d.BossNumber == bossNumber);
         }
 
         private bool DeleteUserReservationData(ReservationData reservationData)
         {
-            var mySQLReservationController = new MySQLReservationController();
+            var mySQLReservationController = new DatabaseReservationController();
             var allSqlReservationData = mySQLReservationController.LoadReservationData(reservationData.PlayerData);
 
             var sqlReservationData = allSqlReservationData
@@ -309,12 +309,12 @@ namespace PriconneBotConsoleApp.Script.ClanBattle
 
         private string CreateUserReservationDataMessage()
             => CreateUserReservationDataMessage(
-                new MySQLPlayerDataController().LoadPlayerData(m_userClanData.ServerID, m_userMessage.Author.Id)
+                new DatabasePlayerDataController().LoadPlayerData(m_userClanData.ServerID, m_userMessage.Author.Id)
             );
 
         private string CreateUserReservationDataMessage(PlayerData playerData)
         {
-            var reservationDataSet = new MySQLReservationController().LoadReservationData(playerData);
+            var reservationDataSet = new DatabaseReservationController().LoadReservationData(playerData);
 
             if (reservationDataSet.Count == 0)
             {
@@ -342,7 +342,7 @@ namespace PriconneBotConsoleApp.Script.ClanBattle
             var bossNumber = clanData.BossNumber;
             var battleLap = clanData.BattleLap;
 
-            var reservationDataSet = new MySQLReservationController().LoadReservationData(clanData);
+            var reservationDataSet = new DatabaseReservationController().LoadReservationData(clanData);
 
             reservationDataSet = reservationDataSet
                 .Where(b => b.BattleLap > battleLap || (b.BattleLap == battleLap && b.BossNumber >= bossNumber))

@@ -3,13 +3,13 @@ using PriconneBotConsoleApp.DataTypes;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PriconneBotConsoleApp.MySQL
+namespace PriconneBotConsoleApp.Database
 {
-    class MySQLDeclarationController
+    class DatabaseDeclarationController
     {
         public bool UpdateDeclarationMessageID(ClanData clanData, ulong messageID)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
             var transaction = mySQLConnector.Database.BeginTransaction();
 
             var clanID = mySQLConnector.ClanData
@@ -43,7 +43,7 @@ namespace PriconneBotConsoleApp.MySQL
 
         public IEnumerable<DeclarationData> LoadDeclarationData(ClanData clanData)
         {
-            var mySQLConnector = new MySQLConnector();
+            var mySQLConnector = new DatabaseConnector();
 
             var clanID = mySQLConnector.ClanData
                 .Include(d => d.ServerData)
@@ -67,7 +67,7 @@ namespace PriconneBotConsoleApp.MySQL
 
         public IEnumerable<DeclarationData> LoadDeclarationData(PlayerData playerData)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
 
             playerData = mySQLConnector.PlayerData
                 .Include(d => d.ClanData)
@@ -92,7 +92,7 @@ namespace PriconneBotConsoleApp.MySQL
                 return false;
             }
 
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
             var transaction = mySQLConnector.Database.BeginTransaction();
 
             if (declarationData.PlayerID == 0)
@@ -128,7 +128,7 @@ namespace PriconneBotConsoleApp.MySQL
                 return false;
             }
 
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
             var transaction = mySQLConnector.Database.BeginTransaction();
 
             if (declarationData.PlayerID == 0)
@@ -170,7 +170,7 @@ namespace PriconneBotConsoleApp.MySQL
         /// <returns></returns>
         public bool DeleteDeclarationData(IEnumerable<DeclarationData> declarationDataSet)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
             var transaction = mySQLConnector.Database.BeginTransaction();
 
             foreach (var declarationData in declarationDataSet)
@@ -218,7 +218,7 @@ namespace PriconneBotConsoleApp.MySQL
             }
 
             var clanData = playerData.ClanData;
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
 
             return mySQLConnector.PlayerData
                 .Include(d => d.ClanData)

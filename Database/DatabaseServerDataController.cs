@@ -3,20 +3,20 @@ using System.Linq;
 using Discord;
 using PriconneBotConsoleApp.DataTypes;
 
-namespace PriconneBotConsoleApp.MySQL
+namespace PriconneBotConsoleApp.Database
 {
-    class MySQLServerDataController
+    class DatabaseServerDataController
     {
         public IEnumerable<ServerData> LoadServerData()
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
 
             return mySQLConnector.ServerData.ToArray();
         }
 
         public ServerData LoadServerData(IGuild guild)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
 
             return mySQLConnector.ServerData
                 .FirstOrDefault(b => b.ServerID == guild.Id);
@@ -24,7 +24,7 @@ namespace PriconneBotConsoleApp.MySQL
 
         public void CreateServerData(IGuild guild)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
             var transaction = mySQLConnector.Database.BeginTransaction();
 
             var mySQLServerData = mySQLConnector.ServerData
@@ -50,7 +50,7 @@ namespace PriconneBotConsoleApp.MySQL
 
         public void UpdateServerData(IGuild guild)
         {
-            using var mySQLConnector = new MySQLConnector();
+            using var mySQLConnector = new DatabaseConnector();
             var transaction = mySQLConnector.Database.BeginTransaction();
 
             var mySQLServerData = mySQLConnector.ServerData

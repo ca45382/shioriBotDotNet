@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PriconneBotConsoleApp.DataTypes
+namespace PriconneBotConsoleApp.DataModel
 {
     public class ClanBattleDate
     {

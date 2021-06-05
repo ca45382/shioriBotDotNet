@@ -2,7 +2,7 @@
 using System.IO;
 using System.Runtime.Serialization;
 
-namespace PriconneBotConsoleApp.Script.Initialize
+namespace PriconneBotConsoleApp.Script
 {
     public class JsonDataManager
     {

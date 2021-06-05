@@ -2,7 +2,6 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using PriconneBotConsoleApp.Script.Initialize;
 using System;
 using System.IO;
 using System.Reflection;

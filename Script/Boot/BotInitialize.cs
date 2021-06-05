@@ -6,7 +6,7 @@ using System.Text.Json;
 using Brotli;
 using PriconneBotConsoleApp.DataTypes;
 
-namespace PriconneBotConsoleApp.Script.Initialize
+namespace PriconneBotConsoleApp.Script
 {
     class BotInitialize
     {

@@ -1,8 +1,6 @@
 ﻿using Discord.WebSocket;
 using PriconneBotConsoleApp.DataTypes;
-using PriconneBotConsoleApp.MySQL;
-using PriconneBotConsoleApp.Script.ClanBattle;
-using PriconneBotConsoleApp.Script.Tools;
+using PriconneBotConsoleApp.Database;
 using System.Threading.Tasks;
 
 namespace PriconneBotConsoleApp.Script
@@ -19,7 +17,7 @@ namespace PriconneBotConsoleApp.Script
             var messageChannel = message.Channel as SocketGuildChannel;
             var guildID = messageChannel.Guild.Id;
             var userID = message.Author.Id;
-            m_playerData = new MySQLPlayerDataController().LoadPlayerData(guildID, userID);
+            m_playerData = new DatabasePlayerDataController().LoadPlayerData(guildID, userID);
             
             if (m_playerData == null)
             {
@@ -33,7 +31,7 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            m_playerClanData = new MySQLClanDataController().LoadClanData(userRole);
+            m_playerClanData = new DatabaseClanDataController().LoadClanData(userRole);
         }
 
         public async Task RunMessageReceive()
