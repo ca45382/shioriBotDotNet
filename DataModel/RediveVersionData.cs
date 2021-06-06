@@ -1,4 +1,4 @@
-﻿namespace PriconneBotConsoleApp.DataTypes
+﻿namespace PriconneBotConsoleApp.DataModel
 {
     public class RediveVersionData
     {

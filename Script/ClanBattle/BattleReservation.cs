@@ -7,7 +7,7 @@ using System.ComponentModel;
 using Discord;
 using Discord.WebSocket;
 using PriconneBotConsoleApp.DataModel;
-using PriconneBotConsoleApp.Enum;
+using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Database;
 
 namespace PriconneBotConsoleApp.Script
