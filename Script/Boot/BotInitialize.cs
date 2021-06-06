@@ -4,7 +4,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 
 using Brotli;
-using PriconneBotConsoleApp.DataTypes;
+using PriconneBotConsoleApp.DataModel;
 
 namespace PriconneBotConsoleApp.Script
 {
