@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace PriconneBotConsoleApp.Enum
+namespace PriconneBotConsoleApp.DataType
 {
     public enum CampaignSystemType
     {

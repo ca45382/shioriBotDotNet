@@ -8,8 +8,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 
-using PriconneBotConsoleApp.Database;
-
 namespace PriconneBotConsoleApp.Script
 {
     class Program
