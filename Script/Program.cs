@@ -32,8 +32,6 @@ namespace PriconneBotConsoleApp.Script
                 MessageCacheSize = 10
             };
 
-            new CampaignViewer().TodayCampaignLoader();
-
             var initialize = new BotInitialize();
             initialize.UpdateRediveDatabase();
 

@@ -1,29 +1,94 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using Discord;
 using PriconneBotConsoleApp.Database;
 using PriconneBotConsoleApp.DataType;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class CampaignViewer
+    class CampaignViewer : BaseClass
     {
-        public void TodayCampaignLoader()
+        private IMessage m_userMessage;
+        public CampaignViewer(IMessage message)
         {
-            var campaignData = new RediveCampaignLoader().LoadCampaignDatas();
+            m_userMessage = message;
+        }
 
-            var data = campaignData.ToArray().Last();
-            var exportString = new StringBuilder();
-
-            var campaignSystemType = CampaignSystemType.Unknown;
-
-            if (System.Enum.IsDefined(typeof(CampaignSystemType), data.SystemID))
+        public async Task SendEventInfomationByMessage()
+        {
+            if (m_userMessage.Content != "!today")
             {
-                campaignSystemType = (CampaignSystemType) data.SystemID;
+                return;
             }
 
-            var aa = campaignSystemType.GetDescription();
-            Console.WriteLine(aa);
+            var embed = EventViewer();
+
+            await m_userMessage.Channel.SendMessageAsync(embed: embed);
+        }
+
+        public Embed EventViewer()
+        {
+            var nowTime = DateTime.Now;
+            var todayCampaignString = CampaignLoader(nowTime);
+            var yesterdayCampaignString = CampaignLoader(nowTime.AddDays(1));
+
+            var embedBuilder = new EmbedBuilder
+            {
+                Title = "本日のキャンペーン"
+            };
+
+            embedBuilder.AddField(new EmbedFieldBuilder()
+            {
+                IsInline = false,
+                Name = "本日のキャンペーン",
+                Value = todayCampaignString
+            });
+
+            embedBuilder.AddField(new EmbedFieldBuilder()
+            {
+                IsInline = false,
+                Name = "明日のキャンペーン",
+                Value = yesterdayCampaignString
+            });
+            return embedBuilder.Build();
+        }
+        public string CampaignLoader(DateTime nowTime)
+        {
+            var campaignAllData = new RediveCampaignLoader().LoadCampaignDatas(nowTime);
+            campaignAllData = campaignAllData
+                .OrderBy(b => b.IconImage);
+
+            var campaignStringBuilder = new StringBuilder();
+            campaignStringBuilder.AppendLine("```Python");
+            foreach(var campaignData in campaignAllData)
+            {
+                var campaignSystemType = CampaignSystemType.Unknown;
+                var campaignIconType = CampaignIconType.Unknown;
+
+                if (Enum.IsDefined(typeof(CampaignSystemType), campaignData.SystemID))
+                {
+                    campaignSystemType = (CampaignSystemType)campaignData.SystemID;
+                }
+
+                if (Enum.IsDefined(typeof(CampaignIconType), campaignData.IconImage))
+                {
+                    campaignIconType = (CampaignIconType)campaignData.IconImage;
+                }
+                
+                var campaignSystemString = campaignSystemType.GetDescription();
+                var campaignItemString = campaignIconType.GetDescription();
+
+                //Console.WriteLine(campaignSystemString + campaignItemString + campaignData.Value/1000 + "倍");
+                campaignStringBuilder.AppendLine(
+                    campaignSystemString + " " + campaignItemString + " " + campaignData.Value / 1000 + "倍"
+                    );
+            }
+
+            campaignStringBuilder.AppendLine("```");
+
+            return campaignStringBuilder.ToString();
         }
     }
 }
