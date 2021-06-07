@@ -8,10 +8,10 @@ using PriconneBotConsoleApp.DataType;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class CampaignViewer : BaseClass
+    class PriconneEventViewer : BaseClass
     {
         private IMessage m_userMessage;
-        public CampaignViewer(IMessage message)
+        public PriconneEventViewer(IMessage message)
         {
             m_userMessage = message;
         }

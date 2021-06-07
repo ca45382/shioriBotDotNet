@@ -45,7 +45,7 @@ namespace PriconneBotConsoleApp.Script
         public async Task RunMessageReceive(SocketUserMessage message)
         {
             await new TimeLineConversion(message).RunByMessage() ;
-            await new CampaignViewer(message).SendEventInfomationByMessage();
+            await new PriconneEventViewer(message).SendEventInfomationByMessage();
 
             if (m_playerData == null || m_playerClanData == null)
             {
