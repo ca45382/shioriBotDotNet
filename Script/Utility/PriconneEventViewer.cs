@@ -23,12 +23,22 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            var embed = EventViewer();
-
-            await m_userMessage.Channel.SendMessageAsync(embed: embed);
+            var eventString = EventString();
+            await m_userMessage.Channel.SendMessageAsync(text: eventString) ;
         }
 
-        public Embed EventViewer()
+        public string EventString()
+        {
+            var nowTime = DateTime.Now;
+            var eventStringBuilder = new StringBuilder();
+
+            eventStringBuilder.AppendLine("本日のキャンペーン");
+            eventStringBuilder.AppendLine(CampaignLoader(nowTime));
+
+            return eventStringBuilder.ToString();
+        }
+
+        public Embed EventEmbed()
         {
             var nowTime = DateTime.Now;
             var todayCampaignString = CampaignLoader(nowTime);
@@ -52,6 +62,7 @@ namespace PriconneBotConsoleApp.Script
                 Name = "明日のキャンペーン",
                 Value = yesterdayCampaignString
             });
+
             return embedBuilder.Build();
         }
         public string CampaignLoader(DateTime nowTime)
