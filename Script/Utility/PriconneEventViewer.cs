@@ -91,7 +91,6 @@ namespace PriconneBotConsoleApp.Script
                 var campaignSystemString = campaignSystemType.GetDescription();
                 var campaignItemString = campaignIconType.GetDescription();
 
-                //Console.WriteLine(campaignSystemString + campaignItemString + campaignData.Value/1000 + "倍");
                 campaignStringBuilder.AppendLine(
                     campaignSystemString + " " + campaignItemString + " " + campaignData.Value / 1000 + "倍"
                     );
