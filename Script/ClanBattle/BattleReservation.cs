@@ -394,15 +394,15 @@ namespace PriconneBotConsoleApp.Script
         
         private async Task SendErrorMessage(ErrorType type, params string[] parameters)
         {
-            var descriptionAttribute = type.GetType().GetField(type.ToString()).GetCustomAttribute<DescriptionAttribute>(false);
+            var descriptionString = type.GetDescription();
             var sendMessage = string.Empty;
-            if (descriptionAttribute == null)
+            if (descriptionString == null)
             {
                 sendMessage = type.ToString();
             }
             else
             {
-                sendMessage = string.Format(descriptionAttribute.Description, parameters);
+                sendMessage = string.Format(descriptionString, parameters);
             }
             await m_userMessage.Channel.SendMessageAsync(sendMessage);
         }
