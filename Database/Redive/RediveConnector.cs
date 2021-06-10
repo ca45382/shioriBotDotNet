@@ -5,7 +5,7 @@ using PriconneBotConsoleApp.DataModel;
 
 namespace PriconneBotConsoleApp.Database
 {
-    class RediveConnector : DbContext
+    public class RediveConnector : DbContext
     {
         public DbSet<CampaignData> CampaignData { get; set; }
 

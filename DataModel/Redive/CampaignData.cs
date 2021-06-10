@@ -13,8 +13,12 @@ namespace PriconneBotConsoleApp.DataModel
         [Column("campaign_category", TypeName = "INTEGER")]
         public int CampaignCategory { get; set; }
 
+        /// <summary>
+        /// 倍率×1000.
+        /// 例:2倍 -> 2000.0
+        /// </summary>
         [Column("value", TypeName = "REAL")]
-        public float Value { get; set; }
+        public float CampaignValue { get; set; }
 
         [Column("system_id", TypeName = "INTEGER")]
         public int SystemID { get; set; }

@@ -8,30 +8,30 @@ using PriconneBotConsoleApp.DataType;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class PriconneEventViewer : BaseClass
+    public class PriconneEventViewer
     {
-        private IMessage m_userMessage;
+        private IMessage m_UserMessage;
         public PriconneEventViewer(IMessage message)
         {
-            m_userMessage = message;
+            m_UserMessage = message;
         }
 
         public async Task SendEventInfomationByMessage()
         {
-            if (m_userMessage.Content != "!today")
+            if (m_UserMessage.Content != "!today")
             {
                 return;
             }
 
             var eventString = EventString();
-            await m_userMessage.Channel.SendMessageAsync(text: eventString) ;
+            await m_UserMessage.Channel.SendMessageAsync(text: eventString) ;
         }
 
         public string EventString()
         {
             var nowTime = DateTime.Now;
-            var eventStringBuilder = new StringBuilder();
 
+            var eventStringBuilder = new StringBuilder();
             eventStringBuilder.AppendLine("本日のキャンペーン");
             eventStringBuilder.AppendLine(CampaignLoader(nowTime));
 
@@ -51,20 +51,19 @@ namespace PriconneBotConsoleApp.Script
 
             embedBuilder.AddField(new EmbedFieldBuilder()
             {
-                IsInline = false,
                 Name = "本日のキャンペーン",
                 Value = todayCampaignString
             });
 
             embedBuilder.AddField(new EmbedFieldBuilder()
             {
-                IsInline = false,
                 Name = "明日のキャンペーン",
                 Value = yesterdayCampaignString
             });
 
             return embedBuilder.Build();
         }
+
         public string CampaignLoader(DateTime nowTime)
         {
             var campaignAllData = new RediveCampaignLoader().LoadCampaignDatas(nowTime);
@@ -73,6 +72,7 @@ namespace PriconneBotConsoleApp.Script
 
             var campaignStringBuilder = new StringBuilder();
             campaignStringBuilder.AppendLine("```Python");
+
             foreach(var campaignData in campaignAllData)
             {
                 var campaignSystemType = CampaignSystemType.Unknown;
@@ -92,7 +92,7 @@ namespace PriconneBotConsoleApp.Script
                 var campaignItemString = campaignIconType.GetDescription();
 
                 campaignStringBuilder.AppendLine(
-                    campaignSystemString + " " + campaignItemString + " " + campaignData.Value / 1000 + "倍"
+                    campaignSystemString + " " + campaignItemString + " " + campaignData.CampaignValue / 1000 + "倍"
                     );
             }
 
