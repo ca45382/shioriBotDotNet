@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PriconneBotConsoleApp.DataModel
@@ -13,5 +14,6 @@ namespace PriconneBotConsoleApp.DataModel
         [Column("feature_name", TypeName = "varchar(20)")]
         public string FeatureName { get; set; }
 
+        public List<MessageData> MessageData { get; set; }
     }
 }
