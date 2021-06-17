@@ -18,8 +18,8 @@ namespace PriconneBotConsoleApp.DataModel
         [Column("boss_num", TypeName = "TINYINT UNSIGNED")]
         public byte BossNumber { get; set; }
 
-        [Column("battle_lap", TypeName = "TINYINT UNSIGNED")]
-        public byte BattleLap { get; set; }
+        [Column("battle_lap", TypeName = "SMALLINT UNSIGNED")]
+        public ushort BattleLap { get; set; }
 
         [Column("attack_type", TypeName = "TINYINT UNSIGNED")]
         public byte AttackType { get; set; }

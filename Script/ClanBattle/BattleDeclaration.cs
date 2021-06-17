@@ -6,6 +6,7 @@ using Discord;
 using Discord.WebSocket;
 using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.Database;
+using PriconneBotConsoleApp.DataType;
 
 namespace PriconneBotConsoleApp.Script
 {
@@ -52,7 +53,9 @@ namespace PriconneBotConsoleApp.Script
 
         public async Task RunDeclarationCommandByReaction()
         {
-            var declarationMessageID = m_userClanData.MessageIDs.DeclarationMessageID;
+            var declarationMessageID = m_userClanData.MessageData
+                .FirstOrDefault(b => b.FeatureID == (uint)MessageFeatureType.DeclareID)
+                ?.MessageID ?? 0;
 
             if (declarationMessageID == 0 || m_userReaction.MessageId != declarationMessageID)
             {
@@ -129,8 +132,11 @@ namespace PriconneBotConsoleApp.Script
 
             var sentMessageId = sentMessage.Id;
 
-            var result = new DatabaseDeclarationController()
-                .UpdateDeclarationMessageID(m_userClanData, sentMessageId);
+            //var result = new DatabaseDeclarationController()
+            //    .UpdateDeclarationMessageID(m_userClanData, sentMessageId);
+
+            var result = new DatabaseMessageDataController()
+                .UpdateMessageID(m_userClanData, sentMessageId, MessageFeatureType.DeclareID);
 
             await AttacheDefaultReaction(sentMessage);
             m_userClanData.MessageIDs.DeclarationMessageID = sentMessageId;

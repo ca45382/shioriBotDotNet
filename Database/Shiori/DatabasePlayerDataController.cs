@@ -23,9 +23,7 @@ namespace PriconneBotConsoleApp.Database
 
             return databaseConnector.PlayerData
                 .Include(b => b.ClanData)
-                .ThenInclude(b => b.ServerData)
-                .Where(b => b.UserID == userID && b.ClanData.ServerID == serverID)
-                .FirstOrDefault();
+                .FirstOrDefault(b => b.UserID == userID && b.ClanData.ServerID == serverID);
         }
 
         public void CreatePlayerData(IEnumerable<PlayerData> playersData)
@@ -68,10 +66,8 @@ namespace PriconneBotConsoleApp.Database
             {
                 var updateData = databaseConnector.PlayerData
                     .Include(d => d.ClanData)
-                    .Where(d => d.ClanData.ServerID == playerData.ClanData.ServerID)
-                    .Where(d => d.ClanData.ClanRoleID == playerData.ClanData.ClanRoleID)
-                    .Where(d => d.UserID == playerData.UserID)
-                    .FirstOrDefault();
+                    .FirstOrDefault(d => d.ClanData.ServerID == playerData.ClanData.ServerID 
+                    && d.ClanData.ClanRoleID == playerData.ClanData.ClanRoleID && d.UserID == playerData.UserID);
 
                 if (updateData != null)
                 {
@@ -92,9 +88,7 @@ namespace PriconneBotConsoleApp.Database
             {
                 var removeData = databaseConnector.PlayerData
                     .Include(d => d.ClanData)
-                    .Where(d => d.ClanData == playerData.ClanData)
-                    .Where(d => d.UserID == playerData.UserID)
-                    .FirstOrDefault();
+                    .FirstOrDefault(d => d.ClanData == playerData.ClanData && d.UserID == playerData.UserID);
 
                 if (removeData != null)
                 {

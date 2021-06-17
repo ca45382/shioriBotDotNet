@@ -154,8 +154,8 @@ namespace PriconneBotConsoleApp.Script
 
             var sendedMessageData = await SendMessageToChannel(resultChannel, messageData);
 
-            new DatabaseReservationController()
-                .UpdateReservationMessageID(userClanData, sendedMessageData.Id);
+            new DatabaseMessageDataController()
+                .UpdateMessageID(userClanData, sendedMessageData.Id, MessageFeatureType.ReserveResultID);
             await AttacheDefaultReaction(sendedMessageData);
         }
 

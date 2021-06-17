@@ -2,6 +2,7 @@
 
 namespace PriconneBotConsoleApp.DataType
 {
+    //ロール系 3xxx
     public enum RoleFeatureType
     {
         [Description("")]
@@ -11,18 +12,18 @@ namespace PriconneBotConsoleApp.DataType
         TaskKillRoleID = 3001,
 
         [Description("Boss1RoleID")]
-        Boss1RoleID = 3011,
+        Boss1RoleID = 3101,
 
         [Description("Boss1RoleID")]
-        Boss2RoleID = 3012,
+        Boss2RoleID = 3102,
 
         [Description("Boss1RoleID")]
-        Boss3RoleID = 3013,
+        Boss3RoleID = 3103,
 
         [Description("Boss1RoleID")]
-        Boss4RoleID = 3014,
+        Boss4RoleID = 3104,
 
         [Description("Boss1RoleID")]
-        Boss5RoleID = 3015,
+        Boss5RoleID = 3105,
     }
 }

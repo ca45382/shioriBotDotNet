@@ -9,8 +9,8 @@ namespace PriconneBotConsoleApp.DataModel
         [Column("id", TypeName = "BIGINT UNSIGNED AUTO_INCREMENT"), Key, Required]
         public ulong DataID { get; set; }
 
-        [Column("channel_id", TypeName = "BIGINT UNSIGNED"), Required]
-        public ulong ChannelID { get; set; }
+        [Column("role_id", TypeName = "BIGINT UNSIGNED"), Required]
+        public ulong RoleID { get; set; }
 
         [Column("clan_id", TypeName = "BIGINT UNSIGNED"), Required]
         public ulong ClanID { get; set; }

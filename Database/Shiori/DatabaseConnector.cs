@@ -11,9 +11,9 @@ namespace PriconneBotConsoleApp.Database
         public DbSet<ClanData> ClanData { get; set; }
 
         //クラン詳細情報
-        public DbSet<ChannelData> ChannelIDs { get; set; }
-        public DbSet<MessageData> MessageIDs { get; set; }
-        public DbSet<RoleData> RoleIDs { get; set; }
+        public DbSet<ChannelData> ChannelData { get; set; }
+        public DbSet<MessageData> MessageData { get; set; }
+        public DbSet<RoleData> RoleData { get; set; }
 
         // 機能情報
         public DbSet<ChannelFeature> ChannelFeatures { get; set; }
