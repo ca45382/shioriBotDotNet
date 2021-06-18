@@ -7,6 +7,7 @@ using Discord.WebSocket;
 using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.Database;
 using PriconneBotConsoleApp.DataType;
+using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Script
 {
@@ -103,8 +104,23 @@ namespace PriconneBotConsoleApp.Script
                 return false;
             }
 
-            m_userClanData.BattleLap = battleLap;
-            m_userClanData.BossNumber = bossNumber;
+            // 今のボス・周回数から ボスごとの周回数に変更して代入
+            if (bossNumber == MaxBossNumber)
+            {
+                bossNumber = 0;
+            }
+
+            for (int i = 0; i < MaxBossNumber; i++)
+            {
+                if (i >= bossNumber)
+                {
+                    m_userClanData.SetBossLap(i + 1, battleLap - 1);
+                }
+                else
+                {
+                    m_userClanData.SetBossLap(i + 1, battleLap);
+                }
+            }
 
             if (!new DatabaseClanDataController().UpdateClanData(m_userClanData))
             {
@@ -122,7 +138,16 @@ namespace PriconneBotConsoleApp.Script
         {
             var embed = CreateDeclarationDataEmbed(m_userClanData);
             var content = CreateDeclarationDataMessage(m_userClanData);
-            var declarationChannel = m_userRole.Guild.GetTextChannel(m_userClanData.ChannelIDs.DeclarationChannelID);
+            var declarationChannelID = m_userClanData.ChannelData
+                .FirstOrDefault(x => x.FeatureID == (uint)ChannelFeatureType.DeclareID)
+                ?.ChannelID ?? 0;
+
+            if (declarationChannelID == 0)
+            {
+                return false;
+            }
+
+            var declarationChannel = m_userRole.Guild.GetTextChannel(declarationChannelID);
             var sentMessage = await declarationChannel.SendMessageAsync(text: content, embed: embed);
 
             if (sentMessage == null)
@@ -132,14 +157,11 @@ namespace PriconneBotConsoleApp.Script
 
             var sentMessageId = sentMessage.Id;
 
-            //var result = new DatabaseDeclarationController()
-            //    .UpdateDeclarationMessageID(m_userClanData, sentMessageId);
-
             var result = new DatabaseMessageDataController()
                 .UpdateMessageID(m_userClanData, sentMessageId, MessageFeatureType.DeclareID);
 
             await AttacheDefaultReaction(sentMessage);
-            m_userClanData.MessageIDs.DeclarationMessageID = sentMessageId;
+            //m_userClanData.MessageIDs.DeclarationMessageID = sentMessageId;
 
             return result;
         }
@@ -153,14 +175,21 @@ namespace PriconneBotConsoleApp.Script
             var userClanData = m_userClanData;
             var userRole = m_userRole;
 
-            var declarationMessageID = userClanData.MessageIDs.DeclarationMessageID;
+            var declarationMessageID = userClanData.MessageData
+                .FirstOrDefault(x => x.FeatureID == (uint)MessageFeatureType.DeclareID)
+                ?.MessageID ?? 0;
+
+            //var declarationMessageID = userClanData.MessageIDs.DeclarationMessageID;
             
             if (declarationMessageID == 0)
             {
                 return false;
             }
 
-            var guildChannel = userRole.Guild.GetChannel(userClanData.ChannelIDs.DeclarationChannelID) as SocketTextChannel;
+            var declarationChannelID = userClanData.ChannelData
+                .FirstOrDefault(x => x.FeatureID == (uint)ChannelFeatureType.DeclareID)
+                ?.ChannelID ?? 0;
+            var guildChannel = userRole.Guild.GetChannel(declarationChannelID) as SocketTextChannel;
 
             if (guildChannel.GetCachedMessage(declarationMessageID) is SocketUserMessage declarationBotMessage)
             {
@@ -240,7 +269,7 @@ namespace PriconneBotConsoleApp.Script
             var mySQLReservationController = new DatabaseReservationController();
             var reservationData = mySQLReservationController.LoadReservationData(playerData);
             var finishReservationData = reservationData
-                .FirstOrDefault(d => d.BattleLap == userClanData.BattleLap && d.BossNumber == userClanData.BossNumber);
+                .FirstOrDefault(d => d.BattleLap == userClanData.GetNowLap() && d.BossNumber == userClanData.GetNowLap());
 
             if (finishReservationData != null)
             {
@@ -280,7 +309,7 @@ namespace PriconneBotConsoleApp.Script
             var userClanData = m_userClanData;
 
             var mySQLDeclaration = new DatabaseDeclarationController();
-            var declarationData = mySQLDeclaration.LoadDeclarationData(userClanData);
+            var declarationData = mySQLDeclaration.LoadDeclarationData(userClanData, userClanData.GetNowBoss());
 
             var result = mySQLDeclaration.DeleteDeclarationData(declarationData);
 
@@ -297,15 +326,37 @@ namespace PriconneBotConsoleApp.Script
 
             DeleteAllBattleData();
 
-            if (m_userClanData.BossNumber == MaxBossNumber)
+            var nowBossNumber = m_userClanData.GetNowBoss();
+            var nowBattleLap = m_userClanData.GetNowLap();
+
+            if (nowBossNumber == MaxBossNumber)
             {
-                m_userClanData.BossNumber = MinBossNumber;
-                m_userClanData.BattleLap += 1;
+                nowBossNumber = MinBossNumber;
+                nowBattleLap += 1;
             }
             else
             {
-                m_userClanData.BossNumber += 1;
+                nowBattleLap += 1;
             }
+
+            // 今のボス・周回数から ボスごとの周回数に変更して代入 上にも書いてある。
+            if (nowBossNumber == MaxBossNumber)
+            {
+                nowBossNumber = 0;
+            }
+
+            for (int i = 0; i < MaxBossNumber; i++)
+            {
+                if (i >= nowBossNumber)
+                {
+                    m_userClanData.SetBossLap(i + 1, nowBattleLap - 1);
+                }
+                else
+                {
+                    m_userClanData.SetBossLap(i + 1, nowBattleLap);
+                }
+            }
+
             new DatabaseClanDataController().UpdateClanData(m_userClanData);
 
             await SendDeclarationBotMessage();
@@ -330,8 +381,8 @@ namespace PriconneBotConsoleApp.Script
             return new DeclarationData()
             {
                 PlayerID = playerData.PlayerID,
-                BattleLap = userClanData.BattleLap,
-                BossNumber = userClanData.BossNumber,
+                BattleLap = userClanData.GetNowLap(),
+                BossNumber = userClanData.GetNowBoss(),
                 FinishFlag = false
             };
         }
@@ -344,7 +395,7 @@ namespace PriconneBotConsoleApp.Script
                 userRole.Guild.Id, userID);
 
             var declarationData = new DatabaseDeclarationController()
-                .LoadDeclarationData(playerData);
+                .LoadDeclarationData(playerData, m_userClanData.GetNowBoss());
 
             return declarationData;
         }
@@ -363,7 +414,10 @@ namespace PriconneBotConsoleApp.Script
 
         private async Task RemoveUserReaction()
         {
-            var textChannnel = m_userRole.Guild.GetTextChannel(m_userClanData.ChannelIDs.DeclarationChannelID);
+            var declarationChannelID = m_userClanData.ChannelData
+                .FirstOrDefault(x => x.FeatureID == (uint)ChannelFeatureType.DeclareID)
+                ?.ChannelID ?? 0;
+            var textChannnel = m_userRole.Guild.GetTextChannel(declarationChannelID);
 
             var message = await textChannnel.GetMessageAsync(m_userReaction.MessageId);
 
@@ -377,12 +431,12 @@ namespace PriconneBotConsoleApp.Script
         private Embed CreateDeclarationDataEmbed(ClanData clanData)
         {
             var reservationDataList =
-                new DatabaseReservationController().LoadBossLapReservationData(clanData);
+                new DatabaseReservationController().LoadBossLapReservationData(clanData, clanData.GetNowBoss());
             var declarationDataList =
-                new DatabaseDeclarationController().LoadDeclarationData(clanData);
+                new DatabaseDeclarationController().LoadDeclarationData(clanData, clanData.GetNowBoss());
 
-            var bossNumber = clanData.BossNumber;
-            var battleLap = clanData.BattleLap;
+            var bossNumber = clanData.GetNowBoss();
+            var battleLap = clanData.GetNowLap();
 
             var updateTime = DateTime.Now;
             var updateTimeString = updateTime.ToString("T");
@@ -479,7 +533,7 @@ namespace PriconneBotConsoleApp.Script
         private string CreateDeclarationDataMessage(ClanData clanData)
         {
             var reservationDataList =
-                new DatabaseReservationController().LoadBossLapReservationData(clanData);
+                new DatabaseReservationController().LoadBossLapReservationData(clanData, clanData.GetNowBoss());
 
             var reservationIDList = reservationDataList
                .OrderBy(d => d.CreateDateTime)

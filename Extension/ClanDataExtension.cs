@@ -18,7 +18,7 @@ namespace PriconneBotConsoleApp.Extension
             };
         }
 
-        public static ushort GetBossLap(this ClanData clanData, int bossNumber)
+        public static int GetBossLap(this ClanData clanData, int bossNumber)
         {
             return bossNumber switch
             {
@@ -29,6 +29,30 @@ namespace PriconneBotConsoleApp.Extension
                 5 => clanData.Boss5Lap,
                 _ => 0,
             };
+        }
+
+        public static void SetBossLap(this ClanData clanData, int bossNum, int bossLap)
+        {
+            switch (bossNum)
+            {
+                case 1:
+                    clanData.Boss1Lap = (ushort)bossLap;
+                    return;
+                case 2:
+                    clanData.Boss2Lap = (ushort)bossLap;
+                    return;
+                case 3:
+                    clanData.Boss3Lap = (ushort)bossLap;
+                    return;
+                case 4:
+                    clanData.Boss4Lap = (ushort)bossLap;
+                    return;
+                case 5:
+                    clanData.Boss5Lap = (ushort)bossLap;
+                    return;
+                default:
+                    return;
+            }
         }
 
         /// <summary>

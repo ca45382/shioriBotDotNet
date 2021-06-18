@@ -9,6 +9,7 @@ using Discord.WebSocket;
 using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Database;
+using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Script
 {
@@ -89,8 +90,10 @@ namespace PriconneBotConsoleApp.Script
                 await SuccessAddEmoji();
                 await UpdateSystemMessage();
 
-                if (m_userClanData.BossNumber == reservationData.BossNumber 
-                    && m_userClanData.BattleLap == reservationData.BattleLap)
+#pragma warning disable CS0612 // 型またはメンバーが旧型式です
+                if (m_userClanData.GetNowBoss() == reservationData.BossNumber
+                    && m_userClanData.GetNowLap() == reservationData.BattleLap)
+#pragma warning restore CS0612 // 型またはメンバーが旧型式です
                 {
                     await new BattleDeclaration(m_userClanData,m_userMessage).UpdateDeclarationBotMessage();
                 }
@@ -149,8 +152,15 @@ namespace PriconneBotConsoleApp.Script
             var userRole = m_userRole;
             var messageData = CreateAllReservationDataMessage(userClanData);
 
+            //var resultChannel = userRole.Guild
+            //    .GetTextChannel(userClanData.ChannelIDs.ReservationResultChannelID);
+
+            var reservationResultChannelID = userClanData.ChannelData
+                .FirstOrDefault(b => b.FeatureID == (uint)ChannelFeatureType.ReserveResultID)
+                ?.ChannelID ?? 0;
+
             var resultChannel = userRole.Guild
-                .GetTextChannel(userClanData.ChannelIDs.ReservationResultChannelID);
+                .GetTextChannel(reservationResultChannelID);
 
             var sendedMessageData = await SendMessageToChannel(resultChannel, messageData);
 
@@ -163,15 +173,21 @@ namespace PriconneBotConsoleApp.Script
         {
             var userClanData = m_userClanData;
             var userRole = m_userRole;
-            var reservationMessageID = userClanData.MessageIDs.ReservationMessageID;
+            var reservationMessageID = userClanData.MessageData
+                .FirstOrDefault(b => b.FeatureID == (uint)MessageFeatureType.ReserveResultID)
+                ?.MessageID ?? 0;
 
             if (reservationMessageID == 0)
             {
                 return;
             }
 
+            var reservationResultChannelID = userClanData.ChannelData
+               .FirstOrDefault(b => b.FeatureID == (uint)ChannelFeatureType.ReserveResultID)
+               ?.ChannelID ?? 0;
+
             var guildChannel = userRole.Guild
-                .GetChannel(userClanData.ChannelIDs.ReservationResultChannelID) as SocketTextChannel;
+                .GetChannel(reservationResultChannelID) as SocketTextChannel;
 
             var socketMessage = guildChannel.GetCachedMessage(reservationMessageID);
 
@@ -204,16 +220,19 @@ namespace PriconneBotConsoleApp.Script
             var userClanData = m_userClanData;
             var userMessage = m_userMessage;
 
+            var nowBattleLap = userClanData.GetNowLap();
+            var nowBossNumber = userClanData.GetNowBoss();
+
             var splitMessageContent =
                 ZenToHan(userMessage.Content).Split(new string[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
             if (splitMessageContent.Length < 3
                 || !(byte.TryParse(splitMessageContent[1], out byte battleLap) && battleLap > 0)
                 || !(byte.TryParse(splitMessageContent[2], out byte bossNumber) && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber)
-                || battleLap < userClanData.BattleLap
-                || battleLap > userClanData.BattleLap + LimitReservationLap
-                || battleLap == userClanData.BattleLap && bossNumber < userClanData.BossNumber
-                || battleLap == userClanData.BattleLap + LimitReservationLap && bossNumber > userClanData.BossNumber)
+                || battleLap < nowBattleLap
+                || battleLap > nowBattleLap + LimitReservationLap
+                || battleLap == nowBattleLap && bossNumber < nowBossNumber
+                || battleLap == nowBattleLap + LimitReservationLap && bossNumber > nowBossNumber)
             {
                 return null;
             }
@@ -339,8 +358,8 @@ namespace PriconneBotConsoleApp.Script
 
         private string CreateAllReservationDataMessage(ClanData clanData)
         {
-            var bossNumber = clanData.BossNumber;
-            var battleLap = clanData.BattleLap;
+            var bossNumber = clanData.GetNowBoss();
+            var battleLap = clanData.GetNowLap();
 
             var reservationDataSet = new DatabaseReservationController().LoadReservationData(clanData);
 
@@ -381,7 +400,10 @@ namespace PriconneBotConsoleApp.Script
 
         private async Task RemoveUserReaction()
         {
-            var textChannnel = m_userRole.Guild.GetTextChannel(m_userClanData.ChannelIDs.ReservationResultChannelID);
+            var reservationResultChannelID = m_userClanData.ChannelData
+                .FirstOrDefault(b => b.FeatureID == (uint)ChannelFeatureType.ReserveResultID)
+                ?.ChannelID ?? 0;
+            var textChannnel = m_userRole.Guild.GetTextChannel(reservationResultChannelID);
 
             var message = await textChannnel.GetMessageAsync(m_userReaction.MessageId);
 
