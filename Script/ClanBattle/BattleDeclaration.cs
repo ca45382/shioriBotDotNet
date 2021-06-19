@@ -104,23 +104,7 @@ namespace PriconneBotConsoleApp.Script
                 return false;
             }
 
-            // 今のボス・周回数から ボスごとの周回数に変更して代入
-            if (bossNumber == MaxBossNumber)
-            {
-                bossNumber = 0;
-            }
-
-            for (int i = 0; i < MaxBossNumber; i++)
-            {
-                if (i >= bossNumber)
-                {
-                    m_userClanData.SetBossLap(i + 1, battleLap - 1);
-                }
-                else
-                {
-                    m_userClanData.SetBossLap(i + 1, battleLap);
-                }
-            }
+            SetAllBossLaps(bossNumber, battleLap);
 
             if (!new DatabaseClanDataController().UpdateClanData(m_userClanData))
             {
@@ -318,7 +302,6 @@ namespace PriconneBotConsoleApp.Script
         private async Task<bool> NextBossCommand()
         {
             UserFinishBattleCommand();
-
             DeleteAllBattleData();
 
             var nowBossNumber = m_userClanData.GetNowBoss();
@@ -334,26 +317,8 @@ namespace PriconneBotConsoleApp.Script
                 nowBattleLap += 1;
             }
 
-            // 今のボス・周回数から ボスごとの周回数に変更して代入 上にも書いてある。
-            if (nowBossNumber == MaxBossNumber)
-            {
-                nowBossNumber = 0;
-            }
-
-            for (int i = 0; i < MaxBossNumber; i++)
-            {
-                if (i >= nowBossNumber)
-                {
-                    m_userClanData.SetBossLap(i + 1, nowBattleLap - 1);
-                }
-                else
-                {
-                    m_userClanData.SetBossLap(i + 1, nowBattleLap);
-                }
-            }
-
+            SetAllBossLaps(nowBossNumber, nowBattleLap);
             new DatabaseClanDataController().UpdateClanData(m_userClanData);
-
             await SendDeclarationBotMessage();
 
             return true;
@@ -563,6 +528,33 @@ namespace PriconneBotConsoleApp.Script
             }
 
             return messageData;
+        }
+
+        /// <summary>
+        /// 今のボス・周回数から ボスごとの周回数に変更して代入。
+        /// 7月削除予定。
+        /// </summary>
+        /// <param name="bossNumber"></param>
+        /// <param name="battleLap"></param>
+        [Obsolete]
+        private void SetAllBossLaps(int bossNumber, int battleLap)
+        {
+            if (bossNumber <= 0 || bossNumber > 5 || battleLap < 0 || m_userClanData == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < MaxBossNumber; i++)
+            {
+                if (i >= bossNumber)
+                {
+                    m_userClanData.SetBossLap(i + 1, battleLap - 1);
+                }
+                else
+                {
+                    m_userClanData.SetBossLap(i + 1, battleLap);
+                }
+            }
         }
     }
 }
