@@ -93,23 +93,23 @@ namespace PriconneBotConsoleApp.DataModel
                 && Boss3Lap == Boss4Lap
                 && Boss4Lap == Boss5Lap)
             {
+                return 5;
+            }
+            if (Boss1Lap  == Boss2Lap + 1 )
+            {
                 return 1;
             }
-            if (Boss1Lap - 1 == Boss2Lap)
+            else if (Boss2Lap == Boss3Lap + 1)
             {
                 return 2;
             }
-            else if (Boss2Lap - 1 == Boss3Lap)
+            else if (Boss3Lap == Boss4Lap + 1)
             {
                 return 3;
             }
-            else if (Boss3Lap - 1 == Boss4Lap)
+            else if (Boss4Lap == Boss5Lap + 1)
             {
                 return 4;
-            }
-            else if (Boss4Lap - 1 == Boss5Lap)
-            {
-                return 5;
             }
 
             return 0;
@@ -128,11 +128,11 @@ namespace PriconneBotConsoleApp.DataModel
                 && Boss3Lap == Boss4Lap
                 && Boss4Lap == Boss5Lap)
             {
-                return Boss1Lap;
+                return Boss5Lap;
             }
             else
             {
-                return Boss5Lap;
+                return Boss1Lap;
             }
         }
     }

@@ -54,7 +54,7 @@ namespace PriconneBotConsoleApp.Script
                 await new BattleDeclaration(userClanData, reaction)
                     .RunDeclarationCommandByReaction();
             } 
-            else if (reactionChannelID == userClanData.ChannelData.GetChannelID(userClanData.ClanID, ChannelFeatureType.ReserveID))
+            else if (reactionChannelID == userClanData.ChannelData.GetChannelID(userClanData.ClanID, ChannelFeatureType.ReserveResultID))
             {
                 await new BattleReservation(userClanData, reaction)
                     .RunReservationResultReaction();
