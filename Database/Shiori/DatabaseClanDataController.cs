@@ -41,11 +41,10 @@ namespace PriconneBotConsoleApp.Database
             }
 
             // 周回数アップデート
-            databaseClanData.Boss1Lap = clanData.Boss1Lap;
-            databaseClanData.Boss2Lap = clanData.Boss2Lap;
-            databaseClanData.Boss3Lap = clanData.Boss3Lap;
-            databaseClanData.Boss4Lap = clanData.Boss4Lap;
-            databaseClanData.Boss5Lap = clanData.Boss5Lap;
+            for (var i = 0; i < Define.Common.MaxBossNumber; i++)
+            {
+                databaseClanData.SetBossLap(i + 1,clanData.GetBossLap(i + 1));
+            }
 
             //予約機能
             databaseClanData.ReservationLap = clanData.ReservationLap;
