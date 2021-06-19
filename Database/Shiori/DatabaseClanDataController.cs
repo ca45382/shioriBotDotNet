@@ -20,12 +20,10 @@ namespace PriconneBotConsoleApp.Database
 
             return databaseConnector.ClanData
                 .Include(b => b.ServerData)
-                .Include(b => b.MessageIDs)
-                .Include(b => b.ChannelIDs)
-                .Include(b => b.RoleIDs)
-                .Where(b => b.ServerID == role.Guild.Id)
-                .Where(b => b.ClanRoleID == role.Id)
-                .FirstOrDefault();
+                .Include(b => b.MessageData)
+                .Include(b => b.ChannelData)
+                .Include(b => b.RoleData)
+                .FirstOrDefault(b => b.ServerID == role.Guild.Id && b.ClanRoleID == role.Id);
         }
 
         public bool UpdateClanData (ClanData clanData)
@@ -33,10 +31,8 @@ namespace PriconneBotConsoleApp.Database
             using var databaseConnector = new DatabaseConnector();
             var transaction = databaseConnector.Database.BeginTransaction();
 
-            var databaseClanData = databaseConnector.ClanData
-                .Include(b => b.ServerData)
-                .Where(b => b.ClanID == clanData.ClanID)
-                .FirstOrDefault();
+            var databaseClanData = databaseConnector.ClanData.AsQueryable()
+                .FirstOrDefault(b => b.ClanID == clanData.ClanID);
 
             if (databaseClanData == null)
             {
@@ -44,10 +40,17 @@ namespace PriconneBotConsoleApp.Database
                 return false;
             }
 
-            databaseClanData.BattleLap = clanData.BattleLap;
-            databaseClanData.BossNumber = clanData.BossNumber;
-            databaseClanData.ProgressiveFlag = clanData.ProgressiveFlag;
-            //databaseClanData.BossRoleReady = clanData.BossRoleReady;
+            // 周回数アップデート
+            for (var i = 0; i < Define.Common.MaxBossNumber; i++)
+            {
+                databaseClanData.SetBossLap(i + 1,clanData.GetBossLap(i + 1));
+            }
+
+            //予約機能
+            databaseClanData.ReservationLap = clanData.ReservationLap;
+            databaseClanData.ReservationStartTime = clanData.ReservationStartTime;
+            databaseClanData.ReservationEndTime = clanData.ReservationEndTime;
+
             databaseClanData.ClanName = clanData.ClanName;
             databaseConnector.SaveChanges();
             transaction.Commit();

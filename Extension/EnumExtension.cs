@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Reflection;
 
-namespace PriconneBotConsoleApp.Script
+namespace PriconneBotConsoleApp.Extension
 {
     public static class EnumExtension
     {

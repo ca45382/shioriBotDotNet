@@ -2,41 +2,13 @@
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.DataType;
+using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Database
 {
-    class DatabaseReservationController
+    public class DatabaseReservationController
     {
-        public bool UpdateReservationMessageID(ClanData clanData, ulong messageID)
-        {
-            using var databaseConnector = new DatabaseConnector();
-            var transaction = databaseConnector.Database.BeginTransaction();
-
-            var clanID = databaseConnector.ClanData
-                .FirstOrDefault(d => d.ServerID == clanData.ServerID && d.ClanRoleID == clanData.ClanRoleID)
-                ?.ClanID ?? 0;
-
-            if (clanID == 0) 
-            {
-                transaction.Rollback();
-                return false;
-            }
-
-            var updateData = databaseConnector.MessageIDs
-                .FirstOrDefault(d => d.ClanID == clanID);
-
-            if (updateData == null)
-            {
-                transaction.Rollback();
-                return false;
-            }
-
-            updateData.ReservationMessageID = messageID;
-            databaseConnector.SaveChanges();
-            transaction.Commit();
-
-            return true;
-        }
 
         public List<ReservationData> LoadReservationData(ClanData clanData)
         {
@@ -63,28 +35,27 @@ namespace PriconneBotConsoleApp.Database
             var playerID = LoadPlayerID(databaseConnector.PlayerData, playerData);
             
             return databaseConnector.ReservationData.AsQueryable()
-                .Where(b => b.PlayerID == playerID && b.DeleteFlag == false)
+                .Where(b => b.PlayerID == playerID && !b.DeleteFlag)
                 .OrderBy(o => o.BattleLap).ThenBy(d => d.BossNumber)
                 .ToList();
         }
 
-        public List<ReservationData> LoadBossLapReservationData(ClanData clanData)
+        public List<ReservationData> LoadBossLapReservationData(ClanData clanData, byte bossNumber)
         {
             using var databaseConnector = new DatabaseConnector();
 
-            var clanID = databaseConnector.ClanData
-                .FirstOrDefault(d => d.ServerID == clanData.ServerID && d.ClanRoleID == clanData.ClanRoleID)
-                ?.ClanID ?? 0;
+            var databaseClanData = databaseConnector.ClanData
+                .FirstOrDefault(d => d.ServerID == clanData.ServerID && d.ClanRoleID == clanData.ClanRoleID);
 
-            if (clanID == 0)
+            if (databaseClanData == null)
             {
                 return null;
             }
 
             return databaseConnector.ReservationData
                 .Include(b => b.PlayerData)
-                .Where(b => b.PlayerData.ClanID == clanID && !b.DeleteFlag
-                    && b.BattleLap == clanData.BattleLap && b.BossNumber == clanData.BossNumber)
+                .Where(b => b.PlayerData.ClanID == databaseClanData.ClanID && !b.DeleteFlag
+                    && b.BossNumber == bossNumber && b.BattleLap == clanData.GetBossLap(bossNumber))
                 .OrderBy(d => d.CreateDateTime)
                 .ToList();
         }

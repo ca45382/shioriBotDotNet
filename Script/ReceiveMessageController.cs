@@ -2,6 +2,9 @@
 using Discord.WebSocket;
 using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.Database;
+using System.Linq;
+using PriconneBotConsoleApp.DataType;
+using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Script
 {
@@ -54,17 +57,17 @@ namespace PriconneBotConsoleApp.Script
 
             var messageChannelID = message.Channel.Id;
 
-            if (messageChannelID == m_playerClanData.ChannelIDs.ReservationChannelID)
+            if (messageChannelID == m_playerClanData.ChannelData.GetChannelID(m_playerClanData.ClanID, ChannelFeatureType.ReserveID))
             {
                 await new BattleReservation(m_playerClanData, message).RunReservationCommand();
             }
 
-            if (messageChannelID == m_playerClanData.ChannelIDs.ReservationResultChannelID)
+            if (messageChannelID == m_playerClanData.ChannelData.GetChannelID(m_playerClanData.ClanID, ChannelFeatureType.ReserveResultID))
             {
                 await new BattleReservation(m_playerClanData, message).RunReservationResultCommand();
             }
 
-            if (messageChannelID == m_playerClanData.ChannelIDs.DeclarationChannelID)
+            if (messageChannelID == m_playerClanData.ChannelData.GetChannelID(m_playerClanData.ClanID, ChannelFeatureType.DeclareID))
             {
                 await new BattleDeclaration(m_playerClanData, message).RunDeclarationCommandByMessage();
             }
