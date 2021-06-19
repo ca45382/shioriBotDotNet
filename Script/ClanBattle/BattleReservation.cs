@@ -18,9 +18,9 @@ namespace PriconneBotConsoleApp.Script
         private const int MinBossNumber = 1;
         private const int MaxBossNumber = 5;
 
-        private const int LimitReservationLap = 2;
+        //private const int LimitReservationLap = 2;
 
-        private const int ReservableStartTimeHour = 18;
+        //private const int ReservableStartTimeHour = 18;
 
         private const int MaxCommentLength = 30;
 
@@ -70,13 +70,20 @@ namespace PriconneBotConsoleApp.Script
                         return;
                 }
 
-#if !DEBUG
-                if (DateTime.Now.Hour < ReservableStartTimeHour)
+                //#if !DEBUG
+                var nowTime = DateTime.Now.Hour;
+                if (nowTime < 5)
                 {
-                    await SendErrorMessage(ErrorType.OutOfReservationTime, $"{ReservableStartTimeHour}:00", "24:00");
+                    nowTime += 24;
+                }
+                if (nowTime - 5 < m_userClanData.ReservationStartTime.Hours - 5 ||
+                    nowTime - 5 > m_userClanData.ReservationEndTime.Hours - 5)
+                {
+                    await SendErrorMessage(ErrorType.OutOfReservationTime,
+                        $"{m_userClanData.ReservationStartTime.Hours}:00", $"{m_userClanData.ReservationEndTime.Hours}:00");
                     return;
                 }
-#endif
+//#endif
 
                 var reservationData = MessageToReservationData();
 
@@ -227,6 +234,12 @@ namespace PriconneBotConsoleApp.Script
             var nowBattleLap = userClanData.GetNowLap();
             var nowBossNumber = userClanData.GetNowBoss();
 
+            var limitReservationLap = m_userClanData.ReservationLap;
+            if (limitReservationLap == 0)
+            {
+                limitReservationLap = byte.MaxValue;
+            }
+
             var splitMessageContent =
                 ZenToHan(userMessage.Content).Split(new string[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -234,9 +247,9 @@ namespace PriconneBotConsoleApp.Script
                 || !(byte.TryParse(splitMessageContent[1], out byte battleLap) && battleLap > 0)
                 || !(byte.TryParse(splitMessageContent[2], out byte bossNumber) && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber)
                 || battleLap < nowBattleLap
-                || battleLap > nowBattleLap + LimitReservationLap
+                || battleLap > nowBattleLap + limitReservationLap
                 || battleLap == nowBattleLap && bossNumber < nowBossNumber
-                || battleLap == nowBattleLap + LimitReservationLap && bossNumber > nowBossNumber)
+                || battleLap == nowBattleLap + limitReservationLap && bossNumber > nowBossNumber)
             {
                 return null;
             }
