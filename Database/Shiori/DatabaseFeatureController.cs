@@ -55,7 +55,7 @@ namespace PriconneBotConsoleApp.Database
                 if (features.FirstOrDefault(x => x.FeatureID == databaseFeature.FeatureID) == null
                     && databaseFeature.FeatureID != 0)
                 {
-                    databaseConnector.ChannelFeatures.Add(databaseFeature);
+                    databaseConnector.ChannelFeatures.Remove(databaseFeature);
                 }
             }
 
@@ -87,7 +87,7 @@ namespace PriconneBotConsoleApp.Database
                 if ( features.FirstOrDefault(x => x.FeatureID == databaseFeature.FeatureID) == null
                     && databaseFeature.FeatureID != 0)
                 {
-                    databaseConnector.MessageFeatures.Add(databaseFeature);
+                    databaseConnector.MessageFeatures.Remove(databaseFeature);
                 }
             }
 
@@ -119,7 +119,7 @@ namespace PriconneBotConsoleApp.Database
                 if (features.FirstOrDefault(x => x.FeatureID == databaseFeature.FeatureID) == null
                     && databaseFeature.FeatureID != 0)
                 {
-                    databaseConnector.RoleFeatures.Add(databaseFeature);
+                    databaseConnector.RoleFeatures.Remove(databaseFeature);
                 }
             }
 
