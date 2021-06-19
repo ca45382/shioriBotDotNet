@@ -69,26 +69,15 @@ namespace PriconneBotConsoleApp.DataModel
 
         public void SetBossLap(int bossNum, int bossLap)
         {
-            switch (bossNum)
+            _ = bossNum switch
             {
-                case 1:
-                    Boss1Lap = (ushort)bossLap;
-                    return;
-                case 2:
-                    Boss2Lap = (ushort)bossLap;
-                    return;
-                case 3:
-                    Boss3Lap = (ushort)bossLap;
-                    return;
-                case 4:
-                    Boss4Lap = (ushort)bossLap;
-                    return;
-                case 5:
-                    Boss5Lap = (ushort)bossLap;
-                    return;
-                default:
-                    return;
-            }
+                1 => Boss1Lap = (ushort)bossLap,
+                2 => Boss2Lap = (ushort)bossLap,
+                3 => Boss3Lap = (ushort)bossLap,
+                4 => Boss4Lap = (ushort)bossLap,
+                5 => Boss5Lap = (ushort)bossLap,
+                _ => 0,
+            };
         }
 
         /// <summary>
