@@ -13,9 +13,6 @@ namespace PriconneBotConsoleApp.Script
 {
     class BattleDeclaration : BaseClass
     {
-        private const int MinBossNumber = 1;
-        private const int MaxBossNumber = 5;
-
         private readonly ClanData m_userClanData;
         private readonly SocketRole m_userRole;
         private readonly SocketUserMessage m_userMessage;
@@ -55,8 +52,7 @@ namespace PriconneBotConsoleApp.Script
         public async Task RunDeclarationCommandByReaction()
         {
             var declarationMessageID = m_userClanData.MessageData
-                .FirstOrDefault(b => b.FeatureID == (uint)MessageFeatureType.DeclareID)
-                ?.MessageID ?? 0;
+                .GetMessageID(m_userClanData.ClanID, MessageFeatureType.DeclareID);
 
             if (declarationMessageID == 0 || m_userReaction.MessageId != declarationMessageID)
             {
@@ -99,7 +95,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (splitMessageContent.Length != 3
                 || !(byte.TryParse(splitMessageContent[1], out byte battleLap) && battleLap > 0)
-                || !(byte.TryParse(splitMessageContent[2], out byte bossNumber) && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber))
+                || !(byte.TryParse(splitMessageContent[2], out byte bossNumber) && bossNumber <= Define.Common.MaxBossNumber && bossNumber >= Define.Common.MinBossNumber))
             {
                 return false;
             }
@@ -123,8 +119,7 @@ namespace PriconneBotConsoleApp.Script
             var embed = CreateDeclarationDataEmbed(m_userClanData);
             var content = CreateDeclarationDataMessage(m_userClanData);
             var declarationChannelID = m_userClanData.ChannelData
-                .FirstOrDefault(x => x.FeatureID == (uint)ChannelFeatureType.DeclareID)
-                ?.ChannelID ?? 0;
+                .GetChannelID(m_userClanData.ClanID, ChannelFeatureType.DeclareID);
 
             if (declarationChannelID == 0)
             {
@@ -168,6 +163,7 @@ namespace PriconneBotConsoleApp.Script
                 return false;
             }
             
+            // ここでguildChannelは存在するチャンネルからしかメッセージが来ない
             var guildChannel = userRole.Guild.GetChannel(declarationChannelID) as SocketTextChannel;
 
             if (guildChannel.GetCachedMessage(declarationMessageID) is SocketUserMessage declarationBotMessage)
@@ -307,9 +303,9 @@ namespace PriconneBotConsoleApp.Script
             var nowBossNumber = m_userClanData.GetNowBoss();
             var nowBattleLap = m_userClanData.GetNowLap();
 
-            if (nowBossNumber == MaxBossNumber)
+            if (nowBossNumber == Define.Common.MaxBossNumber)
             {
-                nowBossNumber = MinBossNumber;
+                nowBossNumber = Define.Common.MinBossNumber;
                 nowBattleLap += 1;
             }
             else
@@ -544,7 +540,7 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            for (int i = 0; i < MaxBossNumber; i++)
+            for (int i = 0; i < Define.Common.MaxBossNumber; i++)
             {
                 if (i >= bossNumber)
                 {
