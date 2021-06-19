@@ -57,7 +57,7 @@ namespace PriconneBotConsoleApp.Database
 
             modelBuilder.Entity<RoleData>()
                 .HasOne(b => b.ClanData)
-                .WithMany(i => i.roleData)
+                .WithMany(i => i.RoleData)
                 .HasForeignKey(b => b.ClanID);
 
             // 機能情報とのリレーション

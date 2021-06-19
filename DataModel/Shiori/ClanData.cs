@@ -51,7 +51,7 @@ namespace PriconneBotConsoleApp.DataModel
         public ServerData ServerData { get; set; }
         public List<ChannelData> ChannelData { get; set; }
         public List<MessageData> MessageData { get; set; }
-        public List<RoleData> roleData { get; set; }
+        public List<RoleData> RoleData { get; set; }
         public List<PlayerData> PlayerData { get; set; }
 
         public int GetBossLap(int bossNumber)

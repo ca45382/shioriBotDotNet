@@ -22,7 +22,7 @@ namespace PriconneBotConsoleApp.Database
                 .Include(b => b.ServerData)
                 .Include(b => b.MessageData)
                 .Include(b => b.ChannelData)
-                .Include(b => b.roleData)
+                .Include(b => b.RoleData)
                 .FirstOrDefault(b => b.ServerID == role.Guild.Id && b.ClanRoleID == role.Id);
         }
 

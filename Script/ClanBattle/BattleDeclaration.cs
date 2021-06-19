@@ -161,7 +161,6 @@ namespace PriconneBotConsoleApp.Script
                 .UpdateMessageID(m_userClanData, sentMessageId, MessageFeatureType.DeclareID);
 
             await AttacheDefaultReaction(sentMessage);
-            //m_userClanData.MessageIDs.DeclarationMessageID = sentMessageId;
 
             return result;
         }
@@ -176,19 +175,15 @@ namespace PriconneBotConsoleApp.Script
             var userRole = m_userRole;
 
             var declarationMessageID = userClanData.MessageData
-                .FirstOrDefault(x => x.FeatureID == (uint)MessageFeatureType.DeclareID)
-                ?.MessageID ?? 0;
+                .GetMessageID(userClanData.ClanID, MessageFeatureType.DeclareID);
+            var declarationChannelID = userClanData.ChannelData
+                .GetChannelID(userClanData.ClanID, ChannelFeatureType.DeclareID);
 
-            //var declarationMessageID = userClanData.MessageIDs.DeclarationMessageID;
-            
-            if (declarationMessageID == 0)
+            if (declarationMessageID == 0 || declarationChannelID == 0)
             {
                 return false;
             }
-
-            var declarationChannelID = userClanData.ChannelData
-                .FirstOrDefault(x => x.FeatureID == (uint)ChannelFeatureType.DeclareID)
-                ?.ChannelID ?? 0;
+            
             var guildChannel = userRole.Guild.GetChannel(declarationChannelID) as SocketTextChannel;
 
             if (guildChannel.GetCachedMessage(declarationMessageID) is SocketUserMessage declarationBotMessage)
@@ -415,9 +410,13 @@ namespace PriconneBotConsoleApp.Script
         private async Task RemoveUserReaction()
         {
             var declarationChannelID = m_userClanData.ChannelData
-                .FirstOrDefault(x => x.FeatureID == (uint)ChannelFeatureType.DeclareID)
-                ?.ChannelID ?? 0;
+                .GetChannelID(m_userClanData.ClanID, ChannelFeatureType.DeclareID);
             var textChannnel = m_userRole.Guild.GetTextChannel(declarationChannelID);
+
+            if(textChannnel == null)
+            {
+                return;
+            }
 
             var message = await textChannnel.GetMessageAsync(m_userReaction.MessageId);
 
@@ -425,6 +424,7 @@ namespace PriconneBotConsoleApp.Script
             {
                 return;
             }
+
             await message.RemoveReactionAsync(m_userReaction.Emote, m_userReaction.User.Value);
         }
 

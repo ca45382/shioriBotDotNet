@@ -90,10 +90,8 @@ namespace PriconneBotConsoleApp.Script
                 await SuccessAddEmoji();
                 await UpdateSystemMessage();
 
-#pragma warning disable CS0612 // 型またはメンバーが旧型式です
                 if (m_userClanData.GetNowBoss() == reservationData.BossNumber
                     && m_userClanData.GetNowLap() == reservationData.BattleLap)
-#pragma warning restore CS0612 // 型またはメンバーが旧型式です
                 {
                     await new BattleDeclaration(m_userClanData,m_userMessage).UpdateDeclarationBotMessage();
                 }
@@ -146,18 +144,22 @@ namespace PriconneBotConsoleApp.Script
             await RemoveUserReaction();
         }
 
+        /// <summary>
+        /// 凸予約一覧チャンネルにメッセージを送信する。
+        /// </summary>
+        /// <returns></returns>
         public async Task SendSystemMessage()
         {
             var userClanData = m_userClanData;
             var userRole = m_userRole;
             var messageData = CreateAllReservationDataMessage(userClanData);
-
-            //var resultChannel = userRole.Guild
-            //    .GetTextChannel(userClanData.ChannelIDs.ReservationResultChannelID);
-
             var reservationResultChannelID = userClanData.ChannelData
-                .FirstOrDefault(b => b.FeatureID == (uint)ChannelFeatureType.ReserveResultID)
-                ?.ChannelID ?? 0;
+                .GetChannelID(userClanData.ClanID, ChannelFeatureType.ReserveResultID);
+
+            if (reservationResultChannelID == 0)
+            {
+                return;
+            }
 
             var resultChannel = userRole.Guild
                 .GetTextChannel(reservationResultChannelID);
@@ -174,8 +176,7 @@ namespace PriconneBotConsoleApp.Script
             var userClanData = m_userClanData;
             var userRole = m_userRole;
             var reservationMessageID = userClanData.MessageData
-                .FirstOrDefault(b => b.FeatureID == (uint)MessageFeatureType.ReserveResultID)
-                ?.MessageID ?? 0;
+                .GetMessageID(userClanData.ClanID, MessageFeatureType.ReserveResultID);
 
             if (reservationMessageID == 0)
             {
@@ -183,12 +184,15 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var reservationResultChannelID = userClanData.ChannelData
-               .FirstOrDefault(b => b.FeatureID == (uint)ChannelFeatureType.ReserveResultID)
-               ?.ChannelID ?? 0;
+                .GetChannelID(userClanData.ClanID, ChannelFeatureType.ReserveResultID);
+
+            if(reservationResultChannelID == 0)
+            {
+                return;
+            }
 
             var guildChannel = userRole.Guild
                 .GetChannel(reservationResultChannelID) as SocketTextChannel;
-
             var socketMessage = guildChannel.GetCachedMessage(reservationMessageID);
 
             if (socketMessage == null || !(socketMessage is SocketUserMessage))
@@ -401,9 +405,13 @@ namespace PriconneBotConsoleApp.Script
         private async Task RemoveUserReaction()
         {
             var reservationResultChannelID = m_userClanData.ChannelData
-                .FirstOrDefault(b => b.FeatureID == (uint)ChannelFeatureType.ReserveResultID)
-                ?.ChannelID ?? 0;
+                .GetChannelID(m_userClanData.ClanID, ChannelFeatureType.ReserveResultID);
             var textChannnel = m_userRole.Guild.GetTextChannel(reservationResultChannelID);
+
+            if(textChannnel == null)
+            {
+                return;
+            }
 
             var message = await textChannnel.GetMessageAsync(m_userReaction.MessageId);
 

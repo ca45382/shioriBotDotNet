@@ -36,6 +36,11 @@ namespace PriconneBotConsoleApp.Database
             playerData = databaseConnector.PlayerData.AsQueryable()
                 .FirstOrDefault(d => d.PlayerID == playerData.PlayerID);
 
+            if(playerData == null)
+            {
+                return null;
+            }
+
             return databaseConnector.DeclarationData
                 .Include(b => b.PlayerData)
                 .Where(d => d.PlayerData.PlayerID == playerData.PlayerID && !d.DeleteFlag 
