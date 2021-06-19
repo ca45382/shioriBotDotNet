@@ -3,7 +3,7 @@
 namespace PriconneBotConsoleApp.DataType
 {
     //ロール系 3xxx
-    public enum RoleFeatureType
+    public enum RoleFeatureType : uint
     {
         Unknown = 0,
 
