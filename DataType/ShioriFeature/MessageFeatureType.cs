@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace PriconneBotConsoleApp.DataType
+﻿namespace PriconneBotConsoleApp.DataType
 {
     //メッセージ 2xxx
     public enum MessageFeatureType : uint

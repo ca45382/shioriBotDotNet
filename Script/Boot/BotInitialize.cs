@@ -2,14 +2,12 @@
 using System.Net;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Collections;
 using System.Collections.Generic;
 using System;
 
 using Brotli;
 using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.DataType;
-using PriconneBotConsoleApp.Extension;
 using PriconneBotConsoleApp.Database;
 
 namespace PriconneBotConsoleApp.Script

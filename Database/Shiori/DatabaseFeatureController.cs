@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using PriconneBotConsoleApp.DataModel;
 
@@ -30,6 +27,9 @@ namespace PriconneBotConsoleApp.Database
 
             return databaseConnector.RoleFeatures.ToList();
         }
+
+        // ここから下の3つの関数がかなり似ているので
+        // メソッドにしたいんだけど方法が思いつかない
 
         public void UpdateChannelFeature(IEnumerable<ChannelFeature> features)
         {

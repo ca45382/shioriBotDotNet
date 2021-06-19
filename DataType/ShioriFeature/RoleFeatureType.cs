@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace PriconneBotConsoleApp.DataType
+﻿namespace PriconneBotConsoleApp.DataType
 {
     //ロール系 3xxx
     public enum RoleFeatureType : uint
