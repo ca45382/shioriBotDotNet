@@ -7,7 +7,6 @@ namespace PriconneBotConsoleApp.DataModel
     [Table("message_feature")]
     public class MessageFeature
     {
-
         [Column("feature_id", TypeName = "INT UNSIGNED"), Key, Required]
         public uint FeatureID { get; set; }
 
