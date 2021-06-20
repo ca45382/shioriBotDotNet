@@ -310,7 +310,7 @@ namespace PriconneBotConsoleApp.Script
             }
             else
             {
-                nowBattleLap += 1;
+                nowBossNumber += 1;
             }
 
             SetAllBossLaps(nowBossNumber, nowBattleLap);

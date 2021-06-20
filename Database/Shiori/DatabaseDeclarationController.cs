@@ -41,6 +41,13 @@ namespace PriconneBotConsoleApp.Database
                 return null;
             }
 
+            if (playerData.ClanData == null)
+            {
+                playerData = databaseConnector.PlayerData
+                    .Include(x => x.ClanData)
+                    .FirstOrDefault(x => x.PlayerID == playerData.PlayerID);
+            }
+
             return databaseConnector.DeclarationData
                 .Include(b => b.PlayerData)
                 .Where(d => d.PlayerData.PlayerID == playerData.PlayerID && !d.DeleteFlag 
