@@ -22,9 +22,13 @@ namespace PriconneBotConsoleApp.Database
 
         // プレイヤーデータ
         public DbSet<PlayerData> PlayerData { get; set; }
+
+        // クラバト機能保存
         public DbSet<ReservationData> ReservationData { get; set; }
         public DbSet<DeclarationData> DeclarationData { get; set; }
-        
+        public DbSet<TaskKillData> TaskKillData { get; set; }
+
+
         public static readonly JsonDataManager JsonData = new JsonDataManager();
 
         // TODO: 動的に取得する
