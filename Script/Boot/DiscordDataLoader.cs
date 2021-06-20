@@ -38,6 +38,33 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
+        public void UpdateClanData(SocketGuild guild)
+        {
+            var clanDatas = m_clanData
+                .Where(x => x.ServerID == guild.Id)
+                .ToList();
+
+            var updateDataList = new List<ClanData>();
+            var removeDataList = new List<ClanData>();
+
+            foreach (var clanData in clanDatas)
+            {
+                var updateClanData = clanData;
+                var clanRole = guild.Roles
+                    .FirstOrDefault(x => x.Id == clanData.ClanRoleID);
+
+                if (clanRole == null)
+                {
+                    removeDataList.Add(updateClanData);
+                }
+                else if(clanData.ClanName == updateClanData.ClanName)
+                {
+                    updateDataList.Add(updateClanData);
+                }
+            }
+
+        }
+
         /// <summary>
         /// SQLサーバー側とDiscord側のプレイヤーデータ同期
         /// </summary>
