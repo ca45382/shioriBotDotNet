@@ -2,6 +2,7 @@
 using System.Linq;
 
 using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.Interface;
 
 namespace PriconneBotConsoleApp.Database
 {
@@ -28,35 +29,23 @@ namespace PriconneBotConsoleApp.Database
             return databaseConnector.RoleFeatures.ToList();
         }
 
-        // ここから下の3つの関数がかなり似ているので
-        // メソッドにしたいんだけど方法が思いつかない
-
         public void UpdateChannelFeature(IEnumerable<ChannelFeature> features)
         {
             var databaseFeatures = LoadChannelFeature();
+            var createFeatures = GetCreateData(features, databaseFeatures);
+            var removeFeatures = GetRemoveData(features, databaseFeatures);
 
             using var databaseConnector = new DatabaseConnector();
             var transaction = databaseConnector.Database.BeginTransaction();
 
-            foreach (var programFeature in features)
+            foreach (var createFeature in createFeatures)
             {
-                // なぜかFeatureIDが0だと通らない
-                if (databaseFeatures
-                    .FirstOrDefault(x => x.FeatureID == programFeature.FeatureID) == null
-                    && programFeature.FeatureID != 0)
-                {
-                    databaseConnector.ChannelFeatures.Add(programFeature);
-                }
+                databaseConnector.ChannelFeatures.Add((ChannelFeature)createFeature);
             }
 
-            foreach (var databaseFeature in databaseFeatures)
+            foreach (var removeFeature in removeFeatures)
             {
-                // なぜかFeatureIDが0だと通らない
-                if (features.FirstOrDefault(x => x.FeatureID == databaseFeature.FeatureID) == null
-                    && databaseFeature.FeatureID != 0)
-                {
-                    databaseConnector.ChannelFeatures.Remove(databaseFeature);
-                }
+                databaseConnector.ChannelFeatures.Remove((ChannelFeature)removeFeature);
             }
 
             databaseConnector.SaveChanges();
@@ -66,29 +55,20 @@ namespace PriconneBotConsoleApp.Database
         public void UpdateMessageFeature(IEnumerable<MessageFeature> features)
         {
             var databaseFeatures = LoadMessageFeature();
+            var createFeatures = GetCreateData(features, databaseFeatures);
+            var removeFeatures = GetRemoveData(features, databaseFeatures);
 
             using var databaseConnector = new DatabaseConnector();
             var transaction = databaseConnector.Database.BeginTransaction();
 
-            foreach (var programFeature in features)
+            foreach (var createFeature in createFeatures)
             {
-                // なぜかFeatureIDが0だと通らない
-                if (databaseFeatures
-                    .FirstOrDefault(x => x.FeatureID == programFeature.FeatureID) == null
-                    && programFeature.FeatureID != 0)
-                {
-                    databaseConnector.MessageFeatures.Add(programFeature);
-                }
+                databaseConnector.MessageFeatures.Add((MessageFeature)createFeature);
             }
 
-            foreach (var databaseFeature in databaseFeatures)
+            foreach (var removeFeature in removeFeatures)
             {
-                // なぜかFeatureIDが0だと通らない
-                if ( features.FirstOrDefault(x => x.FeatureID == databaseFeature.FeatureID) == null
-                    && databaseFeature.FeatureID != 0)
-                {
-                    databaseConnector.MessageFeatures.Remove(databaseFeature);
-                }
+                databaseConnector.MessageFeatures.Remove((MessageFeature)removeFeature);
             }
 
             databaseConnector.SaveChanges();
@@ -98,33 +78,59 @@ namespace PriconneBotConsoleApp.Database
         public void UpdateRoleFeature(IEnumerable<RoleFeature> features)
         {
             var databaseFeatures = LoadRoleFeature();
+            var createFeatures = GetCreateData(features, databaseFeatures);
+            var removeFeatures = GetRemoveData(features, databaseFeatures);
 
             using var databaseConnector = new DatabaseConnector();
             var transaction = databaseConnector.Database.BeginTransaction();
 
-            foreach (var programFeature in features)
+            foreach (var createFeature in createFeatures)
             {
-                // なぜかFeatureIDが0だと通らない
-                if (databaseFeatures
-                    .FirstOrDefault(x => x.FeatureID == programFeature.FeatureID) == null
-                    && programFeature.FeatureID != 0)
-                {
-                    databaseConnector.RoleFeatures.Add(programFeature);
-                }
+                databaseConnector.RoleFeatures.Add((RoleFeature)createFeature);
             }
 
-            foreach (var databaseFeature in databaseFeatures)
+            foreach (var removeFeature in removeFeatures)
             {
-                // なぜかFeatureIDが0だと通らない
-                if (features.FirstOrDefault(x => x.FeatureID == databaseFeature.FeatureID) == null
-                    && databaseFeature.FeatureID != 0)
-                {
-                    databaseConnector.RoleFeatures.Remove(databaseFeature);
-                }
+                databaseConnector.RoleFeatures.Remove((RoleFeature)removeFeature);
             }
 
             databaseConnector.SaveChanges();
             transaction.Commit();
+        }
+
+        private IEnumerable<IBotFeature> GetCreateData(IEnumerable<IBotFeature> programFeatures, IEnumerable<IBotFeature> databaseFeatures)
+        {
+            var updateFeatures = new List<IBotFeature>();
+
+            foreach (var programFeature in programFeatures)
+            {
+                // なぜかFeatureIDが0だと通らない
+                if (databaseFeatures.FirstOrDefault(x => x.FeatureID == programFeature.FeatureID) == null
+                    && programFeature.FeatureID != 0)
+                {
+                    updateFeatures.Add(programFeature);
+                }
+            }
+
+            return updateFeatures;
+        }
+
+        private IEnumerable<IBotFeature> GetRemoveData(IEnumerable<IBotFeature> programFeatures, IEnumerable<IBotFeature> databaseFeatures)
+        {
+            var removeFeatures = new List<IBotFeature>();
+
+            foreach (var databaseFeature in databaseFeatures)
+            {
+                // GetCreateDataと同様の理由
+                // なぜかFeatureIDが0だと通らない
+                if (programFeatures.FirstOrDefault(x => x.FeatureID == databaseFeature.FeatureID) == null 
+                    && databaseFeature.FeatureID != 0)
+                {
+                    removeFeatures.Add(databaseFeature);
+                }
+            }
+
+            return removeFeatures;
         }
     }
 }
