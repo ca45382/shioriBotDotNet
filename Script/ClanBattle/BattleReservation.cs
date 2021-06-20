@@ -17,11 +17,6 @@ namespace PriconneBotConsoleApp.Script
     {
         private const int MinBossNumber = 1;
         private const int MaxBossNumber = 5;
-
-        //private const int LimitReservationLap = 2;
-
-        //private const int ReservableStartTimeHour = 18;
-
         private const int MaxCommentLength = 30;
 
         private readonly ClanData m_userClanData;
