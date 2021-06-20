@@ -71,19 +71,13 @@ namespace PriconneBotConsoleApp.Script
                 }
 
                 //#if !DEBUG
-                var nowTime = DateTime.Now.Hour;
-                if (nowTime < 5)
-                {
-                    nowTime += 24;
-                }
-                if (nowTime - 5 < m_userClanData.ReservationStartTime.Hours - 5 ||
-                    nowTime - 5 > m_userClanData.ReservationEndTime.Hours - 5)
+                if (!IsReservationAllowTime())
                 {
                     await SendErrorMessage(ErrorType.OutOfReservationTime,
                         $"{m_userClanData.ReservationStartTime.Hours}:00", $"{m_userClanData.ReservationEndTime.Hours}:00");
                     return;
                 }
-//#endif
+                //#endif
 
                 var reservationData = MessageToReservationData();
 
@@ -237,7 +231,9 @@ namespace PriconneBotConsoleApp.Script
             var limitReservationLap = m_userClanData.ReservationLap;
             if (limitReservationLap == 0)
             {
-                limitReservationLap = byte.MaxValue;
+                // 0だった場合予約できる最大数をByteの最大にする。
+                //limitReservationLap = byte.MaxValue;
+                limitReservationLap--;
             }
 
             var splitMessageContent =
@@ -452,6 +448,56 @@ namespace PriconneBotConsoleApp.Script
 
         private async Task SuccessAddEmoji()
             => await m_userMessage.AddReactionAsync(new Emoji("🆗"));
+
+        /// <summary>
+        /// 予約できる時間かどうか判断する。
+        /// </summary>
+        /// <returns></returns>
+        private bool IsReservationAllowTime()
+        {
+            if (m_userClanData == null)
+            {
+                return false;
+            }
+
+            var startTime = m_userClanData.ReservationStartTime;
+            var endTime = m_userClanData.ReservationEndTime;
+            var nowTime = DateTime.Now.TimeOfDay;
+
+            //nowTime = new DateTime(2021, 6, 20, 19,0,0).TimeOfDay;
+
+            if (startTime.Hours == 0 && endTime.Hours == 0)
+            {
+                return true;
+            }
+
+            if(startTime.Hours < 5)
+            {
+                startTime = startTime.Add(new TimeSpan(1, 0, 0, 0));
+            }
+
+            if (endTime.Hours < 5)
+            {
+                endTime = endTime.Add(new TimeSpan(1, 0, 0, 0));
+            }
+
+            if (nowTime.Hours < 5)
+            {
+                nowTime = nowTime.Add(new TimeSpan(1, 0, 0, 0));
+            }
+
+            if (startTime.TotalSeconds >= endTime.TotalSeconds)
+            {
+                return false;
+            }
+
+            if (nowTime.TotalSeconds <= startTime.TotalSeconds || nowTime.TotalSeconds > endTime.TotalSeconds)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
     }
 }
