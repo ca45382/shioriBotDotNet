@@ -40,13 +40,13 @@ namespace PriconneBotConsoleApp.Script
 
         public void UpdateClanData(SocketGuild guild)
         {
-            var clanDatas = m_clanData
+            var clanDataList = m_clanData
                 .Where(x => x.ServerID == guild.Id)
                 .ToList();
 
             var removeDataList = new List<ClanData>();
 
-            foreach (var clanData in clanDatas)
+            foreach (var clanData in clanDataList)
             {
                 var updateClanData = clanData;
                 var clanRole = guild.Roles
@@ -54,7 +54,7 @@ namespace PriconneBotConsoleApp.Script
 
                 if (clanRole == null)
                 {
-                    //ここにクランがなくなった際の処理を実装
+                    // TODO : ここにクランがなくなった際の処理を実装
                     continue;
                 }
 
