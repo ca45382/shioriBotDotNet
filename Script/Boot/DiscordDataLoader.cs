@@ -44,7 +44,6 @@ namespace PriconneBotConsoleApp.Script
                 .Where(x => x.ServerID == guild.Id)
                 .ToList();
 
-            var updateDataList = new List<ClanData>();
             var removeDataList = new List<ClanData>();
 
             foreach (var clanData in clanDatas)
@@ -55,14 +54,16 @@ namespace PriconneBotConsoleApp.Script
 
                 if (clanRole == null)
                 {
-                    removeDataList.Add(updateClanData);
+                    //ここにクランがなくなった際の処理を実装
+                    continue;
                 }
-                else if(clanData.ClanName == updateClanData.ClanName)
+
+                if(string.Compare(clanData.ClanName, clanRole.Name) != 0)
                 {
-                    updateDataList.Add(updateClanData);
+                    updateClanData.ClanName = clanRole.Name;
+                    new DatabaseClanDataController().UpdateClanData(updateClanData);
                 }
             }
-
         }
 
         /// <summary>

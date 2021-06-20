@@ -86,6 +86,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var discordDataLoader = new DiscordDataLoader();
             discordDataLoader.UpdateServerData(guild);
+            discordDataLoader.UpdateClanData(guild);
             discordDataLoader.UpdatePlayerData(guild);
             return Task.CompletedTask;
         }
@@ -94,6 +95,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var discordDataLoader = new DiscordDataLoader();
             discordDataLoader.UpdateServerData(userInfo.Guild);
+            discordDataLoader.UpdateClanData(userInfo.Guild);
             discordDataLoader.UpdatePlayerData(userInfo.Guild);
             return Task.CompletedTask;
         }
@@ -104,6 +106,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var discordDataLoader = new DiscordDataLoader();
             discordDataLoader.UpdateServerData(newUserInfo.Guild);
+            discordDataLoader.UpdateClanData(newUserInfo.Guild);
             discordDataLoader.UpdatePlayerData(newUserInfo.Guild);
             return Task.CompletedTask;
         }
