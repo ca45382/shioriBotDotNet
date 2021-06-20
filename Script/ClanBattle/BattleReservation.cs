@@ -65,14 +65,12 @@ namespace PriconneBotConsoleApp.Script
                         return;
                 }
 
-                //#if !DEBUG
                 if (!IsReservationAllowTime())
                 {
                     await SendErrorMessage(ErrorType.OutOfReservationTime,
                         $"{m_userClanData.ReservationStartTime.Hours}:00", $"{m_userClanData.ReservationEndTime.Hours}:00");
                     return;
                 }
-                //#endif
 
                 var reservationData = MessageToReservationData();
 
@@ -459,24 +457,22 @@ namespace PriconneBotConsoleApp.Script
             var endTime = m_userClanData.ReservationEndTime;
             var nowTime = DateTime.Now.TimeOfDay;
 
-            //nowTime = new DateTime(2021, 6, 20, 19,0,0).TimeOfDay;
-
             if (startTime.Hours == 0 && endTime.Hours == 0)
             {
                 return true;
             }
 
-            if(startTime.Hours < 5)
+            if(startTime.Hours < Define.Common.DateUpdateHour)
             {
                 startTime = startTime.Add(new TimeSpan(1, 0, 0, 0));
             }
 
-            if (endTime.Hours < 5)
+            if (endTime.Hours < Define.Common.DateUpdateHour)
             {
                 endTime = endTime.Add(new TimeSpan(1, 0, 0, 0));
             }
 
-            if (nowTime.Hours < 5)
+            if (nowTime.Hours < Define.Common.DateUpdateHour)
             {
                 nowTime = nowTime.Add(new TimeSpan(1, 0, 0, 0));
             }
