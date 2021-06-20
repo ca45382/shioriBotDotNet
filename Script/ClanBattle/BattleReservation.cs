@@ -224,9 +224,7 @@ namespace PriconneBotConsoleApp.Script
             var limitReservationLap = m_userClanData.ReservationLap;
             if (limitReservationLap == 0)
             {
-                // 0だった場合予約できる最大数をByteの最大にする。
-                //limitReservationLap = byte.MaxValue;
-                limitReservationLap--;
+                limitReservationLap = byte.MaxValue;
             }
 
             var splitMessageContent =
