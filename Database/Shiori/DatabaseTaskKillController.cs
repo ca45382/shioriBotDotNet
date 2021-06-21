@@ -10,6 +10,11 @@ namespace PriconneBotConsoleApp.Database
 {
     class DatabaseTaskKillController
     {
+        /// <summary>
+        /// クラン全体のタスキル情報を取得
+        /// </summary>
+        /// <param name="clanData"></param>
+        /// <returns></returns>
         public IEnumerable<TaskKillData> LoadTaskKillData(ClanData clanData)
         {
             using var databaseConnector = new DatabaseConnector();
@@ -20,6 +25,11 @@ namespace PriconneBotConsoleApp.Database
                 .ToList();
         }
 
+        /// <summary>
+        /// 個人のタスキル情報を取得
+        /// </summary>
+        /// <param name="playerData"></param>
+        /// <returns></returns>
         public TaskKillData LoadTaskKillData(PlayerData playerData)
         {
             using var databaseConnector = new DatabaseConnector();
@@ -39,24 +49,24 @@ namespace PriconneBotConsoleApp.Database
                 .FirstOrDefault(x => x.PlayerID == playerData.PlayerID && !x.DeleteFlag);
         }
 
+        /// <summary>
+        /// タスキルデータをデータベースに登録。
+        /// </summary>
+        /// <param name="playerData"></param>
+        /// <returns>書き込み成功True</returns>
         public bool CreateTaskKillData(PlayerData playerData)
         {
             using var databaseConnector = new DatabaseConnector();
-
-            if (playerData.PlayerID == 0)
-            {
-                playerData = databaseConnector.PlayerData
-                    .FirstOrDefault(x => x.ClanID == playerData.ClanID && x.UserID == playerData.UserID);
-            }
 
             if (playerData == null)
             {
                 return false;
             }
 
-            var databaseData = LoadTaskKillData(playerData);
+            var databaseUserTaskKill = databaseConnector.TaskKillData.AsQueryable()
+                .FirstOrDefault(x => x.PlayerID == playerData.PlayerID && !x.DeleteFlag);
 
-            if(databaseData != null)
+            if (databaseUserTaskKill != null)
             {
                 return false;
             }
@@ -68,7 +78,6 @@ namespace PriconneBotConsoleApp.Database
                 databaseConnector.TaskKillData.Add(new TaskKillData()
                 {
                     PlayerID = playerData.PlayerID,
-                    DeleteFlag = false,
                 });
                 databaseConnector.SaveChanges();
                 transaction.Commit();
@@ -81,22 +90,22 @@ namespace PriconneBotConsoleApp.Database
             }
         }
 
-        public bool DeleteTaskKillData(PlayerData playerData)
+        /// <summary>
+        /// タスキルデータのDeleteFlagを付与。
+        /// </summary>
+        /// <param name="playerData"></param>
+        /// <returns>付与成功True</returns>
+        public bool DeleteTaskKillData(TaskKillData taskKillData)
         {
             using var databaseConnector = new DatabaseConnector();
 
-            if (playerData.PlayerID == 0)
-            {
-                playerData = databaseConnector.PlayerData
-                    .FirstOrDefault(x => x.ClanID == playerData.ClanID && x.UserID == playerData.UserID);
-            }
-
-            if (playerData == null)
+            if (taskKillData == null)
             {
                 return false;
             }
 
-            var databaseData = LoadTaskKillData(playerData);
+            var databaseData = databaseConnector.TaskKillData
+                .FirstOrDefault(x => x.TaskKillID == taskKillData.TaskKillID && !x.DeleteFlag);
 
             if (databaseData == null)
             {
@@ -118,6 +127,45 @@ namespace PriconneBotConsoleApp.Database
                 return false;
             }
 
+        }
+
+        public bool DeleteTaskKillData(ClanData clanData)
+        {
+            if (clanData == null)
+            {
+                return false;
+            }
+
+            using var databaseConnector = new DatabaseConnector();
+
+            var deleteDataList = databaseConnector.TaskKillData
+                .Include(x => x.PlayerData)
+                .Where(x => x.PlayerData.ClanID == clanData.ClanID && !x.DeleteFlag)
+                .ToList();
+
+            if (deleteDataList.Count() == 0)
+            {
+                return false;
+            }
+
+            var transaction = databaseConnector.Database.BeginTransaction();
+            try
+            {
+                foreach (var deleteData in deleteDataList)
+                {
+                    deleteData.DeleteFlag = true;
+                }
+
+                databaseConnector.SaveChanges();
+                transaction.Commit();
+                return true;
+            }
+            catch
+            {
+                transaction.Rollback();
+                return false;
+            }
+            
         }
     }
 }

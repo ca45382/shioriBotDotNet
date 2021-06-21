@@ -96,6 +96,11 @@ namespace PriconneBotConsoleApp.Database
                 .HasOne(b => b.PlayerData)
                 .WithMany(i => i.DeclarationData)
                 .HasForeignKey(b => b.PlayerID);
+
+            modelBuilder.Entity<TaskKillData>()
+                .HasOne(x => x.PlayerData)
+                .WithMany(x => x.TaskKillData)
+                .HasForeignKey(x => x.PlayerID);
         }
     }
 }
