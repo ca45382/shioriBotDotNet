@@ -100,37 +100,14 @@ namespace PriconneBotConsoleApp.Database
 
         private IEnumerable<IBotFeature> GetCreateData(IEnumerable<IBotFeature> programFeatures, IEnumerable<IBotFeature> databaseFeatures)
         {
-            var updateFeatures = new List<IBotFeature>();
-
-            foreach (var programFeature in programFeatures)
-            {
-                // なぜかFeatureIDが0だと通らない
-                if (databaseFeatures.FirstOrDefault(x => x.FeatureID == programFeature.FeatureID) == null
-                    && programFeature.FeatureID != 0)
-                {
-                    updateFeatures.Add(programFeature);
-                }
-            }
-
-            return updateFeatures;
+            // メモ : FeatureID = 0 だと通らない
+            return programFeatures.Where(x => x.FeatureID != 0).Except(databaseFeatures, new IBotFeatureComparer());
         }
 
         private IEnumerable<IBotFeature> GetRemoveData(IEnumerable<IBotFeature> programFeatures, IEnumerable<IBotFeature> databaseFeatures)
         {
-            var removeFeatures = new List<IBotFeature>();
-
-            foreach (var databaseFeature in databaseFeatures)
-            {
-                // GetCreateDataと同様の理由
-                // なぜかFeatureIDが0だと通らない
-                if (programFeatures.FirstOrDefault(x => x.FeatureID == databaseFeature.FeatureID) == null 
-                    && databaseFeature.FeatureID != 0)
-                {
-                    removeFeatures.Add(databaseFeature);
-                }
-            }
-
-            return removeFeatures;
+            // メモ : FeatureID = 0 だと通らない
+            return databaseFeatures.Where(x => x.FeatureID != 0).Except(programFeatures, new IBotFeatureComparer());
         }
     }
 }
