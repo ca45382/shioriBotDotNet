@@ -144,8 +144,8 @@ namespace PriconneBotConsoleApp.Script
                 ChannelFeatureType data = (ChannelFeatureType)channelFeatureValue;
                 channelFeatures.Add(new ChannelFeature() 
                 {
-                FeatureID = (uint)channelFeatureValue,
-                FeatureName = data.ToString(),
+                    FeatureID = (uint)channelFeatureValue,
+                    FeatureName = data.ToString(),
                 });
             }
 
@@ -173,7 +173,6 @@ namespace PriconneBotConsoleApp.Script
             databaseFeatureController.UpdateChannelFeature(channelFeatures);
             databaseFeatureController.UpdateMessageFeature(messageFeatures);
             databaseFeatureController.UpdateRoleFeature(roleFeatures);
-            return;
         }
     }
 }
