@@ -30,7 +30,7 @@ namespace PriconneBotConsoleApp.Script
             m_UserMessage = userMessage;
             m_Guild = (userMessage.Channel as SocketTextChannel)?.Guild;
             m_UserRole = m_Guild?.GetRole(clanData.ClanRoleID);
-            m_TaskKillRole = m_Guild.GetRole(clanData.RoleData.GetRoleID(clanData.ClanID, RoleFeatureType.TaskKillRoleID));
+            m_TaskKillRole = m_Guild?.GetRole(clanData.RoleData.GetRoleID(clanData.ClanID, RoleFeatureType.TaskKillRoleID));
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
             var result = false;
-            Task addEmoji;
+            var taskList = new List<Task>();
 
             if (m_UserMessage.Content.StartsWith("!"))
             {
@@ -55,7 +55,7 @@ namespace PriconneBotConsoleApp.Script
 
                     if (result)
                     {
-                        addEmoji = Task.Run(() => SuccessAddEmoji());
+                        taskList.Add(Task.Run(() => SuccessAddEmoji() ));
                     }
                     
                 }
@@ -67,12 +67,13 @@ namespace PriconneBotConsoleApp.Script
 
                 if (result)
                 {
-                    addEmoji = Task.Run(() => SuccessAddEmoji());
+                    taskList.Add(Task.Run(() => SuccessAddEmoji()));
                 }
 
             }
 
-            await SyncTaskKillRole();
+            taskList.Add(Task.Run(() => SyncTaskKillRole()));
+            await Task.WhenAll(taskList);
         }
 
         private bool RegisterTaskKillData()
@@ -124,6 +125,6 @@ namespace PriconneBotConsoleApp.Script
         }
 
         private async Task SuccessAddEmoji()
-            => await m_UserMessage.AddReactionAsync(new Emoji("🆗"));
+            => await m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.GetDescription()));
     }
 }

@@ -143,7 +143,7 @@ namespace PriconneBotConsoleApp.Database
                 .Where(x => x.PlayerData.ClanID == clanData.ClanID && !x.DeleteFlag)
                 .ToList();
 
-            if (deleteDataList.Count() == 0)
+            if (deleteDataList.Any())
             {
                 return false;
             }
@@ -151,11 +151,7 @@ namespace PriconneBotConsoleApp.Database
             var transaction = databaseConnector.Database.BeginTransaction();
             try
             {
-                foreach (var deleteData in deleteDataList)
-                {
-                    deleteData.DeleteFlag = true;
-                }
-
+                deleteDataList.ForEach(x => x.DeleteFlag = true);
                 databaseConnector.SaveChanges();
                 transaction.Commit();
                 return true;
