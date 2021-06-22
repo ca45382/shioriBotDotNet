@@ -57,7 +57,15 @@ namespace PriconneBotConsoleApp.Script
                     {
                         taskList.Add(Task.Run(() => SuccessAddEmoji() ));
                     }
-                    
+
+                }
+                else if(m_UserMessage.Content.StartsWith("!init"))
+                {
+                    result = DeleteClanData();
+                    if (result)
+                    {
+                        taskList.Add(Task.Run(() => SuccessAddEmoji()));
+                    }
                 }
 
             }
@@ -103,6 +111,11 @@ namespace PriconneBotConsoleApp.Script
             var taskKillData = taskKillController.LoadTaskKillData(playerData);
 
             return taskKillController.DeleteTaskKillData(taskKillData);
+        }
+
+        private bool DeleteClanData()
+        {
+            return new DatabaseTaskKillController().DeleteTaskKillData(m_UserClanData);
         }
 
         private async Task SyncTaskKillRole()

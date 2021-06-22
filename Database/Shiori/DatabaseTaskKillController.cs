@@ -143,7 +143,7 @@ namespace PriconneBotConsoleApp.Database
                 .Where(x => x.PlayerData.ClanID == clanData.ClanID && !x.DeleteFlag)
                 .ToList();
 
-            if (deleteDataList.Any())
+            if (!deleteDataList.Any())
             {
                 return false;
             }
