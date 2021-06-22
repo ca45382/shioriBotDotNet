@@ -62,6 +62,7 @@ namespace PriconneBotConsoleApp.Script
                 else if(m_UserMessage.Content.StartsWith("!init"))
                 {
                     result = DeleteClanData();
+
                     if (result)
                     {
                         taskList.Add(Task.Run(() => SuccessAddEmoji()));
