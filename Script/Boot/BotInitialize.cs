@@ -2,9 +2,13 @@
 using System.Net;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Collections.Generic;
+using System;
 
 using Brotli;
 using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.DataType;
+using PriconneBotConsoleApp.Database;
 
 namespace PriconneBotConsoleApp.Script
 {
@@ -27,6 +31,8 @@ namespace PriconneBotConsoleApp.Script
             {
                 Directory.CreateDirectory(TempFolderPath);
             }
+
+            UpdateFeatureList();
         }
 
         public void UpdateRediveDatabase()
@@ -125,6 +131,48 @@ namespace PriconneBotConsoleApp.Script
 
             var instance = JsonSerializer.Deserialize<T>(jsonString, options);
             return instance;
+        }
+
+        private void UpdateFeatureList()
+        {
+            var channelFeatures = new List<ChannelFeature>();
+            var messageFeatures = new List<MessageFeature>();
+            var roleFeatures = new List<RoleFeature>();
+
+            foreach (var channelFeatureValue in Enum.GetValues(typeof(ChannelFeatureType)) )
+            {
+                ChannelFeatureType data = (ChannelFeatureType)channelFeatureValue;
+                channelFeatures.Add(new ChannelFeature() 
+                {
+                    FeatureID = (uint)channelFeatureValue,
+                    FeatureName = data.ToString(),
+                });
+            }
+
+            foreach (var messageFeatureValue in Enum.GetValues(typeof(MessageFeatureType)))
+            {
+                MessageFeatureType data = (MessageFeatureType)messageFeatureValue;
+                messageFeatures.Add(new MessageFeature()
+                {
+                    FeatureID = (uint)messageFeatureValue,
+                    FeatureName = data.ToString(),
+                });
+            }
+
+            foreach (var roleFeatureValue in Enum.GetValues(typeof(RoleFeatureType)))
+            {
+                RoleFeatureType data = (RoleFeatureType)roleFeatureValue;
+                roleFeatures.Add(new RoleFeature()
+                {
+                    FeatureID = (uint)roleFeatureValue,
+                    FeatureName = data.ToString(),
+                });
+            }
+
+            var databaseFeatureController = new DatabaseFeatureController();
+            databaseFeatureController.UpdateChannelFeature(channelFeatures);
+            databaseFeatureController.UpdateMessageFeature(messageFeatures);
+            databaseFeatureController.UpdateRoleFeature(roleFeatures);
         }
     }
 }

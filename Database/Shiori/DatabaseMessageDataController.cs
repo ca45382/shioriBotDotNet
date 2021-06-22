@@ -39,9 +39,9 @@ namespace PriconneBotConsoleApp.Database
             else
             {
                 updateData.MessageID = messageID;
-                databaseConnector.SaveChanges();
             }
 
+            databaseConnector.SaveChanges();
             transaction.Commit();
 
             return true;

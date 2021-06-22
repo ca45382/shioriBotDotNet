@@ -17,11 +17,6 @@ namespace PriconneBotConsoleApp.Script
     {
         private const int MinBossNumber = 1;
         private const int MaxBossNumber = 5;
-
-        private const int LimitReservationLap = 2;
-
-        private const int ReservableStartTimeHour = 18;
-
         private const int MaxCommentLength = 30;
 
         private readonly ClanData m_userClanData;
@@ -70,13 +65,12 @@ namespace PriconneBotConsoleApp.Script
                         return;
                 }
 
-#if !DEBUG
-                if (DateTime.Now.Hour < ReservableStartTimeHour)
+                if (!IsReservationAllowTime())
                 {
-                    await SendErrorMessage(ErrorType.OutOfReservationTime, $"{ReservableStartTimeHour}:00", "24:00");
+                    await SendErrorMessage(ErrorType.OutOfReservationTime,
+                        $"{m_userClanData.ReservationStartTime.Hours}:00", $"{m_userClanData.ReservationEndTime.Hours}:00");
                     return;
                 }
-#endif
 
                 var reservationData = MessageToReservationData();
 
@@ -227,6 +221,12 @@ namespace PriconneBotConsoleApp.Script
             var nowBattleLap = userClanData.GetNowLap();
             var nowBossNumber = userClanData.GetNowBoss();
 
+            var limitReservationLap = m_userClanData.ReservationLap;
+            if (limitReservationLap == 0)
+            {
+                limitReservationLap = byte.MaxValue;
+            }
+
             var splitMessageContent =
                 ZenToHan(userMessage.Content).Split(new string[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -234,9 +234,9 @@ namespace PriconneBotConsoleApp.Script
                 || !(byte.TryParse(splitMessageContent[1], out byte battleLap) && battleLap > 0)
                 || !(byte.TryParse(splitMessageContent[2], out byte bossNumber) && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber)
                 || battleLap < nowBattleLap
-                || battleLap > nowBattleLap + LimitReservationLap
+                || battleLap > nowBattleLap + limitReservationLap
                 || battleLap == nowBattleLap && bossNumber < nowBossNumber
-                || battleLap == nowBattleLap + LimitReservationLap && bossNumber > nowBossNumber)
+                || battleLap == nowBattleLap + limitReservationLap && bossNumber > nowBossNumber)
             {
                 return null;
             }
@@ -439,6 +439,54 @@ namespace PriconneBotConsoleApp.Script
 
         private async Task SuccessAddEmoji()
             => await m_userMessage.AddReactionAsync(new Emoji("🆗"));
+
+        /// <summary>
+        /// 予約できる時間かどうか判断する。
+        /// </summary>
+        /// <returns></returns>
+        private bool IsReservationAllowTime()
+        {
+            if (m_userClanData == null)
+            {
+                return false;
+            }
+
+            var startTime = m_userClanData.ReservationStartTime;
+            var endTime = m_userClanData.ReservationEndTime;
+            var nowTime = DateTime.Now.TimeOfDay;
+
+            if (startTime.Hours == 0 && endTime.Hours == 0)
+            {
+                return true;
+            }
+
+            if(startTime.Hours < Define.Common.DateUpdateHour)
+            {
+                startTime = startTime.Add(new TimeSpan(1, 0, 0, 0));
+            }
+
+            if (endTime.Hours < Define.Common.DateUpdateHour)
+            {
+                endTime = endTime.Add(new TimeSpan(1, 0, 0, 0));
+            }
+
+            if (nowTime.Hours < Define.Common.DateUpdateHour)
+            {
+                nowTime = nowTime.Add(new TimeSpan(1, 0, 0, 0));
+            }
+
+            if (startTime.TotalSeconds >= endTime.TotalSeconds)
+            {
+                return false;
+            }
+
+            if (nowTime.TotalSeconds <= startTime.TotalSeconds || nowTime.TotalSeconds > endTime.TotalSeconds)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
     }
 }

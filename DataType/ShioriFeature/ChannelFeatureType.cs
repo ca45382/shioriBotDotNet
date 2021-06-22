@@ -1,9 +1,7 @@
-﻿using System.ComponentModel;
-
-namespace PriconneBotConsoleApp.DataType
+﻿namespace PriconneBotConsoleApp.DataType
 {
     //チャンネル系 1xxx
-    public enum ChannelFeatureType
+    public enum ChannelFeatureType : uint
     {
         Unknown = 0,
 

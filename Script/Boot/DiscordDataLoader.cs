@@ -38,6 +38,34 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
+        public void UpdateClanData(SocketGuild guild)
+        {
+            var clanDataList = m_clanData
+                .Where(x => x.ServerID == guild.Id)
+                .ToList();
+
+            var removeDataList = new List<ClanData>();
+
+            foreach (var clanData in clanDataList)
+            {
+                var updateClanData = clanData;
+                var clanRole = guild.Roles
+                    .FirstOrDefault(x => x.Id == clanData.ClanRoleID);
+
+                if (clanRole == null)
+                {
+                    // TODO : ここにクランがなくなった際の処理を実装
+                    continue;
+                }
+
+                if(string.Compare(clanData.ClanName, clanRole.Name) != 0)
+                {
+                    updateClanData.ClanName = clanRole.Name;
+                    new DatabaseClanDataController().UpdateClanData(updateClanData);
+                }
+            }
+        }
+
         /// <summary>
         /// SQLサーバー側とDiscord側のプレイヤーデータ同期
         /// </summary>

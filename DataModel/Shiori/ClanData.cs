@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PriconneBotConsoleApp.DataType;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -93,23 +94,23 @@ namespace PriconneBotConsoleApp.DataModel
                 && Boss3Lap == Boss4Lap
                 && Boss4Lap == Boss5Lap)
             {
-                return 1;
+                return (byte)BossNumberType.Boss5Number;
             }
-            if (Boss1Lap - 1 == Boss2Lap)
+            if (Boss1Lap  == Boss2Lap + 1 )
             {
-                return 2;
+                return (byte)BossNumberType.Boss1Number;
             }
-            else if (Boss2Lap - 1 == Boss3Lap)
+            else if (Boss2Lap == Boss3Lap + 1)
             {
-                return 3;
+                return (byte)BossNumberType.Boss2Number;
             }
-            else if (Boss3Lap - 1 == Boss4Lap)
+            else if (Boss3Lap == Boss4Lap + 1)
             {
-                return 4;
+                return (byte)BossNumberType.Boss3Number;
             }
-            else if (Boss4Lap - 1 == Boss5Lap)
+            else if (Boss4Lap == Boss5Lap + 1)
             {
-                return 5;
+                return (byte)BossNumberType.Boss4Number;
             }
 
             return 0;
@@ -128,11 +129,11 @@ namespace PriconneBotConsoleApp.DataModel
                 && Boss3Lap == Boss4Lap
                 && Boss4Lap == Boss5Lap)
             {
-                return Boss1Lap;
+                return Boss5Lap;
             }
             else
             {
-                return Boss5Lap;
+                return Boss1Lap;
             }
         }
     }
