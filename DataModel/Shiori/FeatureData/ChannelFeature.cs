@@ -2,12 +2,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+using PriconneBotConsoleApp.Interface;
+
 namespace PriconneBotConsoleApp.DataModel
 {
     [Table("channel_feature")]
-    public class ChannelFeature
+    public class ChannelFeature : IBotFeature
     {
-
         [Column("feature_id", TypeName = "INT UNSIGNED"), Key, Required]
         public uint FeatureID { get; set; }
 
