@@ -141,6 +141,6 @@ namespace PriconneBotConsoleApp.Script
         }
 
         private async Task SuccessAddEmoji()
-            => await m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.GetDescription()));
+            => await m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success)));
     }
 }
