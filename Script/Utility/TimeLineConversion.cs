@@ -112,7 +112,7 @@ namespace PriconneBotConsoleApp.Script
                     continue;
                 }
 
-                if (!Regex.IsMatch(lineMessageContent, @"(\d:\d{2}|\d+[秒s])"))
+                if (!Regex.IsMatch(lineMessageContent, @"(\d{1,2}:\d{2}|\d+[秒s])"))
                 {
                     sendMessageContent.AppendLine(lineMessageContent);
                     continue;
@@ -120,7 +120,7 @@ namespace PriconneBotConsoleApp.Script
 
                 var afterLineMessageContent = lineMessageContent;
 
-                foreach (Match matchTimeData in Regex.Matches(lineMessageContent, @"\d:\d{2}"))
+                foreach (Match matchTimeData in Regex.Matches(lineMessageContent, @"\d{1,2}:\d{2}"))
                 {
                     var timeDataContent = matchTimeData.Value.Split(":");
                     var minutes = int.Parse(timeDataContent[0]);
