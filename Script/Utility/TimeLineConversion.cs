@@ -136,13 +136,14 @@ namespace PriconneBotConsoleApp.Script
 
                     if (afterSeconds <= 0 && afterSeconds <= 0)
                     {
-                        afterSeconds = 0;
-                        afterMinutes = 0;
+                        afterLineMessageContent = afterLineMessageContent
+                        .Replace(matchTimeData.Value, $"-:--");
                     }
-
-                    afterLineMessageContent = afterLineMessageContent
+                    else
+                    {
+                        afterLineMessageContent = afterLineMessageContent
                         .Replace(matchTimeData.Value, $"{afterMinutes}:{afterSeconds:D2}");
-
+                    }
                 }
 
                 foreach (Match matchTimeData in Regex.Matches(lineMessageContent, @"(\d{1,2})([秒s])"))
@@ -152,11 +153,16 @@ namespace PriconneBotConsoleApp.Script
 
                     if (afterSeconds <= 0)
                     {
-                        afterSeconds = 0;
+                        afterLineMessageContent = afterLineMessageContent
+                        .Replace(matchTimeData.Value, $"--{matchTimeData.Groups[2]}");
+                    }
+                    else
+                    {
+                        afterLineMessageContent = afterLineMessageContent
+                        .Replace(matchTimeData.Value, $"{afterSeconds:D2}{matchTimeData.Groups[2]}");
                     }
 
-                    afterLineMessageContent = afterLineMessageContent
-                        .Replace(matchTimeData.Value, $"{afterSeconds:D2}{matchTimeData.Groups[2]}");
+                    
                 }
 
                 sendMessageContent.AppendLine(afterLineMessageContent);
