@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using PriconneBotConsoleApp.DataModel;
 
@@ -24,6 +25,16 @@ namespace PriconneBotConsoleApp.Database
             return databaseConnector.PlayerData
                 .Include(b => b.ClanData)
                 .FirstOrDefault(b => b.UserID == userID && b.ClanData.ServerID == serverID);
+        }
+
+        public PlayerData LoadPlayerData(SocketRole roleData, ulong userID)
+        {
+            using var databaseConnector = new DatabaseConnector();
+
+            return databaseConnector.PlayerData
+                .Include(x => x.ClanData)
+                .FirstOrDefault(x => x.ClanData.ServerID == roleData.Guild.Id
+                && x.ClanData.ClanRoleID == roleData.Id && x.UserID == userID);
         }
 
         public void CreatePlayerData(IEnumerable<PlayerData> playersData)

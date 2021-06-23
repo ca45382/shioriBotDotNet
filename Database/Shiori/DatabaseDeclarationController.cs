@@ -11,7 +11,7 @@ namespace PriconneBotConsoleApp.Database
 
         public IEnumerable<DeclarationData> LoadDeclarationData(ClanData clanData, byte bossNumber)
         {
-            var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new DatabaseConnector();
 
             var databaseClanData = databaseConnector.ClanData.AsQueryable()
                 .Where(d => d.ServerID == clanData.ServerID && d.ClanRoleID == clanData.ClanRoleID)

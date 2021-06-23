@@ -71,6 +71,11 @@ namespace PriconneBotConsoleApp.Script
             {
                 await new BattleDeclaration(m_playerClanData, message).RunDeclarationCommandByMessage();
             }
+
+            if(messageChannelID == m_playerClanData.ChannelData.GetChannelID(m_playerClanData.ClanID, ChannelFeatureType.TaskKillID))
+            {
+                await new BattleTaskKill(m_playerClanData, message).RunByMessageCommands();
+            }
         }
     }
 }

@@ -26,7 +26,7 @@ namespace PriconneBotConsoleApp.DataModel
         public ClanData ClanData { get; set; }
 
         public List<ReservationData> ReservationData { get; set; }
-
         public List<DeclarationData> DeclarationData { get; set; }
+        public List<TaskKillData> TaskKillData { get; set; }
     }
 }
