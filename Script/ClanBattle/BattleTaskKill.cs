@@ -45,7 +45,6 @@ namespace PriconneBotConsoleApp.Script
             }
             var result = false;
             var taskList = new List<Task>();
-
             if (m_UserMessage.Content.StartsWith("!"))
             {
                 // 予約の取り消し
@@ -55,7 +54,7 @@ namespace PriconneBotConsoleApp.Script
 
                     if (result)
                     {
-                        taskList.Add(Task.Run(() => SuccessAddEmoji() ));
+                        taskList.Add(SuccessAddEmoji());
                     }
 
                 }
@@ -65,7 +64,7 @@ namespace PriconneBotConsoleApp.Script
 
                     if (result)
                     {
-                        taskList.Add(Task.Run(() => SuccessAddEmoji()));
+                        taskList.Add(SuccessAddEmoji());
                     }
                 }
 
@@ -76,12 +75,12 @@ namespace PriconneBotConsoleApp.Script
 
                 if (result)
                 {
-                    taskList.Add(Task.Run(() => SuccessAddEmoji()));
+                    taskList.Add(SuccessAddEmoji());
                 }
 
             }
 
-            taskList.Add(Task.Run(() => SyncTaskKillRole()));
+            taskList.Add(SyncTaskKillRole());
             await Task.WhenAll(taskList);
         }
 
@@ -121,21 +120,24 @@ namespace PriconneBotConsoleApp.Script
 
         private async Task SyncTaskKillRole()
         {
-            var databaseData = new DatabaseTaskKillController().LoadTaskKillData(m_UserClanData)
-                .Select(x => x.PlayerData.UserID);
-            var roleUserData = m_TaskKillRole.Members.Select(x => x.Id);
+            var taskKilledUserIDs = new DatabaseTaskKillController().LoadTaskKillData(m_UserClanData).Select(x => x.PlayerData.UserID);
+            var roledUserIDs = m_TaskKillRole.Members.Select(x => x.Id);
 
-            var assignUserIDList = databaseData.Except(roleUserData);
-            var withdrowUserIDList = roleUserData.Except(databaseData);
+            var assignUserIDs = taskKilledUserIDs.Except(roledUserIDs);
+            var withdrowUserIDs = roledUserIDs.Except(taskKilledUserIDs);
 
-            foreach (var assignUserID in assignUserIDList)
+            var updateTask = new List<Task>();
+
+            foreach (var assignUserID in assignUserIDs)
             {
-                await m_Guild.GetUser(assignUserID).AddRoleAsync(m_TaskKillRole);
+                updateTask.Add(m_Guild.GetUser(assignUserID).AddRoleAsync(m_TaskKillRole));
             }
-            foreach (var withdrowUserID in withdrowUserIDList)
+            foreach (var withdrowUserID in withdrowUserIDs)
             {
-                await m_Guild.GetUser(withdrowUserID).RemoveRoleAsync(m_TaskKillRole);
+                updateTask.Add(m_Guild.GetUser(withdrowUserID).RemoveRoleAsync(m_TaskKillRole));
             }
+
+            await Task.WhenAll(updateTask);
         }
 
         private async Task SuccessAddEmoji()
