@@ -80,6 +80,17 @@ namespace PriconneBotConsoleApp.Script
                     return;
                 }
 
+                var nowLaps = m_userClanData.GetNowLap();
+                var nowBoss = m_userClanData.GetNowBoss();
+                var allowReservationLaps = m_userClanData.ReservationLap;
+
+                if (reservationData.BattleLap > nowLaps + allowReservationLaps
+                    || reservationData.BattleLap == nowLaps + allowReservationLaps && reservationData.BossNumber > nowBoss)
+                {
+                    await SendErrorMessage(ErrorType.OutOfReservationBossLaps, $"{nowLaps + allowReservationLaps}", $"{nowBoss}");
+                    return;
+                }
+
                 RegisterReservationData(reservationData);
                 await SuccessAddEmoji();
                 await UpdateSystemMessage();
@@ -234,9 +245,7 @@ namespace PriconneBotConsoleApp.Script
                 || !(byte.TryParse(splitMessageContent[1], out byte battleLap) && battleLap > 0)
                 || !(byte.TryParse(splitMessageContent[2], out byte bossNumber) && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber)
                 || battleLap < nowBattleLap
-                || battleLap > nowBattleLap + limitReservationLap
-                || battleLap == nowBattleLap && bossNumber < nowBossNumber
-                || battleLap == nowBattleLap + limitReservationLap && bossNumber > nowBossNumber)
+                || battleLap == nowBattleLap && bossNumber < nowBossNumber)
             {
                 return null;
             }
