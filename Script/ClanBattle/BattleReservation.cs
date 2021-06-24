@@ -80,14 +80,13 @@ namespace PriconneBotConsoleApp.Script
                     return;
                 }
 
-                var nowLaps = m_userClanData.GetNowLap();
                 var nowBoss = m_userClanData.GetNowBoss();
-                var allowReservationLaps = m_userClanData.ReservationLap;
+                var allowReservationLap = m_userClanData.ReservationLap + m_userClanData.GetNowLap();
 
-                if (reservationData.BattleLap > nowLaps + allowReservationLaps
-                    || reservationData.BattleLap == nowLaps + allowReservationLaps && reservationData.BossNumber > nowBoss)
+                if (reservationData.BattleLap > allowReservationLap
+                    || reservationData.BattleLap == allowReservationLap && reservationData.BossNumber > nowBoss)
                 {
-                    await SendErrorMessage(ErrorType.OutOfReservationBossLaps, $"{nowLaps + allowReservationLaps}", $"{nowBoss}");
+                    await SendErrorMessage(ErrorType.OutOfReservationBossLaps, allowReservationLap.ToString(), nowBoss.ToString());
                     return;
                 }
 
