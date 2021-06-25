@@ -244,7 +244,7 @@ namespace PriconneBotConsoleApp.Script
             var mySQLReservationController = new DatabaseReservationController();
             var reservationData = mySQLReservationController.LoadReservationData(playerData);
             var finishReservationData = reservationData
-                .FirstOrDefault(d => d.BattleLap == userClanData.GetNowLap() && d.BossNumber == userClanData.GetNowLap());
+                .FirstOrDefault(d => d.BattleLap == userClanData.GetNowLap() && d.BossNumber == userClanData.GetNowBoss());
 
             if (finishReservationData != null)
             {
