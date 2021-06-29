@@ -239,7 +239,7 @@ namespace PriconneBotConsoleApp.Script
 
             // 予約の削除
             var playerData = new DatabasePlayerDataController().LoadPlayerData(
-                userRole.Guild.Id, userReaction.UserId);
+                userRole, userReaction.UserId);
 
             var mySQLReservationController = new DatabaseReservationController();
             var reservationData = mySQLReservationController.LoadReservationData(playerData);
@@ -332,7 +332,7 @@ namespace PriconneBotConsoleApp.Script
             var userRole = m_userRole;
 
             var playerData = new DatabasePlayerDataController().LoadPlayerData(
-                userRole.Guild.Id, userID);
+                userRole, userID);
 
             return new DeclarationData()
             {
@@ -348,7 +348,7 @@ namespace PriconneBotConsoleApp.Script
             var userRole = m_userRole;
 
             var playerData = new DatabasePlayerDataController().LoadPlayerData(
-                userRole.Guild.Id, userID);
+                userRole, userID);
 
             var declarationData = new DatabaseDeclarationController()
                 .LoadDeclarationData(playerData, m_userClanData.GetNowBoss());

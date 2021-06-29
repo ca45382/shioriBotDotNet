@@ -307,7 +307,7 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var playerData = new DatabasePlayerDataController()
-                .LoadPlayerData(m_userClanData.ServerID, userID);
+                .LoadPlayerData(m_userRole, userID);
 
             if (playerData == null)
             {
@@ -340,7 +340,7 @@ namespace PriconneBotConsoleApp.Script
 
         private string CreateUserReservationDataMessage()
             => CreateUserReservationDataMessage(
-                new DatabasePlayerDataController().LoadPlayerData(m_userClanData.ServerID, m_userMessage.Author.Id)
+                new DatabasePlayerDataController().LoadPlayerData(m_userRole, m_userMessage.Author.Id)
             );
 
         private string CreateUserReservationDataMessage(PlayerData playerData)
@@ -446,7 +446,7 @@ namespace PriconneBotConsoleApp.Script
         }
 
         private async Task SuccessAddEmoji()
-            => await m_userMessage.AddReactionAsync(new Emoji("🆗"));
+            => await m_userMessage.AddReactionAsync(new Emoji(ReactionType.Success.GetDescription()));
 
         /// <summary>
         /// 予約できる時間かどうか判断する。
