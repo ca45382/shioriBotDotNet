@@ -56,15 +56,14 @@ namespace PriconneBotConsoleApp.Script
         {
             var splitMessageContent = message.Content.Split( new[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
-            if (splitMessageContent.Length != 3 || !int.TryParse(splitMessageContent[2], out int timeData) 
-                || timeData < 20 || timeData > 90 )
+            if (splitMessageContent.Length != 3 || !int.TryParse(splitMessageContent[2], out int timeData) || timeData < 20 || timeData > 90 )
             {
                 return null;
             }
 
             var convertData = new ConvertData
             {
-                Time = timeData
+                Time = timeData,
             };
 
             var uriData = new Uri(splitMessageContent[1]);
@@ -136,13 +135,11 @@ namespace PriconneBotConsoleApp.Script
 
                     if (afterSeconds <= 0 && afterSeconds <= 0)
                     {
-                        afterLineMessageContent = afterLineMessageContent
-                        .Replace(matchTimeData.Value, $"-:--");
+                        afterLineMessageContent = afterLineMessageContent.Replace(matchTimeData.Value, $"-:--");
                     }
                     else
                     {
-                        afterLineMessageContent = afterLineMessageContent
-                        .Replace(matchTimeData.Value, $"{afterMinutes}:{afterSeconds:D2}");
+                        afterLineMessageContent = afterLineMessageContent.Replace(matchTimeData.Value, $"{afterMinutes}:{afterSeconds:D2}");
                     }
                 }
 
@@ -153,13 +150,11 @@ namespace PriconneBotConsoleApp.Script
 
                     if (afterSeconds <= 0)
                     {
-                        afterLineMessageContent = afterLineMessageContent
-                        .Replace(matchTimeData.Value, $"--{matchTimeData.Groups[2]}");
+                        afterLineMessageContent = afterLineMessageContent.Replace(matchTimeData.Value, $"--{matchTimeData.Groups[2]}");
                     }
                     else
                     {
-                        afterLineMessageContent = afterLineMessageContent
-                        .Replace(matchTimeData.Value, $"{afterSeconds:D2}{matchTimeData.Groups[2]}");
+                        afterLineMessageContent = afterLineMessageContent.Replace(matchTimeData.Value, $"{afterSeconds:D2}{matchTimeData.Groups[2]}");
                     }
 
                     
