@@ -39,7 +39,7 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var dictionaryData = m_EnumDictionary[typeof(T)];
-            var castEnum = Enum.Parse(typeof(T), data.ToString()) as Enum ;
+            var castEnum = Enum.Parse(typeof(T), data.ToString()) as Enum;
             var castInt = Convert.ToInt32(castEnum);
 
             if (dictionaryData.ContainsKey(castInt))
