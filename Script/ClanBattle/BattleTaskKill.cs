@@ -24,7 +24,7 @@ namespace PriconneBotConsoleApp.Script
         {
             if (clanData.RoleData == null || clanData.ChannelData == null || clanData.MessageData == null)
             {
-                clanData = new DatabaseClanDataController().LoadClanData(m_UserRole);
+                clanData = DatabaseClanDataController.LoadClanData(m_UserRole);
             }
             m_UserClanData = clanData;
             m_UserMessage = userMessage;
@@ -86,41 +86,38 @@ namespace PriconneBotConsoleApp.Script
 
         private bool RegisterTaskKillData()
         {
-            var playerData = new DatabasePlayerDataController()
-                .LoadPlayerData(m_UserRole, m_UserMessage.Author.Id);
+            var playerData = DatabasePlayerDataController.LoadPlayerData(m_UserRole, m_UserMessage.Author.Id);
 
             if (playerData == null)
             {
                 return false;
             }
 
-            return new DatabaseTaskKillController().CreateTaskKillData(playerData);
+            return DatabaseTaskKillController.CreateTaskKillData(playerData);
         }
 
         private bool DeleteTaskKillData()
         {
-            var playerData = new DatabasePlayerDataController()
-                .LoadPlayerData(m_UserRole, m_UserMessage.Author.Id);
+            var playerData = DatabasePlayerDataController.LoadPlayerData(m_UserRole, m_UserMessage.Author.Id);
 
             if (playerData == null)
             {
                 return false;
             }
 
-            var taskKillController = new DatabaseTaskKillController();
-            var taskKillData = taskKillController.LoadTaskKillData(playerData);
+            var taskKillData = DatabaseTaskKillController.LoadTaskKillData(playerData);
 
-            return taskKillController.DeleteTaskKillData(taskKillData);
+            return DatabaseTaskKillController.DeleteTaskKillData(taskKillData);
         }
 
         private bool DeleteClanData()
         {
-            return new DatabaseTaskKillController().DeleteTaskKillData(m_UserClanData);
+            return DatabaseTaskKillController.DeleteTaskKillData(m_UserClanData);
         }
 
         private async Task SyncTaskKillRole()
         {
-            var taskKilledUserIDs = new DatabaseTaskKillController().LoadTaskKillData(m_UserClanData).Select(x => x.PlayerData.UserID);
+            var taskKilledUserIDs = DatabaseTaskKillController.LoadTaskKillData(m_UserClanData).Select(x => x.PlayerData.UserID);
             var roledUserIDs = m_TaskKillRole.Members.Select(x => x.Id);
 
             var assignUserIDs = taskKilledUserIDs.Except(roledUserIDs);

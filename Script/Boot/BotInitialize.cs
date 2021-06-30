@@ -169,10 +169,9 @@ namespace PriconneBotConsoleApp.Script
                 });
             }
 
-            var databaseFeatureController = new DatabaseFeatureController();
-            databaseFeatureController.UpdateChannelFeature(channelFeatures);
-            databaseFeatureController.UpdateMessageFeature(messageFeatures);
-            databaseFeatureController.UpdateRoleFeature(roleFeatures);
+            DatabaseFeatureController.UpdateChannelFeature(channelFeatures);
+            DatabaseFeatureController.UpdateMessageFeature(messageFeatures);
+            DatabaseFeatureController.UpdateRoleFeature(roleFeatures);
         }
     }
 }

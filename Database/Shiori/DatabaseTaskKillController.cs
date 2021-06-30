@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace PriconneBotConsoleApp.Database
 {
-    class DatabaseTaskKillController
+    public static class DatabaseTaskKillController
     {
         /// <summary>
         /// クラン全体のタスキル情報を取得
         /// </summary>
         /// <param name="clanData"></param>
         /// <returns></returns>
-        public IEnumerable<TaskKillData> LoadTaskKillData(ClanData clanData)
+        public static IEnumerable<TaskKillData> LoadTaskKillData(ClanData clanData)
         {
             using var databaseConnector = new DatabaseConnector();
 
@@ -30,7 +30,7 @@ namespace PriconneBotConsoleApp.Database
         /// </summary>
         /// <param name="playerData"></param>
         /// <returns></returns>
-        public TaskKillData LoadTaskKillData(PlayerData playerData)
+        public static TaskKillData LoadTaskKillData(PlayerData playerData)
         {
             using var databaseConnector = new DatabaseConnector();
 
@@ -54,7 +54,7 @@ namespace PriconneBotConsoleApp.Database
         /// </summary>
         /// <param name="playerData"></param>
         /// <returns>書き込み成功True</returns>
-        public bool CreateTaskKillData(PlayerData playerData)
+        public static bool CreateTaskKillData(PlayerData playerData)
         {
             using var databaseConnector = new DatabaseConnector();
 
@@ -95,7 +95,7 @@ namespace PriconneBotConsoleApp.Database
         /// </summary>
         /// <param name="playerData"></param>
         /// <returns>付与成功True</returns>
-        public bool DeleteTaskKillData(TaskKillData taskKillData)
+        public static bool DeleteTaskKillData(TaskKillData taskKillData)
         {
             using var databaseConnector = new DatabaseConnector();
 
@@ -129,7 +129,7 @@ namespace PriconneBotConsoleApp.Database
 
         }
 
-        public bool DeleteTaskKillData(ClanData clanData)
+        public static bool DeleteTaskKillData(ClanData clanData)
         {
             if (clanData == null)
             {

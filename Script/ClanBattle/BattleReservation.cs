@@ -169,9 +169,7 @@ namespace PriconneBotConsoleApp.Script
                 .GetTextChannel(reservationResultChannelID);
 
             var sendedMessageData = await SendMessageToChannel(resultChannel, messageData);
-
-            new DatabaseMessageDataController()
-                .UpdateMessageID(userClanData, sendedMessageData.Id, MessageFeatureType.ReserveResultID);
+            DatabaseMessageDataController.UpdateMessageID(userClanData, sendedMessageData.Id, MessageFeatureType.ReserveResultID);
             await AttacheDefaultReaction(sendedMessageData);
         }
 
@@ -271,9 +269,7 @@ namespace PriconneBotConsoleApp.Script
 
         private void RegisterReservationData(ReservationData reservationData)
         {
-            var mySQLReservationController = new DatabaseReservationController();
-
-            var allSqlReservationData = mySQLReservationController
+            var allSqlReservationData = DatabaseReservationController
                 .LoadReservationData(reservationData.PlayerData);
 
             var doesExistReservationData = allSqlReservationData
@@ -281,11 +277,11 @@ namespace PriconneBotConsoleApp.Script
 
             if (!doesExistReservationData)
             {
-                mySQLReservationController.CreateReservationData(reservationData);
+                DatabaseReservationController.CreateReservationData(reservationData);
             }
             else
             {
-                mySQLReservationController.UpdateReservationData(reservationData);
+                DatabaseReservationController.UpdateReservationData(reservationData);
             }
         }
 
@@ -306,23 +302,20 @@ namespace PriconneBotConsoleApp.Script
                 return null;
             }
 
-            var playerData = new DatabasePlayerDataController()
-                .LoadPlayerData(m_userRole, userID);
+            var playerData = DatabasePlayerDataController.LoadPlayerData(m_userRole, userID);
 
             if (playerData == null)
             {
                 return null;
             }
 
-            return new DatabaseReservationController()
-                .LoadReservationData(playerData)
+            return DatabaseReservationController.LoadReservationData(playerData)
                 .FirstOrDefault(d => d.BattleLap == battleLap && d.BossNumber == bossNumber);
         }
 
         private bool DeleteUserReservationData(ReservationData reservationData)
         {
-            var mySQLReservationController = new DatabaseReservationController();
-            var allSqlReservationData = mySQLReservationController.LoadReservationData(reservationData.PlayerData);
+            var allSqlReservationData = DatabaseReservationController.LoadReservationData(reservationData.PlayerData);
 
             var sqlReservationData = allSqlReservationData
                 .Where(x => x.BossNumber == reservationData.BossNumber && x.BattleLap == reservationData.BattleLap)
@@ -333,19 +326,19 @@ namespace PriconneBotConsoleApp.Script
                 return false;
             }
 
-            mySQLReservationController.DeleteReservationData(sqlReservationData);
+            DatabaseReservationController.DeleteReservationData(sqlReservationData);
 
             return true;
         }
 
         private string CreateUserReservationDataMessage()
             => CreateUserReservationDataMessage(
-                new DatabasePlayerDataController().LoadPlayerData(m_userRole, m_userMessage.Author.Id)
+                DatabasePlayerDataController.LoadPlayerData(m_userRole, m_userMessage.Author.Id)
             );
 
         private string CreateUserReservationDataMessage(PlayerData playerData)
         {
-            var reservationDataSet = new DatabaseReservationController().LoadReservationData(playerData);
+            var reservationDataSet = DatabaseReservationController.LoadReservationData(playerData);
 
             if (reservationDataSet.Count == 0)
             {
@@ -373,7 +366,7 @@ namespace PriconneBotConsoleApp.Script
             var bossNumber = clanData.GetNowBoss();
             var battleLap = clanData.GetNowLap();
 
-            var reservationDataSet = new DatabaseReservationController().LoadReservationData(clanData);
+            var reservationDataSet = DatabaseReservationController.LoadReservationData(clanData);
 
             reservationDataSet = reservationDataSet
                 .Where(b => b.BattleLap > battleLap || (b.BattleLap == battleLap && b.BossNumber >= bossNumber))

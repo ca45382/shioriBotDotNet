@@ -20,7 +20,7 @@ namespace PriconneBotConsoleApp.Script
             var messageChannel = message.Channel as SocketGuildChannel;
             var guildID = messageChannel.Guild.Id;
             var userID = message.Author.Id;
-            m_playerData = new DatabasePlayerDataController().LoadPlayerData(guildID, userID);
+            m_playerData = DatabasePlayerDataController.LoadPlayerData(guildID, userID);
             
             if (m_playerData == null)
             {
@@ -34,7 +34,7 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            m_playerClanData = new DatabaseClanDataController().LoadClanData(userRole);
+            m_playerClanData = DatabaseClanDataController.LoadClanData(userRole);
         }
 
         public async Task RunMessageReceive()

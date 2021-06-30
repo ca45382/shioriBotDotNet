@@ -7,10 +7,10 @@ using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Database
 {
-    public class DatabaseReservationController
+    public static class DatabaseReservationController
     {
 
-        public List<ReservationData> LoadReservationData(ClanData clanData)
+        public static List<ReservationData> LoadReservationData(ClanData clanData)
         {
             using var databaseConnector = new DatabaseConnector();
 
@@ -23,7 +23,7 @@ namespace PriconneBotConsoleApp.Database
                 .ToList();
         }
 
-        public List<ReservationData> LoadReservationData(PlayerData playerData)
+        public static List<ReservationData> LoadReservationData(PlayerData playerData)
         {
             if (playerData == null)
             {
@@ -40,7 +40,7 @@ namespace PriconneBotConsoleApp.Database
                 .ToList();
         }
 
-        public List<ReservationData> LoadBossLapReservationData(ClanData clanData, byte bossNumber)
+        public static List<ReservationData> LoadBossLapReservationData(ClanData clanData, byte bossNumber)
         {
             using var databaseConnector = new DatabaseConnector();
 
@@ -64,7 +64,7 @@ namespace PriconneBotConsoleApp.Database
         /// 予約データの作成。
         /// </summary>
         /// <param name="reservationData"></param>
-        public void CreateReservationData(ReservationData reservationData)
+        public static void CreateReservationData(ReservationData reservationData)
         {
             var playerData = reservationData.PlayerData;
             using var databaseConnector = new DatabaseConnector();
@@ -94,7 +94,7 @@ namespace PriconneBotConsoleApp.Database
         /// 予約データを更新する。
         /// </summary>
         /// <param name="reservationData"></param>
-        public void UpdateReservationData(ReservationData reservationData)
+        public static void UpdateReservationData(ReservationData reservationData)
         {
             var playerData = reservationData.PlayerData;
             using var databaseConnector = new DatabaseConnector();
@@ -122,10 +122,10 @@ namespace PriconneBotConsoleApp.Database
             transaction.Commit();
         }
 
-        public void DeleteReservationData(ReservationData reservationData)
+        public static void DeleteReservationData(ReservationData reservationData)
             => DeleteReservationData(new[] { reservationData });
 
-        public void DeleteReservationData(IEnumerable<ReservationData> reservationDataSet)
+        public static void DeleteReservationData(IEnumerable<ReservationData> reservationDataSet)
         {
             using var databaseConnector = new DatabaseConnector();
             var transaction = databaseConnector.Database.BeginTransaction();
@@ -147,7 +147,7 @@ namespace PriconneBotConsoleApp.Database
             transaction.Commit();
         }
 
-        private ulong LoadPlayerID(IQueryable<PlayerData> queryable, PlayerData playerData)
+        private static ulong LoadPlayerID(IQueryable<PlayerData> queryable, PlayerData playerData)
         {
             return queryable
                 .Include(b => b.ClanData)

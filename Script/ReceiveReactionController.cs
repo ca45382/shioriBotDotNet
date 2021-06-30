@@ -19,7 +19,7 @@ namespace PriconneBotConsoleApp.Script
             m_reaction = reaction;
             var reactionChannel = reaction.Channel as SocketGuildChannel;
 
-            m_playerData = new DatabasePlayerDataController()
+            m_playerData = DatabasePlayerDataController
                 .LoadPlayerData((ulong)reactionChannel?.Guild.Id, reaction.UserId);
             var userRole = reactionChannel?.Guild.GetRole((ulong)m_playerData?.ClanData.ClanRoleID);
 
@@ -28,7 +28,7 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            m_playerClanData = new DatabaseClanDataController().LoadClanData(userRole);
+            m_playerClanData = DatabaseClanDataController.LoadClanData(userRole);
         }
 
         public async Task RunReactionReceive()

@@ -15,7 +15,7 @@ namespace PriconneBotConsoleApp.Script
         {
             try
             {
-                m_clanData = new DatabaseClanDataController().LoadClanData();
+                m_clanData = DatabaseClanDataController.LoadClanData();
             }
             catch (Exception e)
             {
@@ -25,16 +25,15 @@ namespace PriconneBotConsoleApp.Script
 
         public void UpdateServerData(SocketGuild guild)
         {
-            var serverDataController = new DatabaseServerDataController();
-            var serverData = serverDataController.LoadServerData(guild);
+            var serverData = DatabaseServerDataController.LoadServerData(guild);
 
             if (serverData == null)
             {
-                serverDataController.CreateServerData(guild);
+                DatabaseServerDataController.CreateServerData(guild);
             }
             else
             {
-                serverDataController.UpdateServerData(guild);
+                DatabaseServerDataController.UpdateServerData(guild);
             }
         }
 
@@ -61,7 +60,7 @@ namespace PriconneBotConsoleApp.Script
                 if(string.Compare(clanData.ClanName, clanRole.Name) != 0)
                 {
                     updateClanData.ClanName = clanRole.Name;
-                    new DatabaseClanDataController().UpdateClanData(updateClanData);
+                    DatabaseClanDataController.UpdateClanData(updateClanData);
                 }
             }
         }
@@ -72,13 +71,11 @@ namespace PriconneBotConsoleApp.Script
         /// <param name="guild"></param>
         public void UpdatePlayerData(SocketGuild guild)
         {
-            var playerDataController = new DatabasePlayerDataController();
-
             // サーバー上のクランメンバー
             var usersOnDiscord = GetServerClanMember(guild);
 
             // テーブル上のプレイヤーデータ
-            var usersOnSQLServer = new DatabasePlayerDataController().LoadPlayerData(guild.Id);
+            var usersOnSQLServer = DatabasePlayerDataController.LoadPlayerData(guild.Id);
 
             #region テーブルにユーザを追加・更新
             var createUserData = new List<PlayerData>();
@@ -113,8 +110,8 @@ namespace PriconneBotConsoleApp.Script
                 }
             }
 
-            playerDataController.CreatePlayerData(createUserData);
-            playerDataController.UpdatePlayerData(updateUserData);
+            DatabasePlayerDataController.CreatePlayerData(createUserData);
+            DatabasePlayerDataController.UpdatePlayerData(updateUserData);
             #endregion
 
             #region テーブルからユーザを削除
@@ -126,7 +123,7 @@ namespace PriconneBotConsoleApp.Script
                     mySQLUser => !usersOnDiscord.Any(discordUser => IsSameUser(mySQLUser, discordUser))
                 );
 
-            playerDataController.DeletePlayerData(deleteUsers);
+            DatabasePlayerDataController.DeletePlayerData(deleteUsers);
             #endregion
         }
 

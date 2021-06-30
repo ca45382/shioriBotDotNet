@@ -6,9 +6,9 @@ using PriconneBotConsoleApp.DataModel;
 
 namespace PriconneBotConsoleApp.Database
 {
-    class DatabasePlayerDataController
+    public static class DatabasePlayerDataController
     {
-        public List<PlayerData> LoadPlayerData(ulong serverID)
+        public static List<PlayerData> LoadPlayerData(ulong serverID)
         {
             using var databaseConnector = new DatabaseConnector();
 
@@ -18,7 +18,7 @@ namespace PriconneBotConsoleApp.Database
                 .ToList();
         }
 
-        public PlayerData LoadPlayerData(ulong serverID, ulong userID)
+        public static PlayerData LoadPlayerData(ulong serverID, ulong userID)
         {
             using var databaseConnector = new DatabaseConnector();
 
@@ -27,7 +27,7 @@ namespace PriconneBotConsoleApp.Database
                 .FirstOrDefault(b => b.UserID == userID && b.ClanData.ServerID == serverID);
         }
 
-        public PlayerData LoadPlayerData(SocketRole roleData, ulong userID)
+        public static PlayerData LoadPlayerData(SocketRole roleData, ulong userID)
         {
             using var databaseConnector = new DatabaseConnector();
 
@@ -37,7 +37,7 @@ namespace PriconneBotConsoleApp.Database
                 && x.ClanData.ClanRoleID == roleData.Id && x.UserID == userID);
         }
 
-        public void CreatePlayerData(IEnumerable<PlayerData> playersData)
+        public static void CreatePlayerData(IEnumerable<PlayerData> playersData)
         {
             using var databaseConnector = new DatabaseConnector();
             var transaction = databaseConnector.Database.BeginTransaction();
@@ -68,7 +68,7 @@ namespace PriconneBotConsoleApp.Database
             transaction.Commit();
         }
 
-        public void UpdatePlayerData(IEnumerable<PlayerData> playersData)
+        public static void UpdatePlayerData(IEnumerable<PlayerData> playersData)
         {
             using var databaseConnector = new DatabaseConnector();
             var transaction = databaseConnector.Database.BeginTransaction();
@@ -90,7 +90,7 @@ namespace PriconneBotConsoleApp.Database
             transaction.Commit();
         }
 
-        public void DeletePlayerData(IEnumerable<PlayerData> playersData)
+        public static void DeletePlayerData(IEnumerable<PlayerData> playersData)
         {
             using var databaseConnector = new DatabaseConnector();
             var transaction = databaseConnector.Database.BeginTransaction();

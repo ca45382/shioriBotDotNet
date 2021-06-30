@@ -5,7 +5,7 @@ using PriconneBotConsoleApp.Script;
 
 namespace PriconneBotConsoleApp.Database
 {
-    class DatabaseConnector : DbContext
+    public class DatabaseConnector : DbContext
     {
         public DbSet<ServerData> ServerData { get; set; }
         public DbSet<ClanData> ClanData { get; set; }

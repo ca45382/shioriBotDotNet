@@ -6,15 +6,15 @@ using PriconneBotConsoleApp.DataModel;
 
 namespace PriconneBotConsoleApp.Database
 {
-    class DatabaseClanDataController
+    public static class DatabaseClanDataController
     {
-        public List<ClanData> LoadClanData()
+        public static List<ClanData> LoadClanData()
         {
             using var databaseConnector = new DatabaseConnector();
             return databaseConnector.ClanData.ToList();
         }
 
-        public ClanData LoadClanData(SocketRole role)
+        public static ClanData LoadClanData(SocketRole role)
         {
             using var databaseConnector = new DatabaseConnector();
 
@@ -26,7 +26,7 @@ namespace PriconneBotConsoleApp.Database
                 .FirstOrDefault(b => b.ServerID == role.Guild.Id && b.ClanRoleID == role.Id);
         }
 
-        public bool UpdateClanData (ClanData clanData)
+        public static bool UpdateClanData (ClanData clanData)
         {
             using var databaseConnector = new DatabaseConnector();
             var transaction = databaseConnector.Database.BeginTransaction();
