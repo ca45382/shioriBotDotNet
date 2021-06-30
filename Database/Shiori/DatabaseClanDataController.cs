@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Discord.WebSocket;
 using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Define;
 
 namespace PriconneBotConsoleApp.Database
@@ -57,6 +58,50 @@ namespace PriconneBotConsoleApp.Database
             transaction.Commit();
 
             return true;
+        }
+
+        public static bool UpdateClanChannelData(ClanData clanData, ulong channelID, ChannelFeatureType channelType)
+        {
+            using var databaseConnector = new DatabaseConnector();
+            var transaction = databaseConnector.Database.BeginTransaction();
+
+            var clanID = databaseConnector.ClanData
+                .FirstOrDefault(d => d.ServerID == clanData.ServerID && d.ClanRoleID == clanData.ClanRoleID)
+                ?.ClanID ?? 0;
+
+            if (clanID == 0)
+            {
+                transaction.Rollback();
+                return false;
+            }
+
+            var updateData = databaseConnector.ChannelData
+                .FirstOrDefault(d => d.ClanID == clanID && d.FeatureID == (uint)channelType);
+
+            if (updateData == null)
+            {
+                databaseConnector.ChannelData.Add(
+                    new ChannelData()
+                    {
+                        ClanID = clanID,
+                        FeatureID = (uint)channelType,
+                        ChannelID = channelID,
+                    });
+            }
+            else
+            {
+                updateData.ChannelID = channelID;
+            }
+
+            databaseConnector.SaveChanges();
+            transaction.Commit();
+
+            return true;
+        }
+
+        public static void UpdateClanRoleData(RoleData roleData)
+        {
+
         }
     }
 }
