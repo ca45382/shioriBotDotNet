@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class Program
+    public class Program
     {
         private DiscordSocketClient m_client;
         private DiscordSocketConfig m_config;

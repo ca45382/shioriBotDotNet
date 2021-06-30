@@ -12,7 +12,7 @@ using PriconneBotConsoleApp.Database;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class BotInitialize
+    public class BotInitialize
     {
         private const string rediveURL = "https://redive.estertion.win/";
         private readonly string DataFolderPath = Path.Combine("data");

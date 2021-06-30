@@ -11,7 +11,7 @@ using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class BattleDeclaration : BaseClass
+    public class BattleDeclaration : BaseClass
     {
         private readonly ClanData m_userClanData;
         private readonly SocketRole m_userRole;

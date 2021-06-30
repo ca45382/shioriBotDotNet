@@ -13,7 +13,7 @@ using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class BattleReservation : BaseClass
+    public class BattleReservation : BaseClass
     {
         private const int MinBossNumber = 1;
         private const int MaxBossNumber = 5;

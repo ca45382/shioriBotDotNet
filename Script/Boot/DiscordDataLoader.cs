@@ -7,7 +7,7 @@ using PriconneBotConsoleApp.Database;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class DiscordDataLoader
+    public class DiscordDataLoader
     {
         private readonly IEnumerable<ClanData> m_clanData;
 

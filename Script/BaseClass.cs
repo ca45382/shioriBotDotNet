@@ -5,7 +5,7 @@ using Discord.WebSocket;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class BaseClass
+    public class BaseClass
     {
         protected static async Task<RestUserMessage> SendMessageToChannel(ISocketMessageChannel channel, string messageData)
             => await channel.SendMessageAsync(messageData);

@@ -8,7 +8,7 @@ using Discord.WebSocket;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class TimeLineConversion : BaseClass
+    public class TimeLineConversion : BaseClass
     {
         private IMessage m_userMessage;
 

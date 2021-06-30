@@ -8,7 +8,7 @@ using PriconneBotConsoleApp.Database;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class ReceiveReactionController
+    public class ReceiveReactionController
     {
         private readonly ClanData m_playerClanData;
         private readonly PlayerData m_playerData;
