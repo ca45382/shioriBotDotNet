@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
+using PriconneBotConsoleApp.Define;
 
 namespace PriconneBotConsoleApp.Script
 {
@@ -56,7 +57,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var splitMessageContent = message.Content.Split( new[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
-            if (splitMessageContent.Length != 3 || !int.TryParse(splitMessageContent[2], out int timeData) || timeData < 20 || timeData > 90 )
+            if (splitMessageContent.Length != 3 || !int.TryParse(splitMessageContent[2], out int timeData) || timeData < Common.MinBattleTime || timeData > Common.MaxBattleTime )
             {
                 return null;
             }
