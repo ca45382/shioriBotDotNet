@@ -11,6 +11,11 @@ namespace PriconneBotConsoleApp.Database
 {
     public static class DatabaseReportDataController
     {
+        /// <summary>
+        /// 個人の凸報告データを取得する。
+        /// </summary>
+        /// <param name="playerData"></param>
+        /// <returns></returns>
         public static IEnumerable<ReportData> GetReportData(PlayerData playerData)
         {
             using var databaseConnector = new DatabaseConnector();
@@ -20,17 +25,26 @@ namespace PriconneBotConsoleApp.Database
                 .ToList();
         }
 
+        /// <summary>
+        /// クランの凸報告データを取得する。
+        /// </summary>
+        /// <param name="clanData"></param>
+        /// <returns></returns>
         public static IEnumerable<ReportData> GetReportData(ClanData clanData)
         {
             using var databaseConnector = new DatabaseConnector();
 
             return databaseConnector.ReportData.AsQueryable()
                 .Include(x => x.PlayerData)
-                .Where(x => x.PlayerData.ClanID == clanData.ClanID)
+                .Where(x => x.PlayerData.ClanID == clanData.ClanID && x.DeleteFlag == false)
                 .ToList();
         }
 
-
+        /// <summary>
+        /// 凸報告データをデータベースに登録する。
+        /// </summary>
+        /// <param name="reportData"></param>
+        /// <returns></returns>
         public static bool CreateReportData(ReportData reportData)
         {
             if (reportData.PlayerID == 0)
