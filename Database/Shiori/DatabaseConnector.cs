@@ -26,6 +26,7 @@ namespace PriconneBotConsoleApp.Database
         // クラバト機能保存
         public DbSet<ReservationData> ReservationData { get; set; }
         public DbSet<DeclarationData> DeclarationData { get; set; }
+        public DbSet<ReportData> ReportData { get; set; }
         public DbSet<TaskKillData> TaskKillData { get; set; }
 
 
@@ -96,6 +97,11 @@ namespace PriconneBotConsoleApp.Database
                 .HasOne(b => b.PlayerData)
                 .WithMany(i => i.DeclarationData)
                 .HasForeignKey(b => b.PlayerID);
+
+            modelBuilder.Entity<ReportData>()
+                .HasOne(x => x.PlayerData)
+                .WithMany(x => x.ReportData)
+                .HasForeignKey(x => x.PlayerID);
 
             modelBuilder.Entity<TaskKillData>()
                 .HasOne(x => x.PlayerData)
