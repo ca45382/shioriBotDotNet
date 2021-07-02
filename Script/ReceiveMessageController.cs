@@ -79,7 +79,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (messageChannelID == m_playerClanData.ChannelData.GetChannelID(m_playerClanData.ClanID, ChannelFeatureType.ReportID))
             {
-                new BattleReport(m_playerClanData, message).RunByMessage();
+                await new BattleReport(m_playerClanData, message).RunByMessage();
             }
         }
     }
