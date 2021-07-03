@@ -77,25 +77,30 @@ namespace PriconneBotConsoleApp.Database
         /// <returns></returns>
         public static bool DeleteReportData(ReportData reportData)
         {
-            if (reportData.ReportID == 0)
+            var deleteData = new List<ReportData>()
             {
-                return false;
-            }
+                reportData,
+            };
 
+            return DeleteReportData(deleteData);
+        }
+
+        /// <summary>
+        /// 凸報告データを削除する。
+        /// </summary>
+        /// <param name="reportData"></param>
+        /// <returns></returns>
+        public static bool DeleteReportData(IEnumerable<ReportData> reportDataList)
+        {
             using var databaseConnector = new DatabaseConnector();
             var transaction = databaseConnector.Database.BeginTransaction();
 
-            var deleteData = databaseConnector.ReportData
-                .FirstOrDefault(x => x.ReportID == reportData.ReportID);
-
-            if (reportData == null)
-            {
-                return false;
-            }
-
+            var deleteDataList =  databaseConnector.ReportData.AsQueryable()               
+                .Where(x => reportDataList.Select(y => y.ReportID).Any(z => z == x.ReportID))
+                .ToList();
             try
             {
-                deleteData.DeleteFlag = true;
+                deleteDataList.ForEach(x => x.DeleteFlag = true);
                 databaseConnector.SaveChanges();
                 transaction.Commit();
                 return true;
@@ -105,6 +110,7 @@ namespace PriconneBotConsoleApp.Database
                 transaction.Rollback();
                 return false;
             }
+            
         }
     }
 }

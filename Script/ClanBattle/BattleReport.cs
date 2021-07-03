@@ -73,6 +73,10 @@ namespace PriconneBotConsoleApp.Script
                 {
                     DeleteReportData();
                 }
+                else if (m_userMessage.Content.StartsWith("!init"))
+                {
+                    DeleteAllClanReport();
+                }
 
             }
             else
@@ -203,6 +207,18 @@ namespace PriconneBotConsoleApp.Script
 
             return;
 
+        }
+
+        /// <summary>
+        /// クランの凸報告を削除
+        /// </summary>
+        private void DeleteAllClanReport()
+        {
+            var clanReportData = DatabaseReportDataController.GetReportData(m_ClanData);
+            if (DatabaseReportDataController.DeleteReportData(clanReportData))
+            {
+                Task.Run(() => m_userMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
+            }
         }
 
         /// <summary>
