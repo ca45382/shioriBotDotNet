@@ -4,6 +4,7 @@ using PriconneBotConsoleApp.Database;
 using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Define;
+using PriconneBotConsoleApp.Extension;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +14,11 @@ using System.Threading.Tasks;
 
 namespace PriconneBotConsoleApp.Script
 {
-    public class BattleReport : BaseClass
+    public class BattleReport
     {
 
         private readonly ClanData m_ClanData;
-        private readonly SocketUserMessage m_userMessage;
+        private readonly SocketUserMessage m_UserMessage;
         private readonly SocketRole m_ClanRole;
         private readonly SocketGuild m_Guild;
 
@@ -43,7 +44,7 @@ namespace PriconneBotConsoleApp.Script
                 // TODO : 
                 var stringData = string.Join(
                     ',', 
-                    ReportData.Select(x => $"{x.BossNumber}{AttackNumberToString(x.AttackType)}").ToArray()
+                    ReportData.Select(x => $"{x.BossNumber}{ConversionAttackNumber.AttackNumberToString(x.AttackType)}").ToArray()
                 );
                 return $"{PlayerGuildName}({stringData})";
             }
@@ -52,28 +53,28 @@ namespace PriconneBotConsoleApp.Script
         public BattleReport(ClanData clanData, SocketUserMessage userMessage)
         {
             m_ClanData = clanData;
-            m_userMessage = userMessage;
+            m_UserMessage = userMessage;
             m_Guild = (userMessage.Channel as SocketTextChannel)?.Guild;
             m_ClanRole = m_Guild?.GetRole(clanData.ClanRoleID);
         }
 
         public async Task RunByMessage()
         {
-            if (m_userMessage.Content.StartsWith("!"))
+            if (m_UserMessage.Content.StartsWith("!"))
             {
-                if (m_userMessage.Content.StartsWith("!add"))
+                if (m_UserMessage.Content.StartsWith("!add"))
                 {
                     RegisterOtherUserReportData();
                 }
-                else if (m_userMessage.Content.StartsWith("!list"))
+                else if (m_UserMessage.Content.StartsWith("!list"))
                 {
                     await SendClanAttackList();
                 }
-                else if (m_userMessage.Content.StartsWith("!rm"))
+                else if (m_UserMessage.Content.StartsWith("!rm"))
                 {
                     DeleteReportData();
                 }
-                else if (m_userMessage.Content.StartsWith("!init"))
+                else if (m_UserMessage.Content.StartsWith("!init"))
                 {
                     DeleteAllClanReport();
                 }
@@ -90,14 +91,14 @@ namespace PriconneBotConsoleApp.Script
         /// </summary>
         private void RegisterReportData()
         {
-            var playerData = DatabasePlayerDataController.LoadPlayerData(m_ClanRole, m_userMessage.Author.Id);
+            var playerData = DatabasePlayerDataController.LoadPlayerData(m_ClanRole, m_UserMessage.Author.Id);
 
             if (playerData == null)
             {
                 return;
             }
 
-            var reportData = StringToReportData(ZenToHan(m_userMessage.Content), playerData.PlayerID);
+            var reportData = StringToReportData(m_UserMessage.Content.ZenToHan(), playerData.PlayerID);
 
             if (reportData == null)
             {
@@ -108,13 +109,13 @@ namespace PriconneBotConsoleApp.Script
 
             if (userReportedData.Count() >= 3)
             {
-                Task.Run(() => SendSystemMessage(m_userMessage.Channel, "報告件数が規定数を超えています。", 5));
+                Task.Run(() => SendSystemMessage(m_UserMessage.Channel, "報告件数が規定数を超えています。", 5));
                 return;
             }
 
             if (DatabaseReportDataController.CreateReportData(reportData))
             {
-                Task.Run(() => m_userMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
+                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
             }
 
             return;
@@ -125,7 +126,7 @@ namespace PriconneBotConsoleApp.Script
         /// </summary>
         private void DeleteReportData()
         {
-            var splitContent = ZenToHan(m_userMessage.Content).Split(" ", StringSplitOptions.RemoveEmptyEntries);
+            var splitContent = m_UserMessage.Content.ZenToHan().Split(" ", StringSplitOptions.RemoveEmptyEntries);
             var playerData = new PlayerData();
             if (splitContent.Length == 2
                 && ulong.TryParse(Regex.Match(splitContent[1], @"\d+").Value, out ulong registerUserID))
@@ -134,7 +135,7 @@ namespace PriconneBotConsoleApp.Script
             }
             else
             {
-                playerData = DatabasePlayerDataController.LoadPlayerData(m_ClanRole, m_userMessage.Author.Id);
+                playerData = DatabasePlayerDataController.LoadPlayerData(m_ClanRole, m_UserMessage.Author.Id);
             }
 
             if (playerData == null)
@@ -148,11 +149,11 @@ namespace PriconneBotConsoleApp.Script
             if (DatabaseReportDataController.DeleteReportData(removeData))
             {
                 var taskList = new List<Task>();
-                taskList.Add(m_userMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
-                if (playerData.UserID != m_userMessage.Author.Id)
+                taskList.Add(m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
+                if (playerData.UserID != m_UserMessage.Author.Id)
                 {
                     taskList.Add(SendSystemMessage(
-                        m_userMessage.Channel,
+                        m_UserMessage.Channel,
                         $"<@{playerData.UserID}>の凸報告を代理削除しました。\nこのメッセージは30秒後削除されます。",
                         30
                         ));
@@ -166,7 +167,7 @@ namespace PriconneBotConsoleApp.Script
         /// </summary>
         private void RegisterOtherUserReportData()
         {
-            var splitContent = ZenToHan(m_userMessage.Content).Split(" ", StringSplitOptions.RemoveEmptyEntries);
+            var splitContent = m_UserMessage.Content.ZenToHan().Split(" ", StringSplitOptions.RemoveEmptyEntries);
 
             if (splitContent.Count() != 3)
             {
@@ -196,13 +197,13 @@ namespace PriconneBotConsoleApp.Script
 
             if (userReportedData.Count() >= 3)
             {
-                Task.Run(() => SendSystemMessage(m_userMessage.Channel, "報告件数が規定数を超えています。", 5));
+                Task.Run(() => SendSystemMessage(m_UserMessage.Channel, "報告件数が規定数を超えています。", 5));
                 return;
             }
 
             if (DatabaseReportDataController.CreateReportData(reportData))
             {
-                Task.Run(() => m_userMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
+                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
             }
 
             return;
@@ -217,7 +218,7 @@ namespace PriconneBotConsoleApp.Script
             var clanReportData = DatabaseReportDataController.GetReportData(m_ClanData);
             if (DatabaseReportDataController.DeleteReportData(clanReportData))
             {
-                Task.Run(() => m_userMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
+                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
             }
         }
 
@@ -228,7 +229,7 @@ namespace PriconneBotConsoleApp.Script
         private async Task SendClanAttackList()
         {
             var clanAttackEmbed = CreateClanReportData();
-            await m_userMessage.Channel.SendMessageAsync(embed: clanAttackEmbed);
+            await m_UserMessage.Channel.SendMessageAsync(embed: clanAttackEmbed);
             return;
         }
 
@@ -251,7 +252,7 @@ namespace PriconneBotConsoleApp.Script
             {
                 // TODO : 1-5をコンストで示す方法を調べる
                 var bossNumber = int.Parse(Regex.Match(messageContent, @"\d").Value );
-                var attackNumber = StringToAttackNumber(Regex.Match(messageContent, @"\D{1,3}").Value);
+                var attackNumber = ConversionAttackNumber.StringToAttackNumber(Regex.Match(messageContent, @"\D{1,3}").Value);
 
                 // TODO:マジックナンバーを定数化
                 if (attackNumber == 0 || attackNumber == 99)

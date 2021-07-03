@@ -96,7 +96,7 @@ namespace PriconneBotConsoleApp.Database
             var transaction = databaseConnector.Database.BeginTransaction();
 
             var deleteDataList =  databaseConnector.ReportData.AsQueryable()               
-                .Where(x => reportDataList.Select(y => y.ReportID).Any(z => z == x.ReportID))
+                .Where(x => reportDataList.Select(y => y.ReportID).Any(y => y == x.ReportID))
                 .ToList();
             try
             {

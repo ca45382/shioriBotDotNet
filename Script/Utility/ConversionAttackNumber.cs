@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PriconneBotConsoleApp.Script.Utility
+namespace PriconneBotConsoleApp.Script
 {
     public static class ConversionAttackNumber
     {
