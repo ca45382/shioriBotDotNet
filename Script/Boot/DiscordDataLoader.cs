@@ -77,7 +77,7 @@ namespace PriconneBotConsoleApp.Script
             // テーブル上のプレイヤーデータ
             var usersOnSQLServer = DatabasePlayerDataController.LoadPlayerData(guild.Id);
 
-            #region テーブルにユーザを追加・更新
+            // テーブルにユーザを追加・更新
             var createUserData = new List<PlayerData>();
             var updateUserData = new List<PlayerData>();
 
@@ -112,9 +112,8 @@ namespace PriconneBotConsoleApp.Script
 
             DatabasePlayerDataController.CreatePlayerData(createUserData);
             DatabasePlayerDataController.UpdatePlayerData(updateUserData);
-            #endregion
 
-            #region テーブルからユーザを削除
+            // テーブルからユーザを削除
             static bool IsSameUser(PlayerData left, PlayerData right)
                 => left.UserID == right.UserID && left.ClanData.ClanRoleID == right.ClanData.ClanRoleID;
 
@@ -124,7 +123,6 @@ namespace PriconneBotConsoleApp.Script
                 );
 
             DatabasePlayerDataController.DeletePlayerData(deleteUsers);
-            #endregion
         }
 
         /// <summary>

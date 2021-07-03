@@ -61,7 +61,8 @@ namespace PriconneBotConsoleApp.Script
                     case "予約確認":
                     case "予約状況":
                         Console.WriteLine("予約確認");
-                        await SendMessageToChannel(userMessage.Channel, CreateUserReservationDataMessage());
+                        await userMessage.Channel.SendMessageAsync(CreateUserReservationDataMessage());
+                        //await SendMessageToChannel(userMessage.Channel, CreateUserReservationDataMessage());
                         return;
                 }
 
@@ -168,7 +169,7 @@ namespace PriconneBotConsoleApp.Script
             var resultChannel = userRole.Guild
                 .GetTextChannel(reservationResultChannelID);
 
-            var sendedMessageData = await SendMessageToChannel(resultChannel, messageData);
+            var sendedMessageData = await resultChannel.SendMessageAsync(messageData);
             DatabaseMessageDataController.UpdateMessageID(userClanData, sendedMessageData.Id, MessageFeatureType.ReserveResultID);
             await AttacheDefaultReaction(sendedMessageData);
         }
@@ -212,7 +213,7 @@ namespace PriconneBotConsoleApp.Script
 
             var serverMessage = socketMessage as SocketUserMessage;
             var messageData = CreateAllReservationDataMessage(userClanData);
-            await EditMessage(serverMessage, messageData);
+            await serverMessage.ModifyAsync(x => x.Content = messageData);
         }
 
         /// <summary>

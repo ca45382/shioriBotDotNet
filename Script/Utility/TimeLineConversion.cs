@@ -42,7 +42,7 @@ namespace PriconneBotConsoleApp.Script
 
             var convertMessage = ConversionMessage(messageData.Message.Content, messageData.Time);
             var userChannelData = m_userMessage.Channel as ISocketMessageChannel;
-            await SendMessageToChannel(userChannelData, convertMessage);
+            await userChannelData.SendMessageAsync(convertMessage);
             return;
         }
 

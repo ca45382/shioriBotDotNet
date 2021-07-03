@@ -7,12 +7,6 @@ namespace PriconneBotConsoleApp.Script
 {
     public class BaseClass
     {
-        protected static async Task<RestUserMessage> SendMessageToChannel(ISocketMessageChannel channel, string messageData)
-            => await channel.SendMessageAsync(messageData);
-
-        protected static async Task EditMessage(SocketUserMessage message, string messageData)
-            => await message.ModifyAsync(msg => msg.Content = messageData);
-
         /// <summary>
         /// 文字列の0-9,a-z,A-Zを全角から半角に強制的に変更する。
         /// </summary>
