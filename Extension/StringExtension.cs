@@ -1,18 +1,10 @@
 ﻿using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Discord.Rest;
-using Discord.WebSocket;
 
-namespace PriconneBotConsoleApp.Script
+namespace PriconneBotConsoleApp.Extension
 {
-    public class BaseClass
+    public static class StringExtension
     {
-        /// <summary>
-        /// 文字列の0-9,a-z,A-Zを全角から半角に強制的に変更する。
-        /// </summary>
-        /// <param name="textData"></param>
-        /// <returns></returns>
-        protected static string ZenToHan(string textData)
+        public static string ZenToHan(this string textData)
         {
             var convertText = textData;
             convertText = Regex.Replace(convertText, "　", p => ((char)(p.Value[0] - '　' + ' ')).ToString());

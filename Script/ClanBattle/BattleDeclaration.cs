@@ -11,7 +11,7 @@ using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Script
 {
-    public class BattleDeclaration : BaseClass
+    public class BattleDeclaration
     {
         private readonly ClanData m_UserClanData;
         private readonly SocketRole m_UserRole;
@@ -90,7 +90,7 @@ namespace PriconneBotConsoleApp.Script
 
         private async Task<bool> DeclarationCallCommand()
         {
-            var splitMessageContent = ZenToHan(m_UserMessage.Content)
+            var splitMessageContent = m_UserMessage.Content.ZenToHan()
                 .Split(new[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
             if (splitMessageContent.Length != 3

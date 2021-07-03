@@ -13,7 +13,7 @@ using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Script
 {
-    public class BattleReservation : BaseClass
+    public class BattleReservation
     {
         private const int MinBossNumber = 1;
         private const int MaxBossNumber = 5;
@@ -236,8 +236,8 @@ namespace PriconneBotConsoleApp.Script
                 limitReservationLap = byte.MaxValue;
             }
 
-            var splitMessageContent =
-                ZenToHan(userMessage.Content).Split(new string[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
+            var splitMessageContent =userMessage.Content.ZenToHan()
+                .Split(new string[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
             if (splitMessageContent.Length < 3
                 || !(byte.TryParse(splitMessageContent[1], out byte battleLap) && battleLap > 0)
