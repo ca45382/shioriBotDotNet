@@ -7,15 +7,15 @@ using PriconneBotConsoleApp.Database;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class DiscordDataLoader
+    public class DiscordDataLoader
     {
-        private readonly IEnumerable<ClanData> m_clanData;
+        private readonly IEnumerable<ClanData> m_ClanData;
 
         public DiscordDataLoader()
         {
             try
             {
-                m_clanData = new DatabaseClanDataController().LoadClanData();
+                m_ClanData = DatabaseClanDataController.LoadClanData();
             }
             catch (Exception e)
             {
@@ -25,22 +25,21 @@ namespace PriconneBotConsoleApp.Script
 
         public void UpdateServerData(SocketGuild guild)
         {
-            var serverDataController = new DatabaseServerDataController();
-            var serverData = serverDataController.LoadServerData(guild);
+            var serverData = DatabaseServerDataController.LoadServerData(guild);
 
             if (serverData == null)
             {
-                serverDataController.CreateServerData(guild);
+                DatabaseServerDataController.CreateServerData(guild);
             }
             else
             {
-                serverDataController.UpdateServerData(guild);
+                DatabaseServerDataController.UpdateServerData(guild);
             }
         }
 
         public void UpdateClanData(SocketGuild guild)
         {
-            var clanDataList = m_clanData
+            var clanDataList = m_ClanData
                 .Where(x => x.ServerID == guild.Id)
                 .ToList();
 
@@ -61,7 +60,7 @@ namespace PriconneBotConsoleApp.Script
                 if(string.Compare(clanData.ClanName, clanRole.Name) != 0)
                 {
                     updateClanData.ClanName = clanRole.Name;
-                    new DatabaseClanDataController().UpdateClanData(updateClanData);
+                    DatabaseClanDataController.UpdateClanData(updateClanData);
                 }
             }
         }
@@ -72,15 +71,13 @@ namespace PriconneBotConsoleApp.Script
         /// <param name="guild"></param>
         public void UpdatePlayerData(SocketGuild guild)
         {
-            var playerDataController = new DatabasePlayerDataController();
-
             // サーバー上のクランメンバー
             var usersOnDiscord = GetServerClanMember(guild);
 
             // テーブル上のプレイヤーデータ
-            var usersOnSQLServer = new DatabasePlayerDataController().LoadPlayerData(guild.Id);
+            var usersOnSQLServer = DatabasePlayerDataController.LoadPlayerData(guild.Id);
 
-            #region テーブルにユーザを追加・更新
+            // テーブルにユーザを追加・更新
             var createUserData = new List<PlayerData>();
             var updateUserData = new List<PlayerData>();
 
@@ -113,11 +110,10 @@ namespace PriconneBotConsoleApp.Script
                 }
             }
 
-            playerDataController.CreatePlayerData(createUserData);
-            playerDataController.UpdatePlayerData(updateUserData);
-            #endregion
+            DatabasePlayerDataController.CreatePlayerData(createUserData);
+            DatabasePlayerDataController.UpdatePlayerData(updateUserData);
 
-            #region テーブルからユーザを削除
+            // テーブルからユーザを削除
             static bool IsSameUser(PlayerData left, PlayerData right)
                 => left.UserID == right.UserID && left.ClanData.ClanRoleID == right.ClanData.ClanRoleID;
 
@@ -126,8 +122,7 @@ namespace PriconneBotConsoleApp.Script
                     mySQLUser => !usersOnDiscord.Any(discordUser => IsSameUser(mySQLUser, discordUser))
                 );
 
-            playerDataController.DeletePlayerData(deleteUsers);
-            #endregion
+            DatabasePlayerDataController.DeletePlayerData(deleteUsers);
         }
 
         /// <summary>
@@ -188,7 +183,7 @@ namespace PriconneBotConsoleApp.Script
         /// <param name="guildID"></param>
         /// <returns></returns>
         private IReadOnlyList<ulong> ClanIDsOnServer(ulong guildID)
-            => m_clanData
+            => m_ClanData
                 .Where(x => x.ServerID == guildID)
                 .Select(x => x.ClanRoleID)
                 .ToList();

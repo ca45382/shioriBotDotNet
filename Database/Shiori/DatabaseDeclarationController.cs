@@ -6,10 +6,10 @@ using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Database
 {
-    class DatabaseDeclarationController
+    public static class DatabaseDeclarationController
     {
 
-        public IEnumerable<DeclarationData> LoadDeclarationData(ClanData clanData, byte bossNumber)
+        public static IEnumerable<DeclarationData> LoadDeclarationData(ClanData clanData, byte bossNumber)
         {
             using var databaseConnector = new DatabaseConnector();
 
@@ -29,7 +29,7 @@ namespace PriconneBotConsoleApp.Database
                 .ToList();
         }
 
-        public IEnumerable<DeclarationData> LoadDeclarationData(PlayerData playerData, byte bossNumber)
+        public static IEnumerable<DeclarationData> LoadDeclarationData(PlayerData playerData, byte bossNumber)
         {
             using var databaseConnector = new DatabaseConnector();
 
@@ -55,7 +55,7 @@ namespace PriconneBotConsoleApp.Database
                 .ToList();
         }
 
-        public bool CreateDeclarationData(DeclarationData declarationData)
+        public static bool CreateDeclarationData(DeclarationData declarationData)
         {
             var userData = declarationData.PlayerData;
             
@@ -91,7 +91,7 @@ namespace PriconneBotConsoleApp.Database
             }
         }
 
-        public bool UpdateDeclarationData(DeclarationData declarationData)
+        public static bool UpdateDeclarationData(DeclarationData declarationData)
         {
             var userData = declarationData.PlayerData;
 
@@ -132,7 +132,7 @@ namespace PriconneBotConsoleApp.Database
             return true;
         }
 
-        public bool DeleteDeclarationData(DeclarationData declarationData)
+        public static bool DeleteDeclarationData(DeclarationData declarationData)
             => DeleteDeclarationData(new[] { declarationData });
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace PriconneBotConsoleApp.Database
         /// </summary>
         /// <param name="declarationDataSet"></param>
         /// <returns></returns>
-        public bool DeleteDeclarationData(IEnumerable<DeclarationData> declarationDataSet)
+        public static bool DeleteDeclarationData(IEnumerable<DeclarationData> declarationDataSet)
         {
             using var databaseConnector = new DatabaseConnector();
             var transaction = databaseConnector.Database.BeginTransaction();
@@ -182,7 +182,7 @@ namespace PriconneBotConsoleApp.Database
         /// </summary>
         /// <param name="playerData"></param>
         /// <returns></returns>
-        private ulong PlayerDataToPlayerID(PlayerData playerData)
+        private static ulong PlayerDataToPlayerID(PlayerData playerData)
         {
             if (playerData == null || playerData.ClanData == null)
             {

@@ -5,16 +5,16 @@ using PriconneBotConsoleApp.DataModel;
 
 namespace PriconneBotConsoleApp.Database
 {
-    class DatabaseServerDataController
+    public static class DatabaseServerDataController
     {
-        public IEnumerable<ServerData> LoadServerData()
+        public static IEnumerable<ServerData> LoadServerData()
         {
             using var databaseConnector = new DatabaseConnector();
 
             return databaseConnector.ServerData.ToArray();
         }
 
-        public ServerData LoadServerData(IGuild guild)
+        public static ServerData LoadServerData(IGuild guild)
         {
             using var databaseConnector = new DatabaseConnector();
 
@@ -22,7 +22,7 @@ namespace PriconneBotConsoleApp.Database
                 .FirstOrDefault(b => b.ServerID == guild.Id);
         }
 
-        public void CreateServerData(IGuild guild)
+        public static void CreateServerData(IGuild guild)
         {
             using var databaseConnector = new DatabaseConnector();
             var transaction = databaseConnector.Database.BeginTransaction();
@@ -48,7 +48,7 @@ namespace PriconneBotConsoleApp.Database
 
         }
 
-        public void UpdateServerData(IGuild guild)
+        public static void UpdateServerData(IGuild guild)
         {
             using var databaseConnector = new DatabaseConnector();
             var transaction = databaseConnector.Database.BeginTransaction();

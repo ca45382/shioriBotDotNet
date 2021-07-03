@@ -12,7 +12,7 @@ using PriconneBotConsoleApp.Database;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class BotInitialize
+    public class BotInitialize
     {
         private const string rediveURL = "https://redive.estertion.win/";
         private readonly string DataFolderPath = Path.Combine("data");
@@ -172,10 +172,9 @@ namespace PriconneBotConsoleApp.Script
                 });
             }
 
-            var databaseFeatureController = new DatabaseFeatureController();
-            databaseFeatureController.UpdateChannelFeature(channelFeatures);
-            databaseFeatureController.UpdateMessageFeature(messageFeatures);
-            databaseFeatureController.UpdateRoleFeature(roleFeatures);
+            DatabaseFeatureController.UpdateChannelFeature(channelFeatures);
+            DatabaseFeatureController.UpdateMessageFeature(messageFeatures);
+            DatabaseFeatureController.UpdateRoleFeature(roleFeatures);
         }
     }
 }

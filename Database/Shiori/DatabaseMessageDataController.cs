@@ -6,9 +6,9 @@ using PriconneBotConsoleApp.DataType;
 
 namespace PriconneBotConsoleApp.Database
 {
-    public class DatabaseMessageDataController
+    public static class DatabaseMessageDataController
     {
-        public bool UpdateMessageID(ClanData clanData, ulong messageID, MessageFeatureType featureType)
+        public static bool UpdateMessageID(ClanData clanData, ulong messageID, MessageFeatureType featureType)
         {
             using var databaseConnector = new DatabaseConnector();
             var transaction = databaseConnector.Database.BeginTransaction();

@@ -8,45 +8,45 @@ using PriconneBotConsoleApp.Database;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class ReceiveReactionController
+    public class ReceiveReactionController
     {
-        private readonly ClanData m_playerClanData;
-        private readonly PlayerData m_playerData;
-        private readonly SocketReaction m_reaction;
+        private readonly ClanData m_PlayerClanData;
+        private readonly PlayerData m_PlayerData;
+        private readonly SocketReaction m_ReceiveReaction;
 
         public ReceiveReactionController(SocketReaction reaction)
         {
-            m_reaction = reaction;
+            m_ReceiveReaction = reaction;
             var reactionChannel = reaction.Channel as SocketGuildChannel;
 
-            m_playerData = new DatabasePlayerDataController()
+            m_PlayerData = DatabasePlayerDataController
                 .LoadPlayerData((ulong)reactionChannel?.Guild.Id, reaction.UserId);
-            var userRole = reactionChannel?.Guild.GetRole((ulong)m_playerData?.ClanData.ClanRoleID);
+            var userRole = reactionChannel?.Guild.GetRole((ulong)m_PlayerData?.ClanData.ClanRoleID);
 
             if (userRole == null)
             {
                 return;
             }
 
-            m_playerClanData = new DatabaseClanDataController().LoadClanData(userRole);
+            m_PlayerClanData = DatabaseClanDataController.LoadClanData(userRole);
         }
 
         public async Task RunReactionReceive()
         {
-            if (m_reaction != null)
+            if (m_ReceiveReaction != null)
             {
-                await RunReactionReceive(m_reaction); 
+                await RunReactionReceive(m_ReceiveReaction); 
             }
         }
 
         public async Task RunReactionReceive(SocketReaction reaction)
         {
-            if (m_playerClanData == null)
+            if (m_PlayerClanData == null)
             {
                 return;
             }
 
-            var userClanData = m_playerClanData;
+            var userClanData = m_PlayerClanData;
             var reactionChannelID = reaction.Channel.Id;
 
             if (reactionChannelID == userClanData.ChannelData.GetChannelID(userClanData.ClanID,ChannelFeatureType.DeclareID))

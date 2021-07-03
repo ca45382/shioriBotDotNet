@@ -6,30 +6,30 @@ using PriconneBotConsoleApp.Interface;
 
 namespace PriconneBotConsoleApp.Database
 {
-    public class DatabaseFeatureController
+    public static class DatabaseFeatureController
     {
-        public IEnumerable<ChannelFeature> LoadChannelFeature()
+        public static IEnumerable<ChannelFeature> LoadChannelFeature()
         {
             using var databaseConnector = new DatabaseConnector();
 
             return databaseConnector.ChannelFeatures.ToList();
         }
 
-        public IEnumerable<MessageFeature> LoadMessageFeature()
+        public static IEnumerable<MessageFeature> LoadMessageFeature()
         {
             using var databaseConnector = new DatabaseConnector();
 
             return databaseConnector.MessageFeatures.ToList();
         }
 
-        public IEnumerable<RoleFeature> LoadRoleFeature()
+        public static IEnumerable<RoleFeature> LoadRoleFeature()
         {
             using var databaseConnector = new DatabaseConnector();
 
             return databaseConnector.RoleFeatures.ToList();
         }
 
-        public void UpdateChannelFeature(IEnumerable<ChannelFeature> features)
+        public static void UpdateChannelFeature(IEnumerable<ChannelFeature> features)
         {
             var databaseFeatures = LoadChannelFeature();
             var createFeatures = GetCreateData(features, databaseFeatures);
@@ -52,7 +52,7 @@ namespace PriconneBotConsoleApp.Database
             transaction.Commit();
         }
 
-        public void UpdateMessageFeature(IEnumerable<MessageFeature> features)
+        public static void UpdateMessageFeature(IEnumerable<MessageFeature> features)
         {
             var databaseFeatures = LoadMessageFeature();
             var createFeatures = GetCreateData(features, databaseFeatures);
@@ -75,7 +75,7 @@ namespace PriconneBotConsoleApp.Database
             transaction.Commit();
         }
 
-        public void UpdateRoleFeature(IEnumerable<RoleFeature> features)
+        public static void UpdateRoleFeature(IEnumerable<RoleFeature> features)
         {
             var databaseFeatures = LoadRoleFeature();
             var createFeatures = GetCreateData(features, databaseFeatures);
@@ -98,13 +98,13 @@ namespace PriconneBotConsoleApp.Database
             transaction.Commit();
         }
 
-        private IEnumerable<IBotFeature> GetCreateData(IEnumerable<IBotFeature> programFeatures, IEnumerable<IBotFeature> databaseFeatures)
+        private static IEnumerable<IBotFeature> GetCreateData(IEnumerable<IBotFeature> programFeatures, IEnumerable<IBotFeature> databaseFeatures)
         {
             // メモ : FeatureID = 0 だと通らない
             return programFeatures.Where(x => x.FeatureID != 0).Except(databaseFeatures, new IBotFeatureComparer());
         }
 
-        private IEnumerable<IBotFeature> GetRemoveData(IEnumerable<IBotFeature> programFeatures, IEnumerable<IBotFeature> databaseFeatures)
+        private static IEnumerable<IBotFeature> GetRemoveData(IEnumerable<IBotFeature> programFeatures, IEnumerable<IBotFeature> databaseFeatures)
         {
             // メモ : FeatureID = 0 だと通らない
             return databaseFeatures.Where(x => x.FeatureID != 0).Except(programFeatures, new IBotFeatureComparer());

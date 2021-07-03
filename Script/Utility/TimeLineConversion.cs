@@ -9,7 +9,7 @@ using PriconneBotConsoleApp.Define;
 
 namespace PriconneBotConsoleApp.Script
 {
-    class TimeLineConversion : BaseClass
+    public class TimeLineConversion
     {
         private IMessage m_userMessage;
 
@@ -43,7 +43,7 @@ namespace PriconneBotConsoleApp.Script
 
             var convertMessage = ConversionMessage(messageData.Message.Content, messageData.Time);
             var userChannelData = m_userMessage.Channel as ISocketMessageChannel;
-            await SendMessageToChannel(userChannelData, convertMessage);
+            await userChannelData.SendMessageAsync(convertMessage);
             return;
         }
 

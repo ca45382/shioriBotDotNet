@@ -5,16 +5,16 @@ using PriconneBotConsoleApp.DataModel;
 
 namespace PriconneBotConsoleApp.Database
 {
-    public class RediveCampaignLoader
+    public static class RediveCampaignLoader
     {
-        public IEnumerable<CampaignData> LoadCampaignDatas()
+        public static IEnumerable<CampaignData> LoadCampaignData()
         {
             using var rediveConnector = new RediveConnector();
 
             return rediveConnector.CampaignData.ToList();
         }
 
-        public IEnumerable<CampaignData> LoadCampaignDatas(DateTime dateTime)
+        public static IEnumerable<CampaignData> LoadCampaignData(DateTime dateTime)
         {
             using var rediveConnector = new RediveConnector();
 
