@@ -63,18 +63,27 @@ namespace PriconneBotConsoleApp.Script
             {
                 if (m_userMessage.Content.StartsWith("!add"))
                 {
-                    OtherUserRegisterReportData();
+                    RegisterOtherUserReportData();
                 }
                 else if (m_userMessage.Content.StartsWith("!list"))
                 {
                     await SendClanAttackList();
                 }
-                
+                else if (m_userMessage.Content.StartsWith("!rm"))
+                {
+                    DeleteReportData();
+                }
+
             }
-            RegisterReportData();
+            else
+            {
+                RegisterReportData();
+            }
         }
 
-
+        /// <summary>
+        /// 個人の凸報告
+        /// </summary>
         private void RegisterReportData()
         {
             var playerData = DatabasePlayerDataController.LoadPlayerData(m_ClanRole, m_userMessage.Author.Id);
@@ -108,9 +117,50 @@ namespace PriconneBotConsoleApp.Script
         }
 
         /// <summary>
+        /// 個人の最新の凸報告を削除する。
+        /// </summary>
+        private void DeleteReportData()
+        {
+            var splitContent = ZenToHan(m_userMessage.Content).Split(" ", StringSplitOptions.RemoveEmptyEntries);
+            var playerData = new PlayerData();
+            if (splitContent.Length == 2
+                && ulong.TryParse(Regex.Match(splitContent[1], @"\d+").Value, out ulong registerUserID))
+            {
+                playerData = DatabasePlayerDataController.LoadPlayerData(m_ClanRole, registerUserID);
+            }
+            else
+            {
+                playerData = DatabasePlayerDataController.LoadPlayerData(m_ClanRole, m_userMessage.Author.Id);
+            }
+
+            if (playerData == null)
+            {
+                return;
+            }
+            
+            var recentReportData = DatabaseReportDataController.GetReportData(playerData)
+                .OrderBy(x => x.DateTime).ToList();
+            var removeData = recentReportData.Last();
+            if (DatabaseReportDataController.DeleteReportData(removeData))
+            {
+                var taskList = new List<Task>();
+                taskList.Add(m_userMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
+                if (playerData.UserID != m_userMessage.Author.Id)
+                {
+                    taskList.Add(SendSystemMessage(
+                        m_userMessage.Channel,
+                        $"<@{playerData.UserID}>の凸報告を代理削除しました。\nこのメッセージは30秒後削除されます。",
+                        30
+                        ));
+                }
+                Task.Run(() => Task.WhenAll(taskList.ToArray())); 
+            }
+        }
+
+        /// <summary>
         /// 代理報告用
         /// </summary>
-        private void OtherUserRegisterReportData()
+        private void RegisterOtherUserReportData()
         {
             var splitContent = ZenToHan(m_userMessage.Content).Split(" ", StringSplitOptions.RemoveEmptyEntries);
 
@@ -155,13 +205,16 @@ namespace PriconneBotConsoleApp.Script
 
         }
 
+        /// <summary>
+        /// 凸報告データ送信用
+        /// </summary>
+        /// <returns></returns>
         private async Task SendClanAttackList()
         {
             var clanAttackEmbed = CreateClanReportData();
             await m_userMessage.Channel.SendMessageAsync(embed: clanAttackEmbed);
             return;
         }
-
 
         /// <summary>
         /// メッセージ情報から報告データに変換する。
@@ -203,9 +256,17 @@ namespace PriconneBotConsoleApp.Script
 
             return userReportData;
         }
-
+        
+        /// <summary>
+        /// クランごとの凸報告データをEmbedで返す。
+        /// </summary>
+        /// <returns></returns>
         private Embed CreateClanReportData()
         {
+            // TODO : 3を定数化
+            var MaxReportNumber = 3;
+            // TODO : 最大クラン人数 30人
+            var MaxClanPlayer = 30;
             var embedBuilder = new EmbedBuilder();
 
             var clanPlayerDataList = DatabasePlayerDataController.LoadPlayerData(m_ClanData);
@@ -217,10 +278,15 @@ namespace PriconneBotConsoleApp.Script
                 reportDataList.Where(r => r.PlayerID == x.PlayerID).ToArray()
             ));
             
-            // TODO : 3を定数化
-            for (int i = 0; i <= 3; i++)
+            
+            for (int i = 0; i <= MaxReportNumber; i++)
             {
                 var players = playerInfoList.Where(x => x.ReportData.Length == i);
+
+                if (players.Count() > MaxClanPlayer)
+                {
+                    players = players.Take(MaxClanPlayer);
+                }
 
                 var reportStringBuilder = new StringBuilder();
                 var reportMessage = string.Join("\n", players.Select(x => x.GetNameWithReport()).ToArray());
@@ -236,8 +302,10 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var nowAttackCount = reportDataList.Count();
-            var memberAttackCount = clanPlayerDataList.Count() * 3;
-            embedBuilder.Title = $"凸状況({nowAttackCount}凸/{memberAttackCount}凸)";
+            var memberAttackCount = clanPlayerDataList.Count() * MaxReportNumber;
+            var MaxAllReportNumber = MaxClanPlayer * MaxReportNumber;
+            var memberAttackString = memberAttackCount > MaxReportNumber ? $"{MaxAllReportNumber}+" : memberAttackCount.ToString();
+            embedBuilder.Title = $"凸状況({nowAttackCount}凸/ {memberAttackString}凸)";
 
             embedBuilder.Footer = new EmbedFooterBuilder()
             {

@@ -51,6 +51,7 @@ namespace PriconneBotConsoleApp.Database
             {
                 return false;
             }
+
             reportData.PlayerData = null;
 
             using var databaseConnector = new DatabaseConnector();
@@ -58,6 +59,43 @@ namespace PriconneBotConsoleApp.Database
             try
             {
                 databaseConnector.Add(reportData);
+                databaseConnector.SaveChanges();
+                transaction.Commit();
+                return true;
+            }
+            catch
+            {
+                transaction.Rollback();
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 凸報告データを削除する。
+        /// </summary>
+        /// <param name="reportData"></param>
+        /// <returns></returns>
+        public static bool DeleteReportData(ReportData reportData)
+        {
+            if (reportData.ReportID == 0)
+            {
+                return false;
+            }
+
+            using var databaseConnector = new DatabaseConnector();
+            var transaction = databaseConnector.Database.BeginTransaction();
+
+            var deleteData = databaseConnector.ReportData
+                .FirstOrDefault(x => x.ReportID == reportData.ReportID);
+
+            if (reportData == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                deleteData.DeleteFlag = true;
                 databaseConnector.SaveChanges();
                 transaction.Commit();
                 return true;
