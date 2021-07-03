@@ -9,13 +9,13 @@ namespace PriconneBotConsoleApp.Script
 {
     public class DiscordDataLoader
     {
-        private readonly IEnumerable<ClanData> m_clanData;
+        private readonly IEnumerable<ClanData> m_ClanData;
 
         public DiscordDataLoader()
         {
             try
             {
-                m_clanData = DatabaseClanDataController.LoadClanData();
+                m_ClanData = DatabaseClanDataController.LoadClanData();
             }
             catch (Exception e)
             {
@@ -39,7 +39,7 @@ namespace PriconneBotConsoleApp.Script
 
         public void UpdateClanData(SocketGuild guild)
         {
-            var clanDataList = m_clanData
+            var clanDataList = m_ClanData
                 .Where(x => x.ServerID == guild.Id)
                 .ToList();
 
@@ -185,7 +185,7 @@ namespace PriconneBotConsoleApp.Script
         /// <param name="guildID"></param>
         /// <returns></returns>
         private IReadOnlyList<ulong> ClanIDsOnServer(ulong guildID)
-            => m_clanData
+            => m_ClanData
                 .Where(x => x.ServerID == guildID)
                 .Select(x => x.ClanRoleID)
                 .ToList();

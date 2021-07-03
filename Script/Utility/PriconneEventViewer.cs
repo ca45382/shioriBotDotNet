@@ -67,7 +67,7 @@ namespace PriconneBotConsoleApp.Script
 
         public string CampaignLoader(DateTime nowTime)
         {
-            var campaignAllData = RediveCampaignLoader.LoadCampaignDatas(nowTime);
+            var campaignAllData = RediveCampaignLoader.LoadCampaignData(nowTime);
             campaignAllData = campaignAllData
                 .OrderBy(b => b.IconImage);
 

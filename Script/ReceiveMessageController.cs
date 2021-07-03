@@ -10,38 +10,38 @@ namespace PriconneBotConsoleApp.Script
 {
     public class ReceiveMessageController
     {
-        private readonly ClanData m_playerClanData;
-        private readonly PlayerData m_playerData;
-        private readonly SocketUserMessage m_message;
+        private readonly ClanData m_PlayerClanData;
+        private readonly PlayerData m_PlayerData;
+        private readonly SocketUserMessage m_ReceiveMessage;
 
         public ReceiveMessageController(SocketUserMessage message)
         {
-            m_message = message;
+            m_ReceiveMessage = message;
             var messageChannel = message.Channel as SocketGuildChannel;
             var guildID = messageChannel.Guild.Id;
             var userID = message.Author.Id;
-            m_playerData = DatabasePlayerDataController.LoadPlayerData(guildID, userID);
+            m_PlayerData = DatabasePlayerDataController.LoadPlayerData(guildID, userID);
             
-            if (m_playerData == null)
+            if (m_PlayerData == null)
             {
                 return;
             }
 
-            var userRole = messageChannel.Guild.GetRole(m_playerData.ClanData.ClanRoleID);
+            var userRole = messageChannel.Guild.GetRole(m_PlayerData.ClanData.ClanRoleID);
 
             if (userRole == null)
             {
                 return;
             }
 
-            m_playerClanData = DatabaseClanDataController.LoadClanData(userRole);
+            m_PlayerClanData = DatabaseClanDataController.LoadClanData(userRole);
         }
 
         public async Task RunMessageReceive()
         {
-            if (m_message != null)
+            if (m_ReceiveMessage != null)
             {
-                await RunMessageReceive(m_message);
+                await RunMessageReceive(m_ReceiveMessage);
             }
         }
 
@@ -50,31 +50,31 @@ namespace PriconneBotConsoleApp.Script
             await new TimeLineConversion(message).RunByMessage() ;
             await new PriconneEventViewer(message).SendEventInfomationByMessage();
 
-            if (m_playerData == null || m_playerClanData == null)
+            if (m_PlayerData == null || m_PlayerClanData == null)
             {
                 return;
             }
 
             var messageChannelID = message.Channel.Id;
 
-            if (messageChannelID == m_playerClanData.ChannelData.GetChannelID(m_playerClanData.ClanID, ChannelFeatureType.ReserveID))
+            if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.ReserveID))
             {
-                await new BattleReservation(m_playerClanData, message).RunReservationCommand();
+                await new BattleReservation(m_PlayerClanData, message).RunReservationCommand();
             }
 
-            if (messageChannelID == m_playerClanData.ChannelData.GetChannelID(m_playerClanData.ClanID, ChannelFeatureType.ReserveResultID))
+            if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.ReserveResultID))
             {
-                await new BattleReservation(m_playerClanData, message).RunReservationResultCommand();
+                await new BattleReservation(m_PlayerClanData, message).RunReservationResultCommand();
             }
 
-            if (messageChannelID == m_playerClanData.ChannelData.GetChannelID(m_playerClanData.ClanID, ChannelFeatureType.DeclareID))
+            if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.DeclareID))
             {
-                await new BattleDeclaration(m_playerClanData, message).RunDeclarationCommandByMessage();
+                await new BattleDeclaration(m_PlayerClanData, message).RunDeclarationCommandByMessage();
             }
 
-            if(messageChannelID == m_playerClanData.ChannelData.GetChannelID(m_playerClanData.ClanID, ChannelFeatureType.TaskKillID))
+            if(messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.TaskKillID))
             {
-                await new BattleTaskKill(m_playerClanData, message).RunByMessageCommands();
+                await new BattleTaskKill(m_PlayerClanData, message).RunByMessageCommands();
             }
         }
     }
