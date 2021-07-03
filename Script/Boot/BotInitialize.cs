@@ -3,9 +3,9 @@ using System.Net;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System;
 
-using Brotli;
 using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Database;
@@ -62,8 +62,8 @@ namespace PriconneBotConsoleApp.Script
             {
                 var preRediveData = LoadJson<RediveVersionData>(File.ReadAllText(rediveJsonPath));
 
-                if (updateRediveData == null 
-                    || ( preRediveData != null && preRediveData.TruthVersion == updateRediveData.TruthVersion) )
+                if (updateRediveData == null
+                    || (preRediveData != null && preRediveData.TruthVersion == updateRediveData.TruthVersion))
                 {
                     return;
                 }
@@ -76,7 +76,10 @@ namespace PriconneBotConsoleApp.Script
             var rediveDBPath = Path.Combine(DataFolderPath, RediveDatabaseName);
 
             webClient.DownloadFile(rediveDBURL, rediveDBBrotliPath);
-            DecompressBrotli(rediveDBBrotliPath, rediveDBPath);
+            if (!DecompressBrotli(rediveDBBrotliPath, rediveDBPath))
+            {
+                Console.WriteLine("False");
+            }
             File.Delete(rediveDBBrotliPath);
 
             return;
@@ -104,7 +107,7 @@ namespace PriconneBotConsoleApp.Script
                     FileAccess.Write
                 );
 
-                using var bs = new BrotliStream(preDecompressFile, System.IO.Compression.CompressionMode.Decompress);
+                using var bs = new BrotliStream(preDecompressFile, CompressionMode.Decompress);
                 bs.CopyTo(decompressedFile);
             }
             catch
