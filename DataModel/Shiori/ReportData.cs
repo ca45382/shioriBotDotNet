@@ -37,6 +37,13 @@ namespace PriconneBotConsoleApp.DataModel
         [Column("subdue_flag", TypeName = "TINYINT UNSIGNED")]
         public bool SubdueFlag { get; set; }
 
+        /// <summary>
+        /// 有効データかどうか判定。
+        /// 集計機能の際に活きてくる。
+        /// </summary>
+        [Column("valid_flag", TypeName = "TINYINT UNSIGNED")]
+        public bool ValidFlag { get; set; }
+
         [Column("delete_flag", TypeName = "TINYINT UNSIGNED")]
         public bool DeleteFlag { get; set; }
 
