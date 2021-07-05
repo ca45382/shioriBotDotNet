@@ -1,13 +1,55 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PriconneBotConsoleApp.DataModel
 {
+    [Table("clan_battle_2_map_data")]
     public class ClanBattleDate
     {
-        public DateTime StartBattle;
-        public DateTime EndBattle;
+        [Column("id", TypeName = "INTEGER"),Key]
+        public int ID { get; set; }
 
-        public int ClanBattleID;
-        public int Month;
+        [Column("clan_battle_id", TypeName = "INTEGER")]
+        public int ClanBattleID { get; set; }
+
+        [Column("lap_num_from", TypeName = "INTEGER")]
+        public int LapNumberFrom { get; set; }
+
+        [Column("lap_num_to", TypeName = "INTEGER")]
+        public int LapNumberTo { get; set; }
+
+        [Column("phase", TypeName = "INTEGER")]
+        public int Phase { get; set; }
+
+        [Column("wave_group_id_1", TypeName = "INTEGER")]
+        public int WaveGroupID1 { get; set; }
+
+        [Column("wave_group_id_2", TypeName = "INTEGER")]
+        public int WaveGroupID2 { get; set; }
+
+        [Column("wave_group_id_3", TypeName = "INTEGER")]
+        public int WaveGroupID3 { get; set; }
+
+        [Column("wave_group_id_4", TypeName = "INTEGER")]
+        public int WaveGroupID4 { get; set; }
+
+        [Column("wave_group_id_5", TypeName = "INTEGER")]
+        public int WaveGroupID5 { get; set; }
+
+        [Column("score_coefficient_1", TypeName = "REAL")]
+        public float ScoreCoefficient1 { get; set; }
+
+        [Column("score_coefficient_2", TypeName = "REAL")]
+        public float ScoreCoefficient2 { get; set; }
+
+        [Column("score_coefficient_3", TypeName = "REAL")]
+        public float ScoreCoefficient3 { get; set; }
+
+        [Column("score_coefficient_4", TypeName = "REAL")]
+        public float ScoreCoefficient4 { get; set; }
+
+        [Column("score_coefficient_5", TypeName = "REAL")]
+        public float ScoreCoefficient5 { get; set; }
     }
 }
