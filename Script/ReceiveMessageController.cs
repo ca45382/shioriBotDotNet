@@ -97,6 +97,11 @@ namespace PriconneBotConsoleApp.Script
             {
                 await battleDeclaration.RunDeclarationCommandByMessage();
             }
+
+            if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.ProgressID))
+            {
+                await new BattleProgress(m_PlayerClanData, message).RunByMessage();
+            }
         }
     }
 }
