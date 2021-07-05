@@ -24,6 +24,9 @@ namespace PriconneBotConsoleApp.DataModel
         [Column("damage", TypeName = "INT UNSIGNED")]
         public uint Damage { get; set; }
 
+        [Column("remain_time",TypeName = "TINYINT UNSIGNED")]
+        public byte RemainTime { get; set; }
+
         [Column("boss_num", TypeName = "TINYINT UNSIGNED")]
         public byte BossNumber { get; set; }
 
@@ -34,10 +37,16 @@ namespace PriconneBotConsoleApp.DataModel
         public byte AttackType { get; set; }
 
         /// <summary>
-        /// 0:なし 1:凸確定 2:凸仮確定 3:SOS 4:持ち越し
+        /// 0:なし 1:凸確定 2:凸仮確定 3:SOS
         /// </summary>
         [Column("status", TypeName = "TINYINT UNSIGNED")]
         public byte Status { get; set; }
+
+        [Column("carry_over_flag", TypeName = "TINYINT UNSIGNED")]
+        public bool CarryOverFlag { get; set; }
+
+        [Column("report_id", TypeName = "BIGINT UNSIGNED")]
+        public ulong ReportID { get; set; }
 
         [Column("comment_data", TypeName = "varchar(100)")]
         public string CommentData { get; set; }
