@@ -105,7 +105,7 @@ namespace PriconneBotConsoleApp.Script
 
             var userReportedData = DatabaseReportDataController.GetReportData(playerData);
 
-            if (userReportedData.Count() >= 3)
+            if (userReportedData.Count() >= Common.MaxReportNumber)
             {
                 Task.Run(() => SendSystemMessage(m_UserMessage.Channel, "報告件数が規定数を超えています。", 5));
                 return;
@@ -271,10 +271,6 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private Embed CreateClanReportData()
         {
-            // TODO : 3を定数化
-            var MaxReportNumber = 3;
-            // TODO : 最大クラン人数 30人
-            var MaxClanPlayer = 30;
             var embedBuilder = new EmbedBuilder();
 
             var clanPlayerDataList = DatabasePlayerDataController.LoadPlayerData(m_ClanData);
@@ -287,13 +283,13 @@ namespace PriconneBotConsoleApp.Script
             ));
             
             
-            for (int i = 0; i <= MaxReportNumber; i++)
+            for (int i = 0; i <= Common.MaxReportNumber; i++)
             {
                 var players = playerInfoList.Where(x => x.ReportData.Length == i);
 
-                if (players.Count() > MaxClanPlayer)
+                if (players.Count() > Common.MaxClanPlayer)
                 {
-                    players = players.Take(MaxClanPlayer);
+                    players = players.Take(Common.MaxClanPlayer);
                 }
 
                 var reportStringBuilder = new StringBuilder();
@@ -310,9 +306,9 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var nowAttackCount = reportDataList.Count();
-            var memberAttackCount = clanPlayerDataList.Count() * MaxReportNumber;
-            var MaxAllReportNumber = MaxClanPlayer * MaxReportNumber;
-            var memberAttackString = memberAttackCount > MaxReportNumber ? $"{MaxAllReportNumber}+" : memberAttackCount.ToString();
+            var memberAttackCount = clanPlayerDataList.Count() * Common.MaxReportNumber;
+            var MaxAllReportNumber = Common.MaxClanPlayer * Common.MaxReportNumber;
+            var memberAttackString = memberAttackCount > Common.MaxReportNumber ? $"{MaxAllReportNumber}+" : memberAttackCount.ToString();
             embedBuilder.Title = $"凸状況({nowAttackCount}凸/ {memberAttackString}凸)";
 
             embedBuilder.Footer = new EmbedFooterBuilder()
