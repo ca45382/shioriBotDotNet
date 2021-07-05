@@ -9,7 +9,7 @@ namespace PriconneBotConsoleApp.Database
     {
         public DbSet<CampaignData> CampaignData { get; set; }
         public DbSet<ClanBattleSchedule> ClanBattleSchedule { get; set; }
-        public DbSet<ClanBattleDate> ClanBattleData { get; set; }
+        public DbSet<ClanBattleData> ClanBattleData { get; set; }
         public DbSet<WaveGroupData> WaveGroupData { get; set; }
         public DbSet<EnemyParameter> EnemyParameter { get; set; }
 

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace PriconneBotConsoleApp.DataModel
 {
     [Table("clan_battle_2_map_data")]
-    public class ClanBattleDate
+    public class ClanBattleData
     {
         [Column("id", TypeName = "INTEGER"),Key]
         public int ID { get; set; }
