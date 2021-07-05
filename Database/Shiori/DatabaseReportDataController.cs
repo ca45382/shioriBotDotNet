@@ -21,7 +21,7 @@ namespace PriconneBotConsoleApp.Database
             using var databaseConnector = new DatabaseConnector();
 
             return databaseConnector.ReportData.AsQueryable()
-                .Where(x => x.PlayerID == playerData.PlayerID && x.SubdueFlag == false && x.DeleteFlag == false)
+                .Where(x => x.PlayerID == playerData.PlayerID && !x.SubdueFlag && !x.DeleteFlag)
                 .ToList();
         }
 
@@ -36,7 +36,7 @@ namespace PriconneBotConsoleApp.Database
 
             return databaseConnector.ReportData.AsQueryable()
                 .Include(x => x.PlayerData)
-                .Where(x => x.PlayerData.ClanID == clanData.ClanID && x.SubdueFlag == false && x.DeleteFlag == false)
+                .Where(x => x.PlayerData.ClanID == clanData.ClanID && !x.SubdueFlag && !x.DeleteFlag)
                 .ToList();
         }
 
@@ -77,7 +77,7 @@ namespace PriconneBotConsoleApp.Database
         /// <returns></returns>
         public static bool DeleteReportData(ReportData reportData)
         {
-            var deleteData = new List<ReportData>()
+            var deleteData = new ReportData[]
             {
                 reportData,
             };

@@ -59,7 +59,7 @@ namespace PriconneBotConsoleApp.Database
                 .Include(x => x.ClanData)
                 .FirstOrDefault(x => x.ClanData.ServerID == roleData.Guild.Id
                 && x.ClanData.ClanRoleID == roleData.Id && x.UserID == userID);
-        }        
+        }
 
         public static void CreatePlayerData(IEnumerable<PlayerData> playersData)
         {

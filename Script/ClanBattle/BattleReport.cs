@@ -16,7 +16,6 @@ namespace PriconneBotConsoleApp.Script
 {
     public class BattleReport
     {
-
         private readonly ClanData m_ClanData;
         private readonly SocketUserMessage m_UserMessage;
         private readonly SocketRole m_ClanRole;
@@ -41,7 +40,7 @@ namespace PriconneBotConsoleApp.Script
                 {
                     return PlayerGuildName;
                 }
-                // TODO : 
+
                 var stringData = string.Join(
                     ',', 
                     ReportData.Select(x => $"{x.BossNumber}{ConversionAttackNumber.AttackNumberToString(x.AttackType)}").ToArray()
@@ -78,7 +77,6 @@ namespace PriconneBotConsoleApp.Script
                 {
                     DeleteAllClanReport();
                 }
-
             }
             else
             {
@@ -230,7 +228,6 @@ namespace PriconneBotConsoleApp.Script
         {
             var clanAttackEmbed = CreateClanReportData();
             await m_UserMessage.Channel.SendMessageAsync(embed: clanAttackEmbed);
-            return;
         }
 
         /// <summary>
@@ -240,13 +237,7 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private ReportData StringToReportData(string messageContent, ulong playerID)
         {
-            //var messageContent = ZenToHan(m_userMessage.Content);
-
-            var userReportData = new ReportData()
-            {
-                PlayerID = 0,
-                DeleteFlag = false,
-            };
+            var userReportData = new ReportData();
 
             if (Regex.IsMatch(messageContent, @"\d\D{1,3}"))
             {
@@ -259,7 +250,7 @@ namespace PriconneBotConsoleApp.Script
                 {
                     return null;
                 }
-                userReportData.PlayerID = 1;
+
                 userReportData.AttackType = (byte)attackNumber;
                 userReportData.BossNumber = (byte)bossNumber;
             }
