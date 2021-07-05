@@ -107,7 +107,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (userReportedData.Count() >= Common.MaxReportNumber)
             {
-                Task.Run(() => SendSystemMessage(m_UserMessage.Channel, "報告件数が規定数を超えています。", 5));
+                Task.Run(() => SendSystemMessage(m_UserMessage.Channel, EnumMapper.I.GetString(ErrorType.UpperLimitReport), 5));
                 return;
             }
 

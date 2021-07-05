@@ -15,5 +15,7 @@ namespace PriconneBotConsoleApp.DataType
         TooLongComment = 3,
         [Description("予約できません。予約が可能なボスは{0}周目{1}ボスまでです。")]
         OutOfReservationBossLaps = 4,
+        [Description("報告件数が規定数を超えています。")]
+        UpperLimitReport = 5,
     }
 }
