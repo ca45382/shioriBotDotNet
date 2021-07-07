@@ -24,6 +24,38 @@ namespace PriconneBotConsoleApp.Script
 
         private ProgressData m_UserProgressData;
 
+        private class PlayerInfo
+        {
+            public PlayerData PlayerData;
+            public ProgressData ProgressData;
+            private uint BossRemainHP;
+
+            public PlayerInfo(PlayerData playerData, ProgressData progressData, uint bossRemainHP = 0)
+            {
+                PlayerData = playerData;
+                ProgressData = progressData;
+                BossRemainHP = bossRemainHP;
+            }
+
+            public string GetNameWithData()
+            {
+                var stringBuilder = new StringBuilder();
+                stringBuilder.Append(new Emoji(EnumMapper.I.GetString((ProgressStatus)ProgressData.Status)).Name);
+                stringBuilder.Append(ProgressData.Damage.ToString().PadLeft(6, ' ') + "@");
+                stringBuilder.Append(ProgressData.RemainTime.ToString().PadLeft(2, '0') + " ");
+                stringBuilder.Append(ConversionAttackNumber.AttackNumberToShortString(ProgressData.AttackType) + " ");
+                stringBuilder.Append(DatabaseReportDataController.GetReportCount(PlayerData).ToString() + " ");
+                stringBuilder.Append(PlayerData.GuildUserName + " ");
+
+                if (ProgressData.Status != 1)
+                {
+                    stringBuilder.Append(ProgressData.CommentData);
+                }
+
+                return stringBuilder.ToString();
+            }
+        }
+
         public BattleProgress(ClanData clanData, SocketUserMessage userMessage, byte bossNumber = 0)
         {
             if (clanData.RoleData == null || clanData.ChannelData == null || clanData.MessageData == null)
@@ -51,6 +83,12 @@ namespace PriconneBotConsoleApp.Script
             if (m_UserMessage.Content.StartsWith("!init"))
             {
                 InitializeProgressData();
+                return;
+            }
+            else if (m_UserMessage.Content.StartsWith("!list"))
+            {
+                await SendClanProgressList();
+                return;
             }
 
             UpdateProgressData();
@@ -70,7 +108,7 @@ namespace PriconneBotConsoleApp.Script
 
             var progressPlayerData = DatabasePlayerDataController.LoadPlayerData(m_UserRole, progressUser.Id);
             m_UserProgressData = DatabaseProgressController.GetProgressData(progressPlayerData)
-               .Where(x => x.Status != (byte)ProgressStatus.AttackConfirm || x.Status != (byte)ProgressStatus.CarryOver)
+               .Where(x => x.Status != (byte)ProgressStatus.AttackDone || x.Status != (byte)ProgressStatus.CarryOver)
                .FirstOrDefault();
 
             var successFlag = false;
@@ -95,6 +133,11 @@ namespace PriconneBotConsoleApp.Script
             if (!successFlag)
             {
                 return false;
+            }
+
+            if (m_UserProgressData.Status == (byte)ProgressStatus.Unknown)
+            {
+                m_UserProgressData.Status = (byte)ProgressStatus.AttackReported;
             }
 
             m_UserProgressData.BossNumber = m_BossNumber;
@@ -122,6 +165,10 @@ namespace PriconneBotConsoleApp.Script
             return false;
         }
 
+        /// <summary>
+        /// 凸報告の初期化
+        /// </summary>
+        /// <returns></returns>
         private bool InitializeProgressData()
         {
             var deleteData = DatabaseProgressController.GetProgressData(m_UserClanData);
@@ -139,6 +186,17 @@ namespace PriconneBotConsoleApp.Script
             return false;
         }
 
+        private async Task SendClanProgressList()
+        {
+            var clanProgressEmbed = CreateProgressData();
+            await m_UserMessage.Channel.SendMessageAsync(embed: clanProgressEmbed);
+        }
+
+        /// <summary>
+        /// 編成データをアップデートする。
+        /// </summary>
+        /// <param name="inputCommand"></param>
+        /// <returns></returns>
         private bool UpdateAttackData(string inputCommand)
         {
             var attackNumber = (byte)ConversionAttackNumber.StringToAttackNumber(inputCommand);
@@ -167,6 +225,11 @@ namespace PriconneBotConsoleApp.Script
             return false;
         }
 
+        /// <summary>
+        /// ダメージ・残り時間を抽出。
+        /// </summary>
+        /// <param name="inputCommand"></param>
+        /// <returns></returns>
         private bool UpdateDamageData(string[] inputCommand)
         {
             var damageData = inputCommand.Select(x => Regex.Match(x, @"\d+万")).Where(x => x != null).FirstOrDefault().ToString();
@@ -186,7 +249,7 @@ namespace PriconneBotConsoleApp.Script
 
                 if (damageNumber == 0)
                 {
-                    m_UserProgressData.Status = (byte)ProgressStatus.SaveOurSouls;
+                    m_UserProgressData.Status = (byte)ProgressStatus.SOS;
                 }
 
                 m_UserProgressData.Damage = damageNumber;
@@ -217,7 +280,7 @@ namespace PriconneBotConsoleApp.Script
 
                 if (damageNumber == 0)
                 {
-                    m_UserProgressData.Status = (byte)ProgressStatus.SaveOurSouls;
+                    m_UserProgressData.Status = (byte)ProgressStatus.SOS;
                 }
 
                 m_UserProgressData.Damage = damageNumber;
@@ -231,6 +294,11 @@ namespace PriconneBotConsoleApp.Script
             return false;
         }
 
+        /// <summary>
+        /// 進行報告のステータス変更。
+        /// </summary>
+        /// <param name="inputCommand"></param>
+        /// <returns></returns>
         private bool UpdateStatusData(string[] inputCommand)
         {
             if (m_UserProgressData == null)
@@ -243,18 +311,24 @@ namespace PriconneBotConsoleApp.Script
 
             var dataUpdateFlag = SplitData[0] switch
             {
-                "atk" or "凸確定" => m_UserProgressData.Status = (byte)ProgressStatus.AttackConfirm,
-                "kari" or "仮確定" => m_UserProgressData.Status = (byte)ProgressStatus.TemporaryConfirm,
-                "sos" or "ziko" or "jiko" or "事故" => m_UserProgressData.Status = (byte)ProgressStatus.SaveOurSouls,
+                "atk" or "凸確定" => m_UserProgressData.Status = (byte)ProgressStatus.AttackDone,
+                "kari" or "仮確定" => m_UserProgressData.Status = (byte)ProgressStatus.AttackReady,
+                "sos" or "ziko" or "jiko" or "事故" => m_UserProgressData.Status = (byte)ProgressStatus.SOS,
                 "〆確定" or "fin" => m_UserProgressData.Status = (byte)ProgressStatus.CarryOver,
                 _ => 0,
             };
 
-            if (dataUpdateFlag == 0 || SplitData.Length == 1 || !uint.TryParse(SplitData[1], out uint damegeData))
+            if (dataUpdateFlag == 0)
             {
                 return false;
             }
-            else if (m_UserProgressData.Status == (byte)ProgressStatus.CarryOver)
+
+            if (SplitData.Length == 1 || !uint.TryParse(SplitData[1], out uint damegeData))
+            {
+                return true;
+            }
+
+            if (m_UserProgressData.Status == (byte)ProgressStatus.CarryOver)
             {
                 m_UserProgressData.RemainTime = (byte)damegeData;
                 return true;
@@ -263,6 +337,65 @@ namespace PriconneBotConsoleApp.Script
             m_UserProgressData.Damage = damegeData;
             
             return true;
+        }
+
+        private Embed CreateProgressData()
+        {
+            var clanProgressData = DatabaseProgressController.GetProgressData(m_UserClanData)
+                .OrderBy(x => x.Status).ThenByDescending(x => x.Damage).ThenBy(x => x.CreateDateTime)
+                .ToArray();
+            var clanPlayerDataList = DatabasePlayerDataController.LoadPlayerData(m_UserClanData);
+            var progressPlayer = clanProgressData.Select(x => new PlayerInfo(
+                clanPlayerDataList.FirstOrDefault(y => y.PlayerID == x.PlayerID),
+                x
+                )).ToArray();
+
+            var summaryStringBuilder = new StringBuilder();
+            // 持ち越しデータ出力
+            summaryStringBuilder.AppendLine("凸済み:" + progressPlayer.Where(x => x.ProgressData.Status == (byte)ProgressStatus.AttackDone).Count() + "/"
+                + "持ち越し中" + "0");
+
+            var remainAttackString = new StringBuilder();
+            remainAttackString.Append("残凸 ");
+            for (int i = Common.MaxReportNumber; i >= 0; i--)
+            {
+                remainAttackString.Append((i == 0 ? "完" : i + "凸:") + DatabaseReportDataController.GetRemainPlayerCount(m_UserClanData, i) + "人 ");
+            }
+            summaryStringBuilder.AppendLine(remainAttackString.ToString());
+
+            // ボスのHPをここに入力(万表示)
+            var bossHP = 0;
+
+            var sumAttackDoneHP = progressPlayer.Where(x => x.ProgressData.Status == (byte)ProgressStatus.AttackDone).Select(x => (int)x.ProgressData.Damage).Sum();
+            var sumAttackReadyHP = progressPlayer.Where(x => x.ProgressData.Status == (byte)ProgressStatus.AttackReady).Select(x => (int)x.ProgressData.Damage).Sum();
+
+            summaryStringBuilder.AppendLine("現在HP " + (bossHP - sumAttackDoneHP) + "万 / " + bossHP + "万");
+            summaryStringBuilder.AppendLine("仮確HP " + (bossHP - sumAttackReadyHP - sumAttackDoneHP) + "万 / " + bossHP + "万");
+
+            var headerFieldBuilder = new EmbedFieldBuilder()
+            {
+                Name = "概要",
+                Value = summaryStringBuilder.ToString(),
+            };
+
+            var reportMessage = string.Join("\n", progressPlayer.Select(x => x.GetNameWithData()).ToArray()) + "\n";
+            var embedFieldBuilder = new EmbedFieldBuilder()
+            {
+                Name = "参加者",
+                Value = reportMessage.Length == 0 ? "参加者なし" : "```Python\n" + reportMessage + "```",
+            };
+
+            var embedBuilder = new EmbedBuilder();
+            embedBuilder.AddField(headerFieldBuilder);
+            embedBuilder.AddField(embedFieldBuilder);
+            embedBuilder.Title = $"{m_UserClanData.GetBossLap(m_BossNumber)}周目 {m_BossNumber}ボス";
+
+            embedBuilder.Footer = new EmbedFooterBuilder()
+            {
+                Text = $"最終更新時刻 : {DateTime.Now:T}",
+            };
+
+            return embedBuilder.Build();
         }
     }
 }
