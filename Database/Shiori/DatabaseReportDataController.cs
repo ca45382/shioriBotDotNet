@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.Define;
 
 namespace PriconneBotConsoleApp.Database
 {
@@ -38,6 +39,27 @@ namespace PriconneBotConsoleApp.Database
                 .Include(x => x.PlayerData)
                 .Where(x => x.PlayerData.ClanID == clanData.ClanID && !x.SubdueFlag && !x.DeleteFlag)
                 .ToList();
+        }
+
+        public static int GetRemainPlayerCount(ClanData clanData, int remainReport)
+        {
+            using var databaseConnector = new DatabaseConnector();
+
+            return databaseConnector.PlayerData.AsQueryable()
+                .Where(x => x.ClanID == clanData.ClanID)
+                .Where(x => 
+                    databaseConnector.ReportData.AsQueryable().Where(y => y.PlayerID == x.PlayerID && !y.SubdueFlag && !y.DeleteFlag).Count() 
+                    == (Common.MaxReportNumber - remainReport))
+                .Count();
+        }
+
+        public static int GetReportCount(PlayerData playerData)
+        {
+            using var databaseConnector = new DatabaseConnector();
+
+            return databaseConnector.ReportData.AsQueryable()
+                .Where(x => x.PlayerID == playerData.PlayerID && !x.SubdueFlag && !x.DeleteFlag)
+                .Count();
         }
 
         /// <summary>
