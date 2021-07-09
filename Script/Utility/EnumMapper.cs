@@ -13,17 +13,7 @@ namespace PriconneBotConsoleApp.Script
         private Dictionary<int, string> m_ErrorTypes = new Dictionary<int, string>();
 
         private static EnumMapper s_Instance;
-        public static EnumMapper I
-        {
-            get
-            {
-                if(s_Instance == null)
-                {
-                    s_Instance = new EnumMapper();
-                }
-                return s_Instance;
-            }
-        }
+        public static EnumMapper I => s_Instance ??= new EnumMapper();
 
         public EnumMapper()
         {
