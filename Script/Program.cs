@@ -148,7 +148,7 @@ namespace PriconneBotConsoleApp.Script
 
                 await Task.Run(() => Thread.Sleep(updateTimeSpan));
                 initialize.UpdateRediveDatabase();
-;            }
+            }
         }
 
         /// <summary>
