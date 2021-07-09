@@ -27,6 +27,7 @@ namespace PriconneBotConsoleApp.Database
         public DbSet<ReservationData> ReservationData { get; set; }
         public DbSet<DeclarationData> DeclarationData { get; set; }
         public DbSet<ReportData> ReportData { get; set; }
+        public DbSet<CarryOverData> CarryOverData { get; set; }
         public DbSet<TaskKillData> TaskKillData { get; set; }
 
 
@@ -101,6 +102,11 @@ namespace PriconneBotConsoleApp.Database
             modelBuilder.Entity<ReportData>()
                 .HasOne(x => x.PlayerData)
                 .WithMany(x => x.ReportData)
+                .HasForeignKey(x => x.PlayerID);
+
+            modelBuilder.Entity<CarryOverData>()
+                .HasOne(x => x.PlayerData)
+                .WithMany(x => x.CarryOverData)
                 .HasForeignKey(x => x.PlayerID);
 
             modelBuilder.Entity<TaskKillData>()
