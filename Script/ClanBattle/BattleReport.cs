@@ -341,9 +341,9 @@ namespace PriconneBotConsoleApp.Script
             {
                 await messageData.DeleteAsync();
             }
-            catch
+            catch (Exception e)
             {
-                
+                Console.WriteLine(e.Message);
             }
         }
     }
