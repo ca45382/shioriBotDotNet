@@ -9,5 +9,8 @@
         public const int MaxBattleTime = 90;
 
         public const int DateUpdateHour = 5;
+
+        public const int MaxReportNumber = 3;
+        public const int MaxClanPlayer = 30;
     }
 }
