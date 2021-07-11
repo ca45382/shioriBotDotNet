@@ -167,7 +167,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var splitContent = m_UserMessage.Content.ZenToHan().Split(" ", StringSplitOptions.RemoveEmptyEntries);
 
-            if (splitContent.Count() != 3)
+            if (splitContent.Length != 3)
             {
                 return;
             }
