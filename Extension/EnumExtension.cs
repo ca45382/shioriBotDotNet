@@ -10,7 +10,7 @@ namespace PriconneBotConsoleApp.Extension
             var descriptionAttribute = type.GetType()
                .GetField(type.ToString()).GetCustomAttribute<DescriptionAttribute>(false);
 
-            return descriptionAttribute?.Description;
+            return descriptionAttribute?.Description ?? type.ToString();
         }
     }
 }
