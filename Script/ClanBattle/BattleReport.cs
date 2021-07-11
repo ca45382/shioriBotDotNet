@@ -148,12 +148,13 @@ namespace PriconneBotConsoleApp.Script
             {
                 var taskList = new List<Task>();
                 taskList.Add(m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
+                var deleteSpan = 30;
                 if (playerData.UserID != m_UserMessage.Author.Id)
                 {
                     taskList.Add(SendSystemMessage(
                         m_UserMessage.Channel,
-                        $"<@{playerData.UserID}>の凸報告を代理削除しました。\nこのメッセージは30秒後削除されます。",
-                        30
+                        string.Format(EnumMapper.I.GetString(InfomationType.DeleteInsted), playerData.UserID, deleteSpan),
+                        deleteSpan
                         ));
                 }
                 Task.Run(() => Task.WhenAll(taskList.ToArray())); 
