@@ -151,6 +151,7 @@ namespace PriconneBotConsoleApp.Script
                 var deleteSpan = 30;
                 if (playerData.UserID != m_UserMessage.Author.Id)
                 {
+                    // TODO : 送信用の関数を作成したい。
                     taskList.Add(SendSystemMessage(
                         m_UserMessage.Channel,
                         string.Format(EnumMapper.I.GetString(InfomationType.DeleteInsted), playerData.UserID, deleteSpan),
