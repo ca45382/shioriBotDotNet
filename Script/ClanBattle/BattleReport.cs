@@ -146,19 +146,19 @@ namespace PriconneBotConsoleApp.Script
             var removeData = recentReportData.Last();
             if (DatabaseReportDataController.DeleteReportData(removeData))
             {
-                var taskList = new List<Task>();
-                taskList.Add(m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
+                _ = m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success)));
+                // TODO : マジックナンバーどこかで定義
                 var deleteSpan = 30;
+
                 if (playerData.UserID != m_UserMessage.Author.Id)
                 {
                     // TODO : 送信用の関数を作成したい。
-                    taskList.Add(SendSystemMessage(
+                    _ = SendSystemMessage(
                         m_UserMessage.Channel,
                         string.Format(EnumMapper.I.GetString(InfomationType.DeleteInsted), playerData.UserID, deleteSpan),
                         deleteSpan
-                        ));
+                    );
                 }
-                Task.Run(() => Task.WhenAll(taskList.ToArray())); 
             }
         }
 
@@ -169,7 +169,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var splitContent = m_UserMessage.Content.ZenToHan().Split(" ", StringSplitOptions.RemoveEmptyEntries);
 
-            if (splitContent.Length != 3)
+            if (splitContent.Length != Common.MaxReportNumber)
             {
                 return;
             }
@@ -194,9 +194,10 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var userReportedData = DatabaseReportDataController.GetReportData(registerPlayerData);
+            // TODO : マジックナンバーどこかで定義
             var deleteSpan = 5;
 
-            if (userReportedData.Count() >= 3)
+            if (userReportedData.Count() >= Common.MaxReportNumber)
             {
                 Task.Run(() => SendSystemMessage(m_UserMessage.Channel, EnumMapper.I.GetString(ErrorType.UpperLimitReport) , deleteSpan));
                 return;
