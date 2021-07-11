@@ -28,6 +28,7 @@ namespace PriconneBotConsoleApp.DataModel
         public List<ReservationData> ReservationData { get; set; }
         public List<DeclarationData> DeclarationData { get; set; }
         public List<ReportData> ReportData { get; set; }
+        public List<CarryOverData> CarryOverData { get; set; }
         public List<TaskKillData> TaskKillData { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace PriconneBotConsoleApp.Script
             var guildID = messageChannel.Guild.Id;
             var userID = message.Author.Id;
             m_PlayerData = DatabasePlayerDataController.LoadPlayerData(guildID, userID);
-            
+
             if (m_PlayerData == null)
             {
                 return;
@@ -47,7 +47,7 @@ namespace PriconneBotConsoleApp.Script
 
         public async Task RunMessageReceive(SocketUserMessage message)
         {
-            await new TimeLineConversion(message).RunByMessage() ;
+            await new TimeLineConversion(message).RunByMessage();
             await new PriconneEventViewer(message).SendEventInfomationByMessage();
 
             if (m_PlayerData == null || m_PlayerClanData == null)
@@ -72,7 +72,7 @@ namespace PriconneBotConsoleApp.Script
                 await new BattleDeclaration(m_PlayerClanData, message).RunDeclarationCommandByMessage();
             }
 
-            if(messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.TaskKillID))
+            if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.TaskKillID))
             {
                 await new BattleTaskKill(m_PlayerClanData, message).RunByMessageCommands();
             }
@@ -80,6 +80,11 @@ namespace PriconneBotConsoleApp.Script
             if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.ReportID))
             {
                 await new BattleReport(m_PlayerClanData, message).RunByMessage();
+            }
+
+            if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.CarryOverID))
+            {
+                await new BattleCarryOver(m_PlayerClanData, message).RunByMessage();
             }
         }
     }
