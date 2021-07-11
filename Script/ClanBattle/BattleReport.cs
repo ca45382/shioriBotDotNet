@@ -194,10 +194,11 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var userReportedData = DatabaseReportDataController.GetReportData(registerPlayerData);
+            var deleteSpan = 5;
 
             if (userReportedData.Count() >= 3)
             {
-                Task.Run(() => SendSystemMessage(m_UserMessage.Channel, "報告件数が規定数を超えています。", 5));
+                Task.Run(() => SendSystemMessage(m_UserMessage.Channel, EnumMapper.I.GetString(ErrorType.UpperLimitReport) , deleteSpan));
                 return;
             }
 
