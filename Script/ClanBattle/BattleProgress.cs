@@ -21,6 +21,7 @@ namespace PriconneBotConsoleApp.Script
         private readonly ClanData m_UserClanData;
         private readonly SocketGuild m_Guild;
         private readonly byte m_BossNumber;
+        private readonly bool m_AllBattleFlag = true;
 
         private ProgressData m_UserProgressData;
 
@@ -66,6 +67,7 @@ namespace PriconneBotConsoleApp.Script
             if (bossNumber == 0)
             {
                 m_BossNumber = clanData.GetNowBoss();
+                m_AllBattleFlag = false;
             }
             else
             {
@@ -91,12 +93,12 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            UpdateProgressData();
+            await UpdateProgressData();
 
             return;
         }
 
-        private bool UpdateProgressData()
+        private async Task<bool> UpdateProgressData()
         {
             var messageData = m_UserMessage.Content.ZenToHan().Split(" ", StringSplitOptions.RemoveEmptyEntries);
             var progressUser = m_UserMessage.Author;
@@ -150,6 +152,7 @@ namespace PriconneBotConsoleApp.Script
                 if (DatabaseProgressController.CreateProgressData(m_UserProgressData))
                 {
                     Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
+                    await SendClanProgressList();
                     return true;
                 }
             }
@@ -158,6 +161,7 @@ namespace PriconneBotConsoleApp.Script
                 if (DatabaseProgressController.ModifyProgressData(m_UserProgressData))
                 {
                     Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
+                    await SendClanProgressList();
                     return true;
                 }
             }
@@ -186,10 +190,47 @@ namespace PriconneBotConsoleApp.Script
             return false;
         }
 
-        private async Task SendClanProgressList()
+        private async Task SendClanProgressList(bool removeLastMessage = true)
         {
             var clanProgressEmbed = CreateProgressData();
-            await m_UserMessage.Channel.SendMessageAsync(embed: clanProgressEmbed);
+            var sendMessage = await m_UserMessage.Channel.SendMessageAsync(embed: clanProgressEmbed);
+            var bossNumber = 0;
+
+            if (sendMessage == null)
+            {
+                return;
+            }
+
+            if (m_AllBattleFlag)
+            {
+                bossNumber = m_BossNumber;
+            }
+
+            var progressChannel = m_Guild.GetChannel(m_UserClanData.ChannelData.GetChannelID(m_UserClanData.ClanID, BossNumberToChannelType(bossNumber))) as SocketTextChannel;
+            var lastMessageID = m_UserClanData.MessageData.GetMessageID(m_UserClanData.ClanID, BossNumberToMessageType(bossNumber));
+            DatabaseMessageDataController.UpdateMessageID(m_UserClanData, sendMessage.Id, BossNumberToMessageType(bossNumber));
+            var lastMessage = progressChannel.GetCachedMessage(lastMessageID);
+
+            if (lastMessage == null)
+            {
+                IMessage lastIMessage;
+
+                try
+                {
+                    lastIMessage = await progressChannel.GetMessageAsync(lastMessageID);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    return;
+                }
+
+                await lastIMessage.DeleteAsync();
+                return;
+            }
+
+            await lastMessage.DeleteAsync();
+            return;
         }
 
         /// <summary>
@@ -378,11 +419,11 @@ namespace PriconneBotConsoleApp.Script
                 Value = summaryStringBuilder.ToString(),
             };
 
-            var reportMessage = string.Join("\n", progressPlayer.Select(x => x.GetNameWithData()).ToArray()) + "\n";
+            var reportMessage = string.Join("\n", progressPlayer.Select(x => x.GetNameWithData()).ToArray());
             var embedFieldBuilder = new EmbedFieldBuilder()
             {
                 Name = "参加者",
-                Value = reportMessage.Length == 0 ? "参加者なし" : "```Python\n" + reportMessage + "```",
+                Value = reportMessage.Length == 0 ? "参加者なし" : "```Python\n" + reportMessage + "\n```",
             };
 
             var embedBuilder = new EmbedBuilder();
@@ -396,6 +437,32 @@ namespace PriconneBotConsoleApp.Script
             };
 
             return embedBuilder.Build();
+        }
+
+        private MessageFeatureType BossNumberToMessageType(int bossNumber)
+        {
+            return bossNumber switch
+            {
+                (int)BossNumberType.Boss1Number => MessageFeatureType.ProgressBoss1ID,
+                (int)BossNumberType.Boss2Number => MessageFeatureType.ProgressBoss2ID,
+                (int)BossNumberType.Boss3Number => MessageFeatureType.ProgressBoss3ID,
+                (int)BossNumberType.Boss4Number => MessageFeatureType.ProgressBoss4ID,
+                (int)BossNumberType.Boss5Number => MessageFeatureType.ProgressBoss5ID,
+                _ => MessageFeatureType.ProgressID,
+            };
+        }
+
+        private ChannelFeatureType BossNumberToChannelType(int bossNumber)
+        {
+            return bossNumber switch
+            {
+                (int)BossNumberType.Boss1Number => ChannelFeatureType.ProgressBoss1ID,
+                (int)BossNumberType.Boss2Number => ChannelFeatureType.ProgressBoss2ID,
+                (int)BossNumberType.Boss3Number => ChannelFeatureType.ProgressBoss3ID,
+                (int)BossNumberType.Boss4Number => ChannelFeatureType.ProgressBoss4ID,
+                (int)BossNumberType.Boss5Number => ChannelFeatureType.ProgressBoss5ID,
+                _ => ChannelFeatureType.ProgressID,
+            };
         }
     }
 }
