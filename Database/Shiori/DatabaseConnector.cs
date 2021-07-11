@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore;
 using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.Script;
@@ -28,6 +28,7 @@ namespace PriconneBotConsoleApp.Database
         public DbSet<DeclarationData> DeclarationData { get; set; }
         public DbSet<ReportData> ReportData { get; set; }
         public DbSet<ProgressData> ProgressData { get; set; }
+        public DbSet<CarryOverData> CarryOverData { get; set; }
         public DbSet<TaskKillData> TaskKillData { get; set; }
 
 
@@ -107,6 +108,11 @@ namespace PriconneBotConsoleApp.Database
             modelBuilder.Entity<ProgressData>()
                 .HasOne(x => x.PlayerData)
                 .WithMany(x => x.ProgressData)
+                .HasForeignKey(x => x.PlayerID);
+                
+            modelBuilder.Entity<CarryOverData>()
+                .HasOne(x => x.PlayerData)
+                .WithMany(x => x.CarryOverData)
                 .HasForeignKey(x => x.PlayerID);
 
             modelBuilder.Entity<TaskKillData>()
