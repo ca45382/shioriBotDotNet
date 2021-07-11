@@ -18,6 +18,30 @@ namespace PriconneBotConsoleApp.Database
                 .ToList();
         }
 
+        public static IEnumerable<PlayerData> LoadPlayerData(SocketRole roleData)
+        {
+            using var databaseConnector = new DatabaseConnector();
+            var clanData = databaseConnector.ClanData.AsQueryable()
+                .Where(x => x.ClanRoleID == roleData.Id && x.ServerID == roleData.Guild.Id)
+                .FirstOrDefault();
+
+            if (clanData == null)
+            {
+                return null;
+            }
+
+            return LoadPlayerData(clanData);
+        }
+
+        public static IEnumerable<PlayerData> LoadPlayerData(ClanData clanData)
+        {
+            using var databaseConnector = new DatabaseConnector();
+
+            return databaseConnector.PlayerData.AsQueryable()
+                .Where(x => x.ClanID == clanData.ClanID)
+                .ToList();
+        }
+
         public static PlayerData LoadPlayerData(ulong serverID, ulong userID)
         {
             using var databaseConnector = new DatabaseConnector();

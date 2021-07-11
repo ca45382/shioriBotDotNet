@@ -11,6 +11,7 @@ namespace PriconneBotConsoleApp.Script
 
         private Dictionary<int, string> m_ReactionTypes = new Dictionary<int, string>();
         private Dictionary<int, string> m_ErrorTypes = new Dictionary<int, string>();
+        private Dictionary<int, string> m_InfomationTypes = new Dictionary<int, string>();
 
         private static EnumMapper s_Instance;
         public static EnumMapper I => s_Instance ??= new EnumMapper();
@@ -19,6 +20,7 @@ namespace PriconneBotConsoleApp.Script
         {
             m_EnumDictionary.Add(typeof(ReactionType), m_ReactionTypes);
             m_EnumDictionary.Add(typeof(ErrorType), m_ErrorTypes);
+            m_EnumDictionary.Add(typeof(InfomationType), m_InfomationTypes);
         }
 
         public string GetString<T>(T data) where T : Enum
