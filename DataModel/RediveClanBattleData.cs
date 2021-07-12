@@ -17,6 +17,8 @@ namespace PriconneBotConsoleApp.DataModel
 
         public class BossData
         {
+            public int LapNumberFrom;
+            public int LapNumberTo;
             public int Phase;
             public byte BossNumber;
             public int WaveGroupID;
@@ -57,6 +59,8 @@ namespace PriconneBotConsoleApp.DataModel
                 {
                     bossStatusList.Add(new BossData()
                     {
+                        LapNumberFrom = clanBattleData.LapNumberFrom,
+                        LapNumberTo = clanBattleData.LapNumberTo,
                         BossNumber = (byte)i,
                         WaveGroupID = clanBattleData.GetWaveGroupID((BossNumberType)i),
                         ScoreCoefficient = clanBattleData.GetScoreCoefficient((BossNumberType)i),
