@@ -7,7 +7,7 @@ namespace PriconneBotConsoleApp.DataModel
     [Table("clan_battle_schedule")]
     public class ClanBattleSchedule
     {
-        [Column("clan_battle_id", TypeName = "INTEGER")]
+        [Column("clan_battle_id", TypeName = "INTEGER"), Key]
         public int ClanBattleID { get; set; }
 
         [Column("release_month", TypeName = "INTEGER")]

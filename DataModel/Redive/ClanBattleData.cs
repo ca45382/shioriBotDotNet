@@ -1,13 +1,14 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using PriconneBotConsoleApp.DataType;
 
 namespace PriconneBotConsoleApp.DataModel
 {
     [Table("clan_battle_2_map_data")]
     public class ClanBattleData
     {
-        [Column("id", TypeName = "INTEGER"),Key]
+        [Column("id", TypeName = "INTEGER"), Key]
         public int ID { get; set; }
 
         [Column("clan_battle_id", TypeName = "INTEGER")]
@@ -51,5 +52,31 @@ namespace PriconneBotConsoleApp.DataModel
 
         [Column("score_coefficient_5", TypeName = "REAL")]
         public float ScoreCoefficient5 { get; set; }
+
+        public int GetWaveGroupID(BossNumberType bossNumber)
+        {
+            return bossNumber switch
+            {
+                BossNumberType.Boss1Number => WaveGroupID1,
+                BossNumberType.Boss2Number => WaveGroupID2,
+                BossNumberType.Boss3Number => WaveGroupID3,
+                BossNumberType.Boss4Number => WaveGroupID4,
+                BossNumberType.Boss5Number => WaveGroupID5,
+                _ => 0,
+            };
+        }
+
+        public float GetScoreCoefficient(BossNumberType bossNumber)
+        {
+            return bossNumber switch
+            {
+                BossNumberType.Boss1Number => ScoreCoefficient1,
+                BossNumberType.Boss2Number => ScoreCoefficient2,
+                BossNumberType.Boss3Number => ScoreCoefficient3,
+                BossNumberType.Boss4Number => ScoreCoefficient4,
+                BossNumberType.Boss5Number => ScoreCoefficient5,
+                _ => 0,
+            };
+        }
     }
 }
