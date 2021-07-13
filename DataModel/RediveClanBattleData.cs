@@ -97,6 +97,7 @@ namespace PriconneBotConsoleApp.DataModel
                 bossStatus.Level = enemyData.Level;
             }
 
+            BossDataList = bossStatusList.ToArray();
             return true;
         }
     }
