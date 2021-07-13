@@ -5,27 +5,28 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.DataType;
 
 namespace PriconneBotConsoleApp.Database
 {
     public static class DatabaseProgressController
     {
-        public static IEnumerable<ProgressData> GetProgressData(ClanData clanData)
+        public static IEnumerable<ProgressData> GetProgressData(ClanData clanData, BossNumberType bossNumber)
         {
             using var databaseConnector = new DatabaseConnector();
 
             return databaseConnector.ProgressData.AsQueryable()
                 .Include(x => x.PlayerData)
-                .Where(x => x.PlayerData.ClanID == clanData.ClanID && !x.DeleteFlag)
+                .Where(x => x.PlayerData.ClanID == clanData.ClanID && x.BossNumber == (byte)bossNumber && !x.DeleteFlag)
                 .ToArray();
         }
 
-        public static IEnumerable<ProgressData> GetProgressData(PlayerData playerData)
+        public static IEnumerable<ProgressData> GetProgressData(PlayerData playerData, BossNumberType bossNumber)
         {
             using var databaseConnector = new DatabaseConnector();
 
             return databaseConnector.ProgressData.AsQueryable()
-                .Where(x => x.PlayerID == playerData.PlayerID && !x.DeleteFlag)
+                .Where(x => x.PlayerID == playerData.PlayerID && x.BossNumber == (byte)bossNumber && !x.DeleteFlag)
                 .ToArray();
         }
 

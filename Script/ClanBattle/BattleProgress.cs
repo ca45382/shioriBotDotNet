@@ -109,7 +109,7 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var progressPlayerData = DatabasePlayerDataController.LoadPlayerData(m_UserRole, progressUser.Id);
-            m_UserProgressData = DatabaseProgressController.GetProgressData(progressPlayerData)
+            m_UserProgressData = DatabaseProgressController.GetProgressData(progressPlayerData, (BossNumberType)m_BossNumber)
                .Where(x => x.Status != (byte)ProgressStatus.AttackDone || x.Status != (byte)ProgressStatus.CarryOver)
                .FirstOrDefault();
 
@@ -175,7 +175,7 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private bool InitializeProgressData()
         {
-            var deleteData = DatabaseProgressController.GetProgressData(m_UserClanData);
+            var deleteData = DatabaseProgressController.GetProgressData(m_UserClanData, (BossNumberType)m_BossNumber);
 
             if (deleteData == null)
             {
@@ -382,7 +382,7 @@ namespace PriconneBotConsoleApp.Script
 
         private Embed CreateProgressData()
         {
-            var clanProgressData = DatabaseProgressController.GetProgressData(m_UserClanData)
+            var clanProgressData = DatabaseProgressController.GetProgressData(m_UserClanData, (BossNumberType)m_BossNumber)
                 .OrderBy(x => x.Status).ThenByDescending(x => x.Damage).ThenBy(x => x.CreateDateTime)
                 .ToArray();
             var clanPlayerDataList = DatabasePlayerDataController.LoadPlayerData(m_UserClanData);
@@ -390,6 +390,9 @@ namespace PriconneBotConsoleApp.Script
                 clanPlayerDataList.FirstOrDefault(y => y.PlayerID == x.PlayerID),
                 x
                 )).ToArray();
+            var bossLap = m_UserClanData.GetBossLap(m_BossNumber);
+            var bossData = RediveClanBattleData.BossDataList
+                .FirstOrDefault(x => x.BossNumber == m_BossNumber && x.LapNumberFrom <= bossLap && (x.LapNumberTo == -1 || x.LapNumberTo >= bossLap));
 
             var summaryStringBuilder = new StringBuilder();
             // 持ち越しデータ出力
@@ -405,7 +408,7 @@ namespace PriconneBotConsoleApp.Script
             summaryStringBuilder.AppendLine(remainAttackString.ToString());
 
             // ボスのHPをここに入力(万表示)
-            var bossHP = 0;
+            var bossHP = bossData?.HP/10000 ?? 0;
 
             var sumAttackDoneHP = progressPlayer.Where(x => x.ProgressData.Status == (byte)ProgressStatus.AttackDone).Select(x => (int)x.ProgressData.Damage).Sum();
             var sumAttackReadyHP = progressPlayer.Where(x => x.ProgressData.Status == (byte)ProgressStatus.AttackReady).Select(x => (int)x.ProgressData.Damage).Sum();
@@ -429,7 +432,7 @@ namespace PriconneBotConsoleApp.Script
             var embedBuilder = new EmbedBuilder();
             embedBuilder.AddField(headerFieldBuilder);
             embedBuilder.AddField(embedFieldBuilder);
-            embedBuilder.Title = $"{m_UserClanData.GetBossLap(m_BossNumber)}周目 {m_BossNumber}ボス";
+            embedBuilder.Title = $"{m_UserClanData.GetBossLap(m_BossNumber)}周目 {m_BossNumber}ボス {bossData.Name}";
 
             embedBuilder.Footer = new EmbedFooterBuilder()
             {
