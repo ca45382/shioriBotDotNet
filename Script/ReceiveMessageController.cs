@@ -58,6 +58,8 @@ namespace PriconneBotConsoleApp.Script
             var messageChannelID = message.Channel.Id;
             var fetureID = m_PlayerClanData.ChannelData.FirstOrDefault(x => x.ChannelID == messageChannelID)?.FeatureID ?? 0;
 
+            var featureID = m_PlayerClanData.ChannelData.Where(x => x.ChannelID == messageChannelID).FirstOrDefault()?.FeatureID ?? 0;
+
             if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.ReserveID))
             {
                 await new BattleReservation(m_PlayerClanData, message).RunReservationCommand();
@@ -101,6 +103,27 @@ namespace PriconneBotConsoleApp.Script
             if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.ProgressID))
             {
                 await new BattleProgress(m_PlayerClanData, message).RunByMessage();
+            }
+
+            if (featureID == (uint)ChannelFeatureType.ProgressBoss1ID)
+            {
+                await new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss1Number).RunByMessage();
+            }
+            else if(featureID == (uint)ChannelFeatureType.ProgressBoss2ID)
+            {
+                await new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss2Number).RunByMessage();
+            }
+            else if (featureID == (uint)ChannelFeatureType.ProgressBoss3ID)
+            {
+                await new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss3Number).RunByMessage();
+            }
+            else if (featureID == (uint)ChannelFeatureType.ProgressBoss4ID)
+            {
+                await new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss4Number).RunByMessage();
+            }
+            else if (featureID == (uint)ChannelFeatureType.ProgressBoss5ID)
+            {
+                await new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss5Number).RunByMessage();
             }
         }
     }

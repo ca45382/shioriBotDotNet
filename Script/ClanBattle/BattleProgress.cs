@@ -82,19 +82,24 @@ namespace PriconneBotConsoleApp.Script
 
         public async Task RunByMessage()
         {
-            if (m_UserMessage.Content.StartsWith("!init"))
+            if (m_UserMessage.Content.StartsWith("!"))
             {
-                InitializeProgressData();
-                return;
+                if (m_UserMessage.Content.StartsWith("!init"))
+                {
+                    InitializeProgressData();
+                    return;
+                }
+                else if (m_UserMessage.Content.StartsWith("!list"))
+                {
+                    await SendClanProgressList();
+                    return;
+                }
             }
-            else if (m_UserMessage.Content.StartsWith("!list"))
+            else
             {
-                await SendClanProgressList();
-                return;
+                await UpdateProgressData();
             }
-
-            await UpdateProgressData();
-
+            
             return;
         }
 
@@ -151,7 +156,7 @@ namespace PriconneBotConsoleApp.Script
 
                 if (DatabaseProgressController.CreateProgressData(m_UserProgressData))
                 {
-                    Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
+                    _ = m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success)));
                     await SendClanProgressList();
                     return true;
                 }
@@ -160,7 +165,7 @@ namespace PriconneBotConsoleApp.Script
             {
                 if (DatabaseProgressController.ModifyProgressData(m_UserProgressData))
                 {
-                    Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
+                    _ = m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success)));
                     await SendClanProgressList();
                     return true;
                 }
