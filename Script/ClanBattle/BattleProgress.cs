@@ -41,7 +41,8 @@ namespace PriconneBotConsoleApp.Script
             public string GetNameWithData()
             {
                 var stringBuilder = new StringBuilder();
-                stringBuilder.Append(new Emoji(EnumMapper.I.GetString((ProgressStatus)ProgressData.Status)).Name);
+                stringBuilder.Append(new Emoji(EnumMapper.I.GetString((ProgressStatus)ProgressData.Status)).Name + " ");
+                stringBuilder.Append((ProgressData.CarryOverFlag ? "持" : "　") + " ");
                 stringBuilder.Append(ProgressData.Damage.ToString().PadLeft(6, ' ') + "@");
                 stringBuilder.Append(ProgressData.RemainTime.ToString().PadLeft(2, '0') + " ");
                 stringBuilder.Append(ConversionAttackNumber.AttackNumberToShortString(ProgressData.AttackType) + " ");
@@ -92,6 +93,11 @@ namespace PriconneBotConsoleApp.Script
                 else if (m_UserMessage.Content.StartsWith("!list"))
                 {
                     await SendClanProgressList();
+                    return;
+                }
+                else if (m_UserMessage.Content.StartsWith("!next"))
+                {
+                    NextLap();
                     return;
                 }
             }
@@ -172,6 +178,34 @@ namespace PriconneBotConsoleApp.Script
             }
 
             return false;
+        }
+        
+        private async Task<bool> NextLap()
+        {
+            InitializeProgressData();
+            var bossLap = m_UserClanData.GetBossLap(m_BossNumber);
+
+            if (m_AllBattleFlag)
+            {
+                m_UserClanData.SetBossLap(m_BossNumber, bossLap + 1);
+
+            }
+            else
+            {
+                if (m_BossNumber >= Common.MaxBossNumber)
+                {
+                    m_UserClanData.SetBossLap(Common.MinBossNumber, bossLap + 1);
+                }
+                else
+                {
+                    m_UserClanData.SetBossLap(m_BossNumber + 1, bossLap);
+                }
+            }
+
+            DatabaseClanDataController.UpdateClanData(m_UserClanData);
+            await SendClanProgressList();
+
+            return true;
         }
 
         /// <summary>
@@ -437,7 +471,7 @@ namespace PriconneBotConsoleApp.Script
             var embedBuilder = new EmbedBuilder();
             embedBuilder.AddField(headerFieldBuilder);
             embedBuilder.AddField(embedFieldBuilder);
-            embedBuilder.Title = $"{m_UserClanData.GetBossLap(m_BossNumber)}周目 {m_BossNumber}ボス {bossData.Name}";
+            embedBuilder.Title = $"{m_UserClanData.GetBossLap(m_BossNumber)}周目 {m_BossNumber}ボス {bossData?.Name??""}";
 
             embedBuilder.Footer = new EmbedFooterBuilder()
             {

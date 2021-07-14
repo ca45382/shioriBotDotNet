@@ -17,9 +17,13 @@ namespace PriconneBotConsoleApp.DataModel
         [Column("player_id", TypeName = "BIGINT UNSIGNED"), Required]
         public ulong PlayerID { get; set; }
 
-        [Column("date_time"), Required]
+        [Column("create_date_time"), Required]
         [Timestamp]
         public DateTime CreateDateTime { get; set; }
+
+        [Column("update_date_time"), Required]
+        [Timestamp]
+        public DateTime UpdateDateTime { get; set; }
 
         [Column("damage", TypeName = "INT UNSIGNED")]
         public uint Damage { get; set; }
