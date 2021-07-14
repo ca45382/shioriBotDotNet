@@ -13,7 +13,7 @@ namespace PriconneBotConsoleApp.DataModel
         public static int ReleaseMonth { get; private set; } = 0;
         public static DateTime ClanBattleStartTime { get; private set; }
         public static DateTime ClanBattleEndTime { get; private set; }
-        public static BossData[] BossDataList { get; private set; }
+        public static IEnumerable<BossData> BossDataList { get; private set; }
 
         public class BossData
         {
@@ -92,12 +92,18 @@ namespace PriconneBotConsoleApp.DataModel
             foreach (var bossStatus in bossStatusList)
             {
                 var enemyData = enemyDataArray.FirstOrDefault(x => x.EnemyID == bossStatus.EnemyID);
+
+                if (enemyData == null)
+                {
+                    continue;
+                }
+
                 bossStatus.Name = enemyData.Name;
                 bossStatus.HP = enemyData.HP;
                 bossStatus.Level = enemyData.Level;
             }
 
-            BossDataList = bossStatusList.ToArray();
+            BossDataList = bossStatusList;
             return true;
         }
     }
