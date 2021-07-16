@@ -7,6 +7,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using PriconneBotConsoleApp.DataModel;
 
 namespace PriconneBotConsoleApp.Script
 {
@@ -33,6 +34,7 @@ namespace PriconneBotConsoleApp.Script
             };
 
             var initialize = new BotInitialize();
+            RediveClanBattleData.ReloadData();
             initialize.UpdateRediveDatabase();
 
             m_client = new DiscordSocketClient(m_config);
@@ -100,9 +102,7 @@ namespace PriconneBotConsoleApp.Script
             return Task.CompletedTask;
         }
 
-        private Task GuildMemberUpdated(
-            SocketGuildUser oldUserInfo,
-            SocketGuildUser newUserInfo)
+        private Task GuildMemberUpdated(SocketGuildUser oldUserInfo, SocketGuildUser newUserInfo)
         {
             var discordDataLoader = new DiscordDataLoader();
             discordDataLoader.UpdateServerData(newUserInfo.Guild);
@@ -148,6 +148,7 @@ namespace PriconneBotConsoleApp.Script
 
                 await Task.Run(() => Thread.Sleep(updateTimeSpan));
                 initialize.UpdateRediveDatabase();
+                RediveClanBattleData.ReloadData();
             }
         }
 
