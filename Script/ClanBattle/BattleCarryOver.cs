@@ -88,7 +88,8 @@ namespace PriconneBotConsoleApp.Script
         /// </summary>
         private void UpdateCarryOverData()
         {
-            var minCommandLength = 1;
+            const int minCommandLength = 1;
+            // TODO : " "を定数化する。
             var splitMessage = m_UserMessage.Content.ZenToHan().Split(" ", StringSplitOptions.RemoveEmptyEntries);
             var result = false;
 
@@ -115,10 +116,10 @@ namespace PriconneBotConsoleApp.Script
                     return;
                 }
 
-                var databaseCarryOverList = DatabaseCarryOverController.GetCarryOverData(playerData);
+                var databaseCarryOverList = DatabaseCarryOverController.GetCarryOverData(playerData).ToArray();
                 var databaseCarryOverData = databaseCarryOverList.FirstOrDefault(x => x.BossNumber == userCarryOverData.BossNumber && x.RemainTime == userCarryOverData.RemainTime);
 
-                if (databaseCarryOverData == null && databaseCarryOverList.Count() < Common.MaxCarryOverNumber)
+                if (databaseCarryOverData == null && databaseCarryOverList.Length < Common.MaxCarryOverNumber)
                 {
                     result = DatabaseCarryOverController.CreateCarryOverData(userCarryOverData);
                 }
@@ -154,6 +155,7 @@ namespace PriconneBotConsoleApp.Script
             var minCommandLength = 1;
             ulong userID = 0;
             byte deleteNumber = 0;
+            // TODO : " "を定数化する。
             var splitMessage = m_UserMessage.Content.ZenToHan().Split(" ", StringSplitOptions.RemoveEmptyEntries);
 
             if (splitMessage.Length > minCommandLength)
@@ -244,6 +246,7 @@ namespace PriconneBotConsoleApp.Script
             {
                 BossNumber = bossNumber,
                 RemainTime = remainTime,
+                // TODO : " "を定数化する。
                 CommentData = string.Join(" ", messageData.Skip(3)),
                 PlayerID = playerID,
             };
@@ -269,6 +272,7 @@ namespace PriconneBotConsoleApp.Script
                 carryOverStringList.Add(new PlayerInfo(playerData.PlayerID, playerData.GuildUserName, userCarryOverList));
             }
 
+            // TODO : 改行文字も定数化
             var stringData = string.Join('\n', carryOverStringList.Select(x => x.GetCarryOverString()));
 
             EmbedBuilder embedBuilder = new();
