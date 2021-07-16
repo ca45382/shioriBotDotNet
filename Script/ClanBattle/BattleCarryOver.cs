@@ -18,7 +18,6 @@ namespace PriconneBotConsoleApp.Script
         private readonly ClanData m_ClanData;
         private readonly SocketUserMessage m_UserMessage;
         private readonly SocketRole m_ClanRole;
-        private readonly SocketGuild m_Guild;
 
         private class PlayerInfo
         {
@@ -37,7 +36,7 @@ namespace PriconneBotConsoleApp.Script
             {
                 if (CarryOverArray.Length == 0)
                 {
-                    return "";
+                    return string.Empty;
                 }
 
                 var stringData = string.Join(
@@ -53,8 +52,8 @@ namespace PriconneBotConsoleApp.Script
         {
             m_ClanData = clanData;
             m_UserMessage = userMessage;
-            m_Guild = (userMessage.Channel as SocketTextChannel)?.Guild;
-            m_ClanRole = m_Guild?.GetRole(clanData.ClanRoleID);
+            var guild = (userMessage.Channel as SocketTextChannel)?.Guild;
+            m_ClanRole = guild?.GetRole(clanData.ClanRoleID);
         }
 
         public async Task RunByMessage()
@@ -152,7 +151,7 @@ namespace PriconneBotConsoleApp.Script
 
         private void UpdateOtherPlayerData()
         {
-            var minCommandLength = 1;
+            const int minCommandLength = 1;
             ulong userID = 0;
             byte deleteNumber = 0;
             // TODO : " "を定数化する。
@@ -219,7 +218,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var carryOverList = DatabaseCarryOverController.GetCarryOverData(m_ClanData);
 
-            if (carryOverList.Count() == 0)
+            if (!carryOverList.Any())
             {
                 return;
             }
@@ -230,8 +229,8 @@ namespace PriconneBotConsoleApp.Script
 
         private CarryOverData CommandToCarryOverData(string[] messageData)
         {
-            var bossNumberColumn = 1;
-            var remainTimeColumn = 2;
+            const int bossNumberColumn = 1;
+            const int remainTimeColumn = 2;
 
             if (!byte.TryParse(messageData[bossNumberColumn], out var bossNumber) || !byte.TryParse(messageData[remainTimeColumn], out var remainTime)
                 || bossNumber < Common.MinBossNumber || bossNumber > Common.MaxBossNumber

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Database
 {
@@ -110,8 +111,7 @@ namespace PriconneBotConsoleApp.Database
 
             var deleteDataList = databaseConnector.CarryOverData.AsQueryable()
                .Where(x => carryOverDataList.Select(y => y.CarryOverID).Any(y => y == x.CarryOverID))
-               .ToList();
-
+               .AsEnumerable();
             deleteDataList.ForEach(x => x.DeleteFlag = true);
 
             try
