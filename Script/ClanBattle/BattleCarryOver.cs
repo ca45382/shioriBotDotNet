@@ -20,6 +20,35 @@ namespace PriconneBotConsoleApp.Script
         private readonly SocketRole m_ClanRole;
         private readonly SocketGuild m_Guild;
 
+        private class PlayerInfo
+        {
+            public readonly ulong PlayerID;
+            public readonly string PlayerGuildName;
+            public readonly CarryOverData[] CarryOverArray;
+
+            public PlayerInfo(ulong playerID, string playerGuildName, CarryOverData[] carryOverData = null)
+            {
+                PlayerID = playerID;
+                PlayerGuildName = playerGuildName;
+                CarryOverArray = carryOverData ?? Array.Empty<CarryOverData>();
+            }
+
+            public string GetCarryOverString()
+            {
+                if (CarryOverArray.Length == 0)
+                {
+                    return "";
+                }
+
+                var stringData = string.Join(
+                    '\n',
+                    CarryOverArray.Select(x => $"\t- {x.RemainTime}秒 {x.BossNumber}ボス {x.CommentData}").ToArray()
+                    );
+
+                return $"- {PlayerGuildName} {CarryOverArray.Length}つ\n{stringData}";
+            }
+        }
+
         public BattleCarryOver(ClanData clanData, SocketUserMessage userMessage)
         {
             m_ClanData = clanData;
@@ -41,6 +70,10 @@ namespace PriconneBotConsoleApp.Script
                 else if (messageContent.StartsWith("!rm"))
                 {
 
+                }
+                else if (messageContent.StartsWith("!list"))
+                {
+                    await SendClanCarryOverList();
                 }
 
             }
@@ -150,6 +183,12 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
+        private async Task SendClanCarryOverList()
+        {
+            var clanCarryOverEmbed = CreateEmbedData();
+            await m_UserMessage.Channel.SendMessageAsync(embed: clanCarryOverEmbed);
+        }
+
         private bool DeleteCarryOverData(PlayerData playerData, byte deleteNumber = 0)
         {
             var carryOverList = DatabaseCarryOverController.GetCarryOverData(playerData)
@@ -211,5 +250,37 @@ namespace PriconneBotConsoleApp.Script
         }
 
         // 持ち越しを表示するUIを考える
+        private Embed CreateEmbedData()
+        {
+            var carryOverArray = DatabaseCarryOverController.GetCarryOverData(m_ClanData)
+                .OrderBy(x => x.DateTime);
+            var playerArray = DatabasePlayerDataController.LoadPlayerData(m_ClanData);
+            List<PlayerInfo> carryOverStringList = new();
+
+            foreach (var playerData in playerArray)
+            {
+                var userCarryOverList = carryOverArray.Where(x => x.PlayerID == playerData.PlayerID).ToArray();
+
+                if (!userCarryOverList.Any())
+                {
+                    continue;
+                }
+
+                carryOverStringList.Add(new PlayerInfo(playerData.PlayerID, playerData.GuildUserName, userCarryOverList));
+            }
+
+            var stringData = string.Join('\n', carryOverStringList.Select(x => x.GetCarryOverString()));
+
+            EmbedBuilder embedBuilder = new();
+            EmbedFieldBuilder embedFieldBuilder = new();
+
+            embedFieldBuilder.Name = "持ち越し所持者";
+            embedFieldBuilder.Value = stringData == "" ? "持ち越しなし" : "```python\n" + stringData + "\n```";
+            embedBuilder.AddField(embedFieldBuilder);
+
+            embedBuilder.Title = $"{DateTime.Now:t}の残持ち越し";
+
+            return embedBuilder.Build();
+        }
     }
 }
