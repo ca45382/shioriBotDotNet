@@ -1,42 +1,21 @@
-using System.ComponentModel;
+﻿using PriconneBotConsoleApp.Attribute;
 
 namespace PriconneBotConsoleApp.DataType
 {
     public enum AttackType
     {
-        Unknown = 0,
+        Unknown,
 
-        [Description("物理")]
-        Physics = 101,
+        [MultiDescription("物理", "物", "b", "B")]
+        Physics,
 
-        [Description("魔法")]
-        Magic = 102,
+        [MultiDescription("魔法", "魔", "m", "M")]
+        Magic,
 
-        [Description("ニャル")]
-        NewYearKyaru = 103,
+        [MultiDescription("ニャル", "ニ", "n", "N")]
+        NewYearKyaru,
 
-        [Description("持ち越し")]
-        CarryOver = 109,
-
-        [Description("持越し")]
-        CarryOver2 = 119,
-
-        [Description("物")]
-        PhysicsShort = 201,
-
-        [Description("魔")]
-        MagicShort = 202,
-
-        [Description("ニ")]
-        NewYearKyaruShort = 203,
-
-        [Description("b")]
-        PhysicsShortRoman = 301,
-
-        [Description("m")]
-        MagicShortRoman = 302,
-
-        [Description("n")]
-        NewYearKYaruShortRoman = 303,
+        [MultiDescription("持ち越し", "持", "-", "持越し", "持越")]
+        CarryOver,
     }
 }

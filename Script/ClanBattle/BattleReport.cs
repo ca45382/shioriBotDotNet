@@ -107,13 +107,13 @@ namespace PriconneBotConsoleApp.Script
 
             if (userReportedData.Count() >= CommonDefine.MaxReportNumber)
             {
-                Task.Run(() => SendSystemMessage(m_UserMessage.Channel, EnumMapper.I.GetString(ErrorType.UpperLimitReport), 5));
+                Task.Run(() => SendSystemMessage(m_UserMessage.Channel, EnumMapper.GetString(ErrorType.UpperLimitReport), 5));
                 return;
             }
 
             if (DatabaseReportDataController.CreateReportData(reportData))
             {
-                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
+                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.GetString(ReactionType.Success))));
             }
 
             return;
@@ -146,7 +146,7 @@ namespace PriconneBotConsoleApp.Script
             var removeData = recentReportData.Last();
             if (DatabaseReportDataController.DeleteReportData(removeData))
             {
-                _ = m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success)));
+                _ = m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.GetString(ReactionType.Success)));
                 // TODO : マジックナンバーどこかで定義
                 var deleteSpan = 30;
 
@@ -155,7 +155,7 @@ namespace PriconneBotConsoleApp.Script
                     // TODO : 送信用の関数を作成したい。
                     _ = SendSystemMessage(
                         m_UserMessage.Channel,
-                        string.Format(EnumMapper.I.GetString(InfomationType.DeleteInsted), playerData.UserID, deleteSpan),
+                        string.Format(EnumMapper.GetString(InfomationType.DeleteInsted), playerData.UserID, deleteSpan),
                         deleteSpan
                     );
                 }
@@ -199,13 +199,13 @@ namespace PriconneBotConsoleApp.Script
 
             if (userReportedData.Count() >= CommonDefine.MaxReportNumber)
             {
-                Task.Run(() => SendSystemMessage(m_UserMessage.Channel, EnumMapper.I.GetString(ErrorType.UpperLimitReport) , deleteSpan));
+                Task.Run(() => SendSystemMessage(m_UserMessage.Channel, EnumMapper.GetString(ErrorType.UpperLimitReport) , deleteSpan));
                 return;
             }
 
             if (DatabaseReportDataController.CreateReportData(reportData))
             {
-                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
+                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.GetString(ReactionType.Success))));
             }
 
             return;
@@ -220,7 +220,7 @@ namespace PriconneBotConsoleApp.Script
             var clanReportData = DatabaseReportDataController.GetReportData(m_ClanData);
             if (DatabaseReportDataController.DeleteReportData(clanReportData))
             {
-                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
+                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.GetString(ReactionType.Success))));
             }
         }
 

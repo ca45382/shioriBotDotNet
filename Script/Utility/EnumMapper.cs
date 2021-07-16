@@ -1,53 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Reflection;
+using PriconneBotConsoleApp.Attribute;
 using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Script
 {
-    public class EnumMapper
+    public static class EnumMapper
     {
-        private Dictionary<Type, Dictionary<int, string>> m_EnumDictionary = new Dictionary<Type, Dictionary<int, string>>();
-
-        private Dictionary<int, string> m_ReactionTypes = new Dictionary<int, string>();
-        private Dictionary<int, string> m_ErrorTypes = new Dictionary<int, string>();
-        private Dictionary<int, string> m_ProgressStatus = new Dictionary<int, string>();
-        private Dictionary<int, string> m_InfomationTypes = new Dictionary<int, string>();
-        private Dictionary<int, string> m_ButtonType = new Dictionary<int, string>();
-
-        private static EnumMapper s_Instance;
-        public static EnumMapper I => s_Instance ??= new EnumMapper();
-
-        public EnumMapper()
+        private enum DescriptionType
         {
-            m_EnumDictionary.Add(typeof(ReactionType), m_ReactionTypes);
-            m_EnumDictionary.Add(typeof(ErrorType), m_ErrorTypes);
-            m_EnumDictionary.Add(typeof(ProgressStatus), m_ProgressStatus);
-            m_EnumDictionary.Add(typeof(InfomationType), m_InfomationTypes);
-            m_EnumDictionary.Add(typeof(ButtonType), m_ButtonType);
+            Single,
+            Multi,
         }
 
-        public string GetString<T>(T data) where T : Enum
+        private readonly static Dictionary<Type, DescriptionType> m_DescriptionTypeDictionary = new();
+
+        private readonly static Dictionary<(Type, int), string> m_SingleDescriptionDictionary = new();
+        private readonly static Dictionary<(Type, int), MultiDescriptionData> m_MultiDescriptionDictionary = new();
+
+        public static string GetString<T>(T data) where T : Enum
+            => m_DescriptionTypeDictionary.GetValueOrInitialize(typeof(T), GetDescriptionType<T>) switch
+            {
+                DescriptionType.Single => GetSingleString(data),
+                DescriptionType.Multi => GetLongString(data),
+                _ => throw new InvalidProgramException(),
+            };
+
+        private static string GetSingleString<T>(T data) where T : Enum
+            => m_SingleDescriptionDictionary.GetValueOrInitialize((typeof(T), (int)(dynamic)data), data.GetDescription);
+
+        public static string GetLongString<T>(T data) where T : Enum
+            => m_MultiDescriptionDictionary.GetValueOrInitialize((typeof(T), (int)(dynamic)data), data.GetMultiDescripion).LongDescription;
+
+        public static string GetShortString<T>(T data) where T : Enum
+            => m_MultiDescriptionDictionary.GetValueOrInitialize((typeof(T), (int)(dynamic)data), data.GetMultiDescripion).ShortDescription;
+
+        private static DescriptionType GetDescriptionType<T>() where T : Enum
         {
-            if (data == null)
+            foreach (T member in typeof(T).GetEnumValues())
             {
-                return null;
+                var field = typeof(T).GetField(member.ToString());
+                if (field.GetCustomAttribute<DescriptionAttribute>(false) != null)
+                {
+                    return DescriptionType.Single;
+                }
+
+                if (field.GetCustomAttribute<MultiDescriptionAttribute>(false) != null)
+                {
+                    return DescriptionType.Multi;
+                }
             }
 
-            var dictionaryData = m_EnumDictionary[typeof(T)];
-            var castEnum = Enum.Parse(typeof(T), data.ToString()) as Enum;
-            var castInt = Convert.ToInt32(castEnum);
-
-            if (dictionaryData.ContainsKey(castInt))
-            {
-                return dictionaryData[castInt];
-            }
-            else
-            {
-                var descriptionString = castEnum.GetDescription();
-                dictionaryData[castInt] = descriptionString;
-                return descriptionString;
-            }
+            return DescriptionType.Single;
         }
     }
 }
