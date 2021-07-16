@@ -4,6 +4,7 @@ using System.Linq;
 using PriconneBotConsoleApp.Database;
 using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Define;
+using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.DataModel
 {
@@ -31,6 +32,7 @@ namespace PriconneBotConsoleApp.DataModel
 
         public static bool ReloadData()
         {
+            // TODO : 日本時間に対応
             var nowTime = DateTime.Now;
             using var rediveConnector = new RediveConnector();
 
@@ -48,12 +50,12 @@ namespace PriconneBotConsoleApp.DataModel
             ClanBattleStartTime = clanBattleSchedule.StartTime;
             ClanBattleEndTime = clanBattleSchedule.EndTime;
 
-            var clanBattleDataList = rediveConnector.ClanBattleData.AsQueryable()
-                .Where(x => x.ClanBattleID == ClanBattleID)
-                .ToList();
+            var clanBattleDataArray = rediveConnector.ClanBattleData.AsQueryable()
+                .Where(x => x.ClanBattleID == ClanBattleID).OrderBy(x => x.ID)
+                .ToArray();
             var bossStatusList = new List<BossData>();
 
-            foreach (var clanBattleData in clanBattleDataList)
+            foreach (var clanBattleData in clanBattleDataArray)
             {
                 for (int i = Common.MinBossNumber; i <= Common.MaxBossNumber; i++)
                 {
@@ -69,19 +71,19 @@ namespace PriconneBotConsoleApp.DataModel
                 }
             }
 
-
             // クラバトデータからボス情報を抽出
-            EnemyParameter[] enemyDataArray;
+            IEnumerable<EnemyParameter> enemyDataArray;
+
             try
             {
-                var waveIDArray = bossStatusList.Select(x => x.WaveGroupID).ToArray();
+                var waveIDArray = bossStatusList.Select(x => x.WaveGroupID).AsEnumerable();
                 rediveConnector.WaveGroupData.AsQueryable()
-                    .Where(x => waveIDArray.Any(y => y == x.WaveGroupID)).ToList()
-                    .ForEach(x => bossStatusList.Where(y => y.WaveGroupID == x.WaveGroupID).ToList().ForEach(y => y.EnemyID = x.EnemyID1));
+                    .Where(x => waveIDArray.Any(y => y == x.WaveGroupID)).AsEnumerable()
+                    .ForEach(x => bossStatusList.Where(y => y.WaveGroupID == x.WaveGroupID).ForEach(y => y.EnemyID = x.EnemyID1));
                 var enemyIDList = bossStatusList.Select(x => x.EnemyID);
                 enemyDataArray = rediveConnector.EnemyParameter.AsQueryable()
                     .Where(x => enemyIDList.Any(y => y == x.EnemyID))
-                    .ToArray();
+                    .AsEnumerable();
             }
             catch (Exception e)
             {
