@@ -10,20 +10,20 @@ using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Database;
 using PriconneBotConsoleApp.Extension;
+using System.Collections.Generic;
+using PriconneBotConsoleApp.Define;
 
 namespace PriconneBotConsoleApp.Script
 {
     public class BattleReservation
     {
-        private const int MinBossNumber = 1;
-        private const int MaxBossNumber = 5;
         private const int MaxCommentLength = 30;
 
         private readonly ClanData m_UserClanData;
         private readonly SocketRole m_UserRole;
         private readonly SocketUserMessage m_UserMessage;
         private readonly SocketReaction m_UserReaction;
-        
+
         private BattleReservation(
             ClanData userClanData,
             ISocketMessageChannel channel,
@@ -52,7 +52,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (userMessage == null) return;
             var messageContents = userMessage.Content;
-            
+
             if (messageContents.StartsWith("予約"))
             {
                 switch (messageContents)
@@ -62,7 +62,6 @@ namespace PriconneBotConsoleApp.Script
                     case "予約状況":
                         Console.WriteLine("予約確認");
                         await userMessage.Channel.SendMessageAsync(CreateUserReservationDataMessage());
-                        //await SendMessageToChannel(userMessage.Channel, CreateUserReservationDataMessage());
                         return;
                 }
 
@@ -81,13 +80,11 @@ namespace PriconneBotConsoleApp.Script
                     return;
                 }
 
-                var nowBoss = m_UserClanData.GetNowBoss();
-                var allowReservationLap = m_UserClanData.ReservationLap + m_UserClanData.GetNowLap();
+                var allowReservationLap = m_UserClanData.ReservationLap + m_UserClanData.GetMinBossLap();
 
-                if (reservationData.BattleLap > allowReservationLap
-                    || reservationData.BattleLap == allowReservationLap && reservationData.BossNumber > nowBoss)
+                if (reservationData.BattleLap > allowReservationLap)
                 {
-                    await SendErrorMessage(ErrorType.OutOfReservationBossLaps, allowReservationLap.ToString(), nowBoss.ToString());
+                    await SendErrorMessage(ErrorType.OutOfReservationBossLaps, allowReservationLap.ToString());
                     return;
                 }
 
@@ -98,13 +95,13 @@ namespace PriconneBotConsoleApp.Script
                 if (m_UserClanData.GetNowBoss() == reservationData.BossNumber
                     && m_UserClanData.GetNowLap() == reservationData.BattleLap)
                 {
-                    await new BattleDeclaration(m_UserClanData,m_UserMessage).UpdateDeclarationBotMessage();
+                    await new BattleDeclaration(m_UserClanData, m_UserMessage).UpdateDeclarationBotMessage();
                 }
             }
             else if (messageContents.StartsWith("削除"))
             {
                 var deleteReservationData = MessageToReservationData();
-                
+
                 if (deleteReservationData is null)
                 {
                     // await FailedToRegisterMessage();
@@ -169,7 +166,7 @@ namespace PriconneBotConsoleApp.Script
             var resultChannel = userRole.Guild
                 .GetTextChannel(reservationResultChannelID);
 
-            var sendedMessageData = await resultChannel.SendMessageAsync(messageData);
+            var sendedMessageData = await resultChannel.SendMessageAsync(embed: messageData);
             DatabaseMessageDataController.UpdateMessageID(userClanData, sendedMessageData.Id, MessageFeatureType.ReserveResultID);
             await AttacheDefaultReaction(sendedMessageData);
         }
@@ -189,7 +186,7 @@ namespace PriconneBotConsoleApp.Script
             var reservationResultChannelID = userClanData.ChannelData
                 .GetChannelID(userClanData.ClanID, ChannelFeatureType.ReserveResultID);
 
-            if(reservationResultChannelID == 0)
+            if (reservationResultChannelID == 0)
             {
                 return;
             }
@@ -212,8 +209,8 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var serverMessage = socketMessage as SocketUserMessage;
-            var messageData = CreateAllReservationDataMessage(userClanData);
-            await serverMessage.ModifyAsync(x => x.Content = messageData);
+            var embedData = CreateAllReservationDataMessage(userClanData);
+            await serverMessage.ModifyAsync(x => x.Embed = embedData);
         }
 
         /// <summary>
@@ -227,34 +224,31 @@ namespace PriconneBotConsoleApp.Script
             var userClanData = m_UserClanData;
             var userMessage = m_UserMessage;
 
-            var nowBattleLap = userClanData.GetNowLap();
-            var nowBossNumber = userClanData.GetNowBoss();
-
             var limitReservationLap = m_UserClanData.ReservationLap;
             if (limitReservationLap == 0)
             {
                 limitReservationLap = byte.MaxValue;
             }
 
-            var splitMessageContent =userMessage.Content.ZenToHan()
-                .Split(new string[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
+            var splitMessageContent = userMessage.Content.ZenToHan().Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
             if (splitMessageContent.Length < 3
                 || !(byte.TryParse(splitMessageContent[1], out byte battleLap) && battleLap > 0)
-                || !(byte.TryParse(splitMessageContent[2], out byte bossNumber) && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber)
-                || battleLap < nowBattleLap
-                || battleLap == nowBattleLap && bossNumber < nowBossNumber)
+                || !(byte.TryParse(splitMessageContent[2], out byte bossNumber) && bossNumber <= Common.MaxBossNumber && bossNumber >= Common.MinBossNumber)
+                //|| battleLap < nowBattleLap
+                //|| battleLap == nowBattleLap && bossNumber < nowBossNumber)
+                || battleLap < m_UserClanData.GetBossLap(bossNumber))
             {
                 return null;
             }
-            var commentData = string.Join(" ",splitMessageContent.Skip(3));
+            var commentData = string.Join(" ", splitMessageContent.Skip(3));
 
             if (commentData.Length > MaxCommentLength)
             {
-                commentData = commentData.Substring(0,MaxCommentLength);
+                commentData = commentData.Substring(0, MaxCommentLength);
                 userMessage.Channel.SendMessageAsync($"コメントが長いので切り取られました。\n 問題がある場合は予約削除をして再度予約してください。");
             }
-           
+
             return new ReservationData()
             {
                 PlayerData = new PlayerData
@@ -291,13 +285,12 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private ReservationData MessageToUserReservationData()
         {
-            var splitMessageContent = m_UserMessage.Content
-                .Split(new[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
+            var splitMessageContent = m_UserMessage.Content.ZenToHan().Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
             if (splitMessageContent.Length != 4
                 || !ulong.TryParse(splitMessageContent[1], out ulong userID)
                 || !(byte.TryParse(splitMessageContent[2], out byte battleLap) && battleLap > 0)
-                || !(byte.TryParse(splitMessageContent[3], out byte bossNumber) && bossNumber <= MaxBossNumber && bossNumber >= MinBossNumber))
+                || !(byte.TryParse(splitMessageContent[3], out byte bossNumber) && bossNumber <= Common.MaxBossNumber && bossNumber >= Common.MinBossNumber))
             {
                 return null;
             }
@@ -348,7 +341,7 @@ namespace PriconneBotConsoleApp.Script
             var messageData = new StringBuilder();
             messageData.AppendLine("```python");
             messageData.AppendLine($"{playerData.GuildUserName}さんの予約状況");
-            
+
             foreach (var (reservationData, loopNum) in reservationDataSet.Select((v, i) => (v, i)))
             {
                 messageData.AppendLine(
@@ -361,39 +354,49 @@ namespace PriconneBotConsoleApp.Script
             return messageData.ToString();
         }
 
-        private string CreateAllReservationDataMessage(ClanData clanData)
+        /// <summary>
+        /// 予約メッセージを作成する
+        /// </summary>
+        /// <param name="clanData"></param>
+        /// <returns></returns>
+        private Embed CreateAllReservationDataMessage(ClanData clanData)
         {
-            var bossNumber = clanData.GetNowBoss();
-            var battleLap = clanData.GetNowLap();
-
             var reservationDataSet = DatabaseReservationController.LoadReservationData(clanData);
+            List<List<ReservationData>> reservationDataList = new();
 
-            reservationDataSet = reservationDataSet
-                .Where(b => b.BattleLap > battleLap || (b.BattleLap == battleLap && b.BossNumber >= bossNumber))
-                .ToList();
-
-
-            if (!reservationDataSet.Any())
+            for (var i = 0; i < Common.MaxBossNumber; i++)
             {
-                return "予約がありません";
+                reservationDataList.Add(new List<ReservationData>());
             }
 
-            var messageData = new StringBuilder();
-            messageData.AppendLine("```python");
-            messageData.AppendLine($"{battleLap,2}-{bossNumber} 以降の予約一覧です. ");
+            reservationDataSet.ForEach(x => reservationDataList[x.BossNumber - 1].Add(x));
+            EmbedBuilder embedBuilder = new();
 
-            foreach (var reservationData in reservationDataSet)
+            for (var i = 0; i < Common.MaxBossNumber; i++)
             {
-                messageData.AppendLine(
-                    $"{reservationData.BattleLap,2}-{reservationData.BossNumber} " +
-                    $"{reservationData.PlayerData.GuildUserName} {reservationData.CommentData}"
-                );
+                EmbedFieldBuilder fieldBuilder = new();
+
+                if (!reservationDataList[i].Any())
+                {
+                    // 何かの空白代入して空行を生成している。
+                    fieldBuilder.Value = "\n\u200b";
+                }
+                else
+                {
+                    StringBuilder messageData = new();
+                    messageData.AppendLine("```python");
+                    reservationDataList[i].ForEach(x => messageData.AppendLine($"{x.BattleLap,2}周目 {x.PlayerData.GuildUserName} {x.CommentData}"));
+                    messageData.AppendLine("```");
+                    fieldBuilder.Value = messageData.ToString();
+                }
+
+                fieldBuilder.Name = $"{i + 1}ボス({reservationDataList[i].Count}件)";
+                embedBuilder.AddField(fieldBuilder);
             }
 
-            messageData.Append($"以上の{reservationDataSet.Count}件です");
-            messageData.Append("```");
+            embedBuilder.Title = $"現在の予約状況:計{reservationDataSet.Count}件";
 
-            return messageData.ToString();
+            return embedBuilder.Build();
         }
 
         private async Task AttacheDefaultReaction(IUserMessage message)
@@ -409,7 +412,7 @@ namespace PriconneBotConsoleApp.Script
                 .GetChannelID(m_UserClanData.ClanID, ChannelFeatureType.ReserveResultID);
             var textChannnel = m_UserRole.Guild.GetTextChannel(reservationResultChannelID);
 
-            if(textChannnel == null)
+            if (textChannnel == null)
             {
                 return;
             }
@@ -420,9 +423,10 @@ namespace PriconneBotConsoleApp.Script
             {
                 return;
             }
+
             await message.RemoveReactionAsync(m_UserReaction.Emote, m_UserReaction.User.Value);
         }
-        
+
         private async Task SendErrorMessage(ErrorType type, params string[] parameters)
         {
             var descriptionString = type.GetDescription();
@@ -461,7 +465,7 @@ namespace PriconneBotConsoleApp.Script
                 return true;
             }
 
-            if(startTime.Hours < Define.Common.DateUpdateHour)
+            if (startTime.Hours < Define.Common.DateUpdateHour)
             {
                 startTime = startTime.Add(new TimeSpan(1, 0, 0, 0));
             }

@@ -17,10 +17,13 @@ namespace PriconneBotConsoleApp.Script
         private readonly SocketRole m_UserRole;
         private readonly SocketUserMessage m_UserMessage;
         private readonly SocketReaction m_UserReaction;
+        private readonly int m_BossNumber;
+        private readonly bool m_AllBattle = true;
 
         private BattleDeclaration(
             ClanData userClanData,
             ISocketMessageChannel channel,
+            BossNumberType bossNumber = 0,
             SocketUserMessage userMessage = null,
             SocketReaction userReaction = null)
         {
@@ -28,15 +31,26 @@ namespace PriconneBotConsoleApp.Script
             m_UserRole = (channel as SocketGuildChannel)?.Guild.GetRole(m_UserClanData.ClanRoleID);
             m_UserMessage = userMessage;
             m_UserReaction = userReaction;
+
+            if (bossNumber == 0)
+            {
+                m_AllBattle = false;
+                m_BossNumber = m_UserClanData.GetNowBoss();
+            }
+            else
+            {
+                m_BossNumber = (int)bossNumber;
+            }
+            
         }
 
-        public BattleDeclaration(ClanData userClanData, SocketUserMessage message)
-            : this(userClanData, message.Channel, userMessage: message)
+        public BattleDeclaration(ClanData userClanData, SocketUserMessage message, BossNumberType bossNumber = 0)
+            : this(userClanData, message.Channel, bossNumber, userMessage: message)
         {
         }
 
-        public BattleDeclaration(ClanData userClanData, SocketReaction reaction)
-            : this(userClanData, reaction.Channel, userReaction: reaction)
+        public BattleDeclaration(ClanData userClanData, SocketReaction reaction, BossNumberType bossNumber = 0)
+            : this(userClanData, reaction.Channel, bossNumber,  userReaction: reaction)
         {
         }
 
@@ -118,6 +132,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var embed = CreateDeclarationDataEmbed(m_UserClanData);
             var content = CreateDeclarationDataMessage(m_UserClanData);
+            var messageComponent = CreateDeclareComponent();
             var declarationChannelID = m_UserClanData.ChannelData
                 .GetChannelID(m_UserClanData.ClanID, ChannelFeatureType.DeclareID);
 
@@ -373,14 +388,17 @@ namespace PriconneBotConsoleApp.Script
 
         private Embed CreateDeclarationDataEmbed(ClanData clanData)
         {
+            if (!m_AllBattle)
+            {
+                return null;
+            }
+
             var reservationDataList =
-                DatabaseReservationController.LoadBossLapReservationData(clanData, clanData.GetNowBoss());
+                DatabaseReservationController.LoadBossLapReservationData(clanData, m_BossNumber);
             var declarationDataList =
-                DatabaseDeclarationController.LoadDeclarationData(clanData, clanData.GetNowBoss());
+                DatabaseDeclarationController.LoadDeclarationData(clanData, (byte)m_BossNumber);
 
-            var bossNumber = clanData.GetNowBoss();
-            var battleLap = clanData.GetNowLap();
-
+            var battleLap = clanData.GetBossLap(m_BossNumber);
             var updateTime = DateTime.Now;
             var updateTimeString = updateTime.ToString("T");
 
@@ -424,7 +442,7 @@ namespace PriconneBotConsoleApp.Script
 
             var embedBuild = new EmbedBuilder
             {
-                Title = $"凸宣言({battleLap, 2}周目{bossNumber,1}ボス)"
+                Title = $"凸宣言({battleLap, 2}周目{m_BossNumber,1}ボス)"
             };
 
             var explainMessage = "```python\n" +
@@ -475,23 +493,22 @@ namespace PriconneBotConsoleApp.Script
 
         private string CreateDeclarationDataMessage(ClanData clanData)
         {
+            if (!m_AllBattle)
+            {
+                return string.Empty;
+            }
+
             var reservationDataList =
-                DatabaseReservationController.LoadBossLapReservationData(clanData, clanData.GetNowBoss());
+                DatabaseReservationController.LoadBossLapReservationData(clanData, m_BossNumber);
 
             var reservationIDList = reservationDataList
                .OrderBy(d => d.CreateDateTime)
                .Select(d => d.PlayerData.UserID)
                .ToList();
 
-            var messageData = "";
-            foreach ( var reservationID in reservationIDList)
-            {
-                messageData += MentionUtils.MentionUser(reservationID);
-                messageData += " ";
-            }
+            var mentionList = reservationIDList.Select(x => MentionUtils.MentionUser(x));
 
-            return messageData;
-
+            return string.Join(" ", mentionList);
         }
 
         private string NameListToMessageData(List<string> nameDataSet)

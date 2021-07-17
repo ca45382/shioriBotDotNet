@@ -56,6 +56,7 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var messageChannelID = message.Channel.Id;
+            var fetureID = m_PlayerClanData.ChannelData.Where(x => x.ChannelID == messageChannelID).FirstOrDefault()?.FeatureID ?? 0;
 
             if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.ReserveID))
             {
@@ -86,6 +87,36 @@ namespace PriconneBotConsoleApp.Script
             {
                 await new BattleCarryOver(m_PlayerClanData, message).RunByMessage();
             }
+
+            BattleDeclaration battleDeclaration;
+            switch (fetureID)
+            {
+                case (int)ChannelFeatureType.DeclareBoss1ID:
+                    battleDeclaration = new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss1Number);
+                    break;
+                case (int)ChannelFeatureType.DeclareBoss2ID:
+                    battleDeclaration = new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss2Number);
+                    break;
+                case (int)ChannelFeatureType.DeclareBoss3ID:
+                    battleDeclaration = new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss3Number);
+                    break;
+                case (int)ChannelFeatureType.DeclareBoss4ID:
+                    battleDeclaration = new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss4Number);
+                    break;
+                case (int)ChannelFeatureType.DeclareBoss5ID:
+                    battleDeclaration = new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss5Number);
+                    break;
+                default:
+                    battleDeclaration = null;
+                    break;
+            };
+
+            if (battleDeclaration != null)
+            {
+                await battleDeclaration.RunDeclarationCommandByMessage();
+            }
+
+            
         }
     }
 }

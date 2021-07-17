@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.DataType;
+using PriconneBotConsoleApp.Define;
 using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Database
@@ -40,8 +41,13 @@ namespace PriconneBotConsoleApp.Database
                 .ToList();
         }
 
-        public static List<ReservationData> LoadBossLapReservationData(ClanData clanData, byte bossNumber)
+        public static List<ReservationData> LoadBossLapReservationData(ClanData clanData, int bossNumber)
         {
+            if ( bossNumber < Common.MinBossNumber || bossNumber > Common.MaxBossNumber)
+            {
+                return null;
+            }
+
             using var databaseConnector = new DatabaseConnector();
 
             var databaseClanData = databaseConnector.ClanData
