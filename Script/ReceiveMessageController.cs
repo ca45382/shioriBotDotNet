@@ -83,28 +83,16 @@ namespace PriconneBotConsoleApp.Script
                 await new BattleReport(m_PlayerClanData, message).RunByMessage();
             }
 
-            BattleDeclaration battleDeclaration;
-            switch (fetureID)
+            BattleDeclaration battleDeclaration = fetureID switch
             {
-                case (int)ChannelFeatureType.DeclareBoss1ID:
-                    battleDeclaration = new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss1Number);
-                    break;
-                case (int)ChannelFeatureType.DeclareBoss2ID:
-                    battleDeclaration = new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss2Number);
-                    break;
-                case (int)ChannelFeatureType.DeclareBoss3ID:
-                    battleDeclaration = new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss3Number);
-                    break;
-                case (int)ChannelFeatureType.DeclareBoss4ID:
-                    battleDeclaration = new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss4Number);
-                    break;
-                case (int)ChannelFeatureType.DeclareBoss5ID:
-                    battleDeclaration = new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss5Number);
-                    break;
-                default:
-                    battleDeclaration = null;
-                    break;
+                (int)ChannelFeatureType.DeclareBoss1ID => new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss1Number),
+                (int)ChannelFeatureType.DeclareBoss2ID => new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss2Number),
+                (int)ChannelFeatureType.DeclareBoss3ID => new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss3Number),
+                (int)ChannelFeatureType.DeclareBoss4ID => new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss4Number),
+                (int)ChannelFeatureType.DeclareBoss5ID => new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss5Number),
+                _ => null,
             };
+            ;
 
             if (battleDeclaration != null)
             {
