@@ -21,7 +21,7 @@ namespace PriconneBotConsoleApp.Script
             var guildID = messageChannel.Guild.Id;
             var userID = message.Author.Id;
             m_PlayerData = DatabasePlayerDataController.LoadPlayerData(guildID, userID);
-            
+
             if (m_PlayerData == null)
             {
                 return;
@@ -47,7 +47,7 @@ namespace PriconneBotConsoleApp.Script
 
         public async Task RunMessageReceive(SocketUserMessage message)
         {
-            await new TimeLineConversion(message).RunByMessage() ;
+            await new TimeLineConversion(message).RunByMessage();
             await new PriconneEventViewer(message).SendEventInfomationByMessage();
 
             if (m_PlayerData == null || m_PlayerClanData == null)
@@ -56,6 +56,7 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var messageChannelID = message.Channel.Id;
+            var fetureID = m_PlayerClanData.ChannelData.Where(x => x.ChannelID == messageChannelID).FirstOrDefault()?.FeatureID ?? 0;
 
             if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.ReserveID))
             {
@@ -72,7 +73,7 @@ namespace PriconneBotConsoleApp.Script
                 await new BattleDeclaration(m_PlayerClanData, message).RunDeclarationCommandByMessage();
             }
 
-            if(messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.TaskKillID))
+            if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.TaskKillID))
             {
                 await new BattleTaskKill(m_PlayerClanData, message).RunByMessageCommands();
             }
@@ -80,6 +81,34 @@ namespace PriconneBotConsoleApp.Script
             if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.ReportID))
             {
                 await new BattleReport(m_PlayerClanData, message).RunByMessage();
+            }
+
+            BattleDeclaration battleDeclaration;
+            switch (fetureID)
+            {
+                case (int)ChannelFeatureType.DeclareBoss1ID:
+                    battleDeclaration = new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss1Number);
+                    break;
+                case (int)ChannelFeatureType.DeclareBoss2ID:
+                    battleDeclaration = new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss2Number);
+                    break;
+                case (int)ChannelFeatureType.DeclareBoss3ID:
+                    battleDeclaration = new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss3Number);
+                    break;
+                case (int)ChannelFeatureType.DeclareBoss4ID:
+                    battleDeclaration = new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss4Number);
+                    break;
+                case (int)ChannelFeatureType.DeclareBoss5ID:
+                    battleDeclaration = new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss5Number);
+                    break;
+                default:
+                    battleDeclaration = null;
+                    break;
+            };
+
+            if (battleDeclaration != null)
+            {
+                await battleDeclaration.RunDeclarationCommandByMessage();
             }
         }
     }
