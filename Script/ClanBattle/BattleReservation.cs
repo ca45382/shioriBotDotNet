@@ -252,13 +252,11 @@ namespace PriconneBotConsoleApp.Script
             if (splitMessageContent.Length < 3
                 || !(byte.TryParse(splitMessageContent[1], out byte battleLap) && battleLap > 0)
                 || !(byte.TryParse(splitMessageContent[2], out byte bossNumber) && bossNumber <= Common.MaxBossNumber && bossNumber >= Common.MinBossNumber)
-                //|| battleLap < nowBattleLap
-                //|| battleLap == nowBattleLap && bossNumber < nowBossNumber)
                 || battleLap < m_UserClanData.GetBossLap(bossNumber))
             {
                 return null;
             }
-            var commentData = string.Join(" ", splitMessageContent.Skip(3));
+            var commentData = string.Join(' ', splitMessageContent.Skip(3));
 
             if (commentData.Length > MaxCommentLength)
             {

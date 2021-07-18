@@ -38,7 +38,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (channelData == null || channelData.FeatureID == (uint)GetDeclareChannelType(m_BossNumber))
             {
-                m_DeclarationChannel =  guild.GetTextChannel(channelData.ChannelID);
+                m_DeclarationChannel = guild.GetTextChannel(channelData.ChannelID);
             }
         }
 
@@ -300,7 +300,7 @@ namespace PriconneBotConsoleApp.Script
         /// <param name="userID"></param>
         /// <returns></returns>
         private DeclarationData UserToDeclareData(PlayerData playerData)
-            =>  new DeclarationData()
+            => new DeclarationData()
             {
                 PlayerID = playerData.PlayerID,
                 BattleLap = (ushort)m_UserClanData.GetBossLap(m_BossNumber),

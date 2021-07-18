@@ -56,7 +56,7 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var messageChannelID = message.Channel.Id;
-            var fetureID = m_PlayerClanData.ChannelData.Where(x => x.ChannelID == messageChannelID).FirstOrDefault()?.FeatureID ?? 0;
+            var fetureID = m_PlayerClanData.ChannelData.FirstOrDefault(x => x.ChannelID == messageChannelID)?.FeatureID ?? 0;
 
             if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.ReserveID))
             {
@@ -92,7 +92,6 @@ namespace PriconneBotConsoleApp.Script
                 (int)ChannelFeatureType.DeclareBoss5ID => new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss5Number),
                 _ => null,
             };
-            ;
 
             if (battleDeclaration != null)
             {
