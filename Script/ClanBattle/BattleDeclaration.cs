@@ -525,21 +525,9 @@ namespace PriconneBotConsoleApp.Script
             return messageData;
         }
 
-        /// <summary>
-        /// 今のボス・周回数から ボスごとの周回数に変更して代入。
-        /// 7月削除予定。
-        /// </summary>
-        /// <param name="bossNumber"></param>
-        /// <param name="battleLap"></param>
-        [Obsolete]
-        private void SetAllBossLaps(int bossNumber, int battleLap)
-        {
-            if (bossNumber <= 0 || bossNumber > 5 || battleLap < 0 || m_UserClanData == null)
         private ChannelFeatureType GetDeclareChannelType(int bossNumber)
             => bossNumber switch
             {
-                return;
-            }
                 1 => ChannelFeatureType.DeclareBoss1ID,
                 2 => ChannelFeatureType.DeclareBoss2ID,
                 3 => ChannelFeatureType.DeclareBoss3ID,
@@ -548,20 +536,9 @@ namespace PriconneBotConsoleApp.Script
                 _ => 0,
             };
 
-            for (int i = 0; i < Define.Common.MaxBossNumber; i++)
         private MessageFeatureType GetDeclareMessageType(int bossNumber)
             => bossNumber switch
             {
-                if (i >= bossNumber)
-                {
-                    m_UserClanData.SetBossLap(i + 1, battleLap - 1);
-                }
-                else
-                {
-                    m_UserClanData.SetBossLap(i + 1, battleLap);
-                }
-            }
-        }
                 1 => MessageFeatureType.DeclareBoss1ID,
                 2 => MessageFeatureType.DeclareBoss2ID,
                 3 => MessageFeatureType.DeclareBoss3ID,
