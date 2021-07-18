@@ -97,7 +97,17 @@ namespace PriconneBotConsoleApp.Script
                 }
                 else if (m_UserMessage.Content.StartsWith("!next"))
                 {
-                    NextLap();
+                    await NextLap();
+                    return;
+                }
+                else if (m_UserMessage.Content.StartsWith("!rm"))
+                {
+                    await RevertOrRevertUserData(true);
+                    return;
+                }
+                else if (m_UserMessage.Content.StartsWith("!rv"))
+                {
+                    await RevertOrRevertUserData();
                     return;
                 }
             }
@@ -208,25 +218,56 @@ namespace PriconneBotConsoleApp.Script
             return true;
         }
 
+        private async Task RevertOrRevertUserData(bool deleteFlag = false)
+        {
+            var userData = m_UserMessage.MentionedUsers.FirstOrDefault();
+
+            if (userData == null)
+            {
+                return;
+            }
+
+            var playerData = DatabasePlayerDataController.LoadPlayerData(m_UserRole, userData.Id);
+            var playerProgressData = DatabaseProgressController.GetProgressData(playerData, (BossNumberType)m_BossNumber)
+                .OrderByDescending(x => x.UpdateDateTime).FirstOrDefault();
+
+            if (playerProgressData == null)
+            {
+                return;
+            }
+
+            if (deleteFlag)
+            {
+                DatabaseProgressController.DeleteProgressData(playerProgressData);
+            }
+            else
+            {
+                playerProgressData.Status = (byte)ProgressStatus.AttackReported;
+                DatabaseProgressController.ModifyProgressData(playerProgressData);
+            }
+
+            await SendClanProgressList();
+        }
+
         /// <summary>
         /// 凸報告の初期化
         /// </summary>
         /// <returns></returns>
-        private bool InitializeProgressData()
+        private void InitializeProgressData()
         {
             var deleteData = DatabaseProgressController.GetProgressData(m_UserClanData, (BossNumberType)m_BossNumber);
 
             if (deleteData == null)
             {
-                return false;
+                return;
             }
 
             if (DatabaseProgressController.DeleteProgressData(deleteData))
             {
-                return true;
+                return;
             }
 
-            return false;
+            return;
         }
 
         private async Task SendClanProgressList(bool removeLastMessage = true)

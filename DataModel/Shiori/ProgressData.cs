@@ -40,9 +40,6 @@ namespace PriconneBotConsoleApp.DataModel
         [Column("attack_type", TypeName = "TINYINT UNSIGNED")]
         public byte AttackType { get; set; }
 
-        /// <summary>
-        /// 0:なし 1:凸確定 2:凸仮確定 3:SOS
-        /// </summary>
         [Column("status", TypeName = "TINYINT UNSIGNED")]
         public byte Status { get; set; }
 
