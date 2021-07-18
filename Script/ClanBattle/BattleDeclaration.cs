@@ -8,6 +8,7 @@ using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.Database;
 using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Extension;
+using PriconneBotConsoleApp.Define;
 
 namespace PriconneBotConsoleApp.Script
 {
@@ -15,48 +16,56 @@ namespace PriconneBotConsoleApp.Script
     {
         private readonly ClanData m_UserClanData;
         private readonly SocketRole m_UserRole;
+        private readonly IUser m_User;
+        private readonly SocketTextChannel m_DeclarationChannel;
         private readonly SocketUserMessage m_UserMessage;
         private readonly SocketReaction m_UserReaction;
-        private readonly int m_BossNumber;
+        private readonly SocketInteraction m_UserInteraction;
+        private readonly byte m_BossNumber;
         private readonly bool m_AllBattle = true;
 
         private BattleDeclaration(
             ClanData userClanData,
             ISocketMessageChannel channel,
-            BossNumberType bossNumber = 0,
+            BossNumberType bossNumber,
             SocketUserMessage userMessage = null,
-            SocketReaction userReaction = null)
+            SocketReaction userReaction = null,
         {
             m_UserClanData = userClanData;
-            m_UserRole = (channel as SocketGuildChannel)?.Guild.GetRole(m_UserClanData.ClanRoleID);
-            m_UserMessage = userMessage;
-            m_UserReaction = userReaction;
+            var channelData = m_UserClanData.ChannelData.FirstOrDefault(x => x.ChannelID == channel.Id);
+            var guild = (channel as SocketGuildChannel)?.Guild;
+            m_UserRole = guild?.GetRole(m_UserClanData.ClanRoleID);
+            m_BossNumber = (byte)bossNumber;
 
-            if (bossNumber == 0)
+            if (channelData == null || channelData.FeatureID == (uint)GetDeclareChannelType(m_BossNumber))
             {
-                m_AllBattle = false;
-                m_BossNumber = m_UserClanData.GetNowBoss();
+                m_DeclarationChannel =  guild.GetTextChannel(channelData.ChannelID);
             }
-            else
-            {
-                m_BossNumber = (int)bossNumber;
-            }
-            
         }
 
-        public BattleDeclaration(ClanData userClanData, SocketUserMessage message, BossNumberType bossNumber = 0)
+        public BattleDeclaration(ClanData userClanData, SocketUserMessage message, BossNumberType bossNumber)
             : this(userClanData, message.Channel, bossNumber, userMessage: message)
         {
+            m_UserMessage = message;
+            m_User = message.Author;
         }
 
-        public BattleDeclaration(ClanData userClanData, SocketReaction reaction, BossNumberType bossNumber = 0)
-            : this(userClanData, reaction.Channel, bossNumber,  userReaction: reaction)
+        public BattleDeclaration(ClanData userClanData, SocketReaction reaction, BossNumberType bossNumber)
+            : this(userClanData, reaction.Channel, bossNumber, userReaction: reaction)
         {
+            m_UserReaction = reaction;
+            m_User = reaction.User.Value;
+        }
         }
 
         public async Task RunDeclarationCommandByMessage()
         {
-            if (m_UserMessage != null && m_UserMessage.Content.StartsWith("!call"))
+            if (m_UserMessage == null || m_DeclarationChannel == null)
+            {
+                return;
+            }
+
+            if (m_UserMessage.Content.StartsWith("!call"))
             {
                 await DeclarationCallCommand();
                 await new BattleReservation(m_UserClanData, m_UserMessage).UpdateSystemMessage();
@@ -65,10 +74,7 @@ namespace PriconneBotConsoleApp.Script
 
         public async Task RunDeclarationCommandByReaction()
         {
-            var declarationMessageID = m_UserClanData.MessageData
-                .GetMessageID(m_UserClanData.ClanID, MessageFeatureType.DeclareID);
-
-            if (declarationMessageID == 0 || m_UserReaction.MessageId != declarationMessageID)
+            if (m_DeclarationChannel == null)
             {
                 return;
             }
@@ -208,22 +214,18 @@ namespace PriconneBotConsoleApp.Script
         /// 凸宣言した時のコード
         /// </summary>
         /// <returns></returns>
-        private bool UserRegistorDeclareCommand()
+        private void UserRegistorDeclareCommand()
         {
-            var userReaction = m_UserReaction;
-            var userId = userReaction.UserId;
+            var playerData = DatabasePlayerDataController.LoadPlayerData(m_UserRole, m_User.Id);
 
-            var isExistSqlData = DeclareDataOnSQL(userId) .Any(d => d.FinishFlag == false);
-
-            if (isExistSqlData)
+            if (DatabaseDeclarationController.LoadDeclarationData(playerData, m_BossNumber)
+                .Any(x => !x.FinishFlag))
             {
-                return false;
+                return;
             }
 
-            var declarationData = UserToDeclareData(userId);
-            var result = DatabaseDeclarationController.CreateDeclarationData(declarationData);
-
-            return result;
+            var declarationData = UserToDeclareData(playerData);
+            DatabaseDeclarationController.CreateDeclarationData(declarationData);
         }
 
         /// <summary>
@@ -232,29 +234,22 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private bool UserFinishBattleCommand()
         {
-            var userRole = m_UserRole;
-            var userClanData = m_UserClanData;
-            var userReaction = m_UserReaction;
+            var playerData = DatabasePlayerDataController.LoadPlayerData(m_UserRole, m_User.Id);
+            var userDeclareData = DatabaseDeclarationController.LoadDeclarationData(playerData, m_BossNumber)
+                .FirstOrDefault(x => !x.FinishFlag);
 
-            // すでに宣言しているか判定
-            var sqlData = DeclareDataOnSQL(userReaction.UserId)
-                .Count(d => d.FinishFlag == false);
-
-            if (sqlData != 1)
+            if (userDeclareData == null)
             {
                 return false;
             }
 
-            // 宣言終了
-            var declarationData = UserToDeclareData(userReaction.UserId);
-            declarationData.FinishFlag = true;
-            var result = DatabaseDeclarationController.UpdateDeclarationData(declarationData);
+            userDeclareData.FinishFlag = true;
+            var result = DatabaseDeclarationController.UpdateDeclarationData(userDeclareData);
 
             // 予約の削除
-            var playerData = DatabasePlayerDataController.LoadPlayerData(userRole, userReaction.UserId);
             var reservationData = DatabaseReservationController.LoadReservationData(playerData);
             var finishReservationData = reservationData
-                .FirstOrDefault(d => d.BattleLap == userClanData.GetNowLap() && d.BossNumber == userClanData.GetNowBoss());
+                .FirstOrDefault(d => d.BattleLap == m_UserClanData.GetBossLap(m_BossNumber) && d.BossNumber == m_BossNumber);
 
             if (finishReservationData != null)
             {
@@ -262,69 +257,49 @@ namespace PriconneBotConsoleApp.Script
             }
 
             return result;
-
         }
 
         /// <summary>
         /// ユーザーがバトルをキャンセルした際のコード
         /// </summary>
         /// <returns></returns>
-        private bool UserDeleteBattleData()
+        private void UserDeleteBattleData()
         {
-            var userReaction = m_UserReaction;
+            var playerData = DatabasePlayerDataController.LoadPlayerData(m_UserRole, m_User.Id);
+            var sqlData = DatabaseDeclarationController.LoadDeclarationData(playerData, m_BossNumber)
+                .FirstOrDefault(x => !x.FinishFlag);
 
-            var sqlDataSet = DeclareDataOnSQL(userReaction.UserId);
-
-            var sqlData = sqlDataSet.FirstOrDefault(d => d.FinishFlag == false);
-
-            if (sqlData != null)
+            if (sqlData == null)
             {
-                DatabaseDeclarationController.DeleteDeclarationData(sqlData);
+                return;
             }
 
-            return true;
+            DatabaseDeclarationController.DeleteDeclarationData(sqlData);
         }
 
         /// <summary>
         /// 凸宣言削除
         /// </summary>
         /// <returns></returns>
-        private bool DeleteAllBattleData()
+        private void DeleteAllBattleData()
         {
-            var userClanData = m_UserClanData;
-            var declarationData = DatabaseDeclarationController.LoadDeclarationData(userClanData, userClanData.GetNowBoss());
-            var result = DatabaseDeclarationController.DeleteDeclarationData(declarationData);
-
-            return result;
+            var declarationData = DatabaseDeclarationController.LoadDeclarationData(m_UserClanData, m_BossNumber);
+            DatabaseDeclarationController.DeleteDeclarationData(declarationData);
         }
 
         /// <summary>
         /// 次のボスに行く際のコード
         /// </summary>
         /// <returns></returns>
-        private async Task<bool> NextBossCommand()
+        private async Task NextBossCommand()
         {
             UserFinishBattleCommand();
             DeleteAllBattleData();
 
-            var nowBossNumber = m_UserClanData.GetNowBoss();
-            var nowBattleLap = m_UserClanData.GetNowLap();
-
-            if (nowBossNumber == Define.Common.MaxBossNumber)
-            {
-                nowBossNumber = Define.Common.MinBossNumber;
-                nowBattleLap += 1;
-            }
-            else
-            {
-                nowBossNumber += 1;
-            }
-
-            SetAllBossLaps(nowBossNumber, nowBattleLap);
+            var nowBattleLap = m_UserClanData.GetBossLap(m_BossNumber);
+            m_UserClanData.SetBossLap(m_BossNumber, nowBattleLap + 1);
             DatabaseClanDataController.UpdateClanData(m_UserClanData);
             await SendDeclarationBotMessage();
-
-            return true;
         }
 
         /// <summary>
@@ -333,29 +308,14 @@ namespace PriconneBotConsoleApp.Script
         /// </summary>
         /// <param name="userID"></param>
         /// <returns></returns>
-        private DeclarationData UserToDeclareData(ulong userID)
-        {
-            var userClanData = m_UserClanData;
-            var userRole = m_UserRole;
-            var playerData = DatabasePlayerDataController.LoadPlayerData(userRole, userID);
-
-            return new DeclarationData()
+        private DeclarationData UserToDeclareData(PlayerData playerData)
+            =>  new DeclarationData()
             {
                 PlayerID = playerData.PlayerID,
-                BattleLap = userClanData.GetNowLap(),
-                BossNumber = userClanData.GetNowBoss(),
+                BattleLap = (ushort)m_UserClanData.GetBossLap(m_BossNumber),
+                BossNumber = m_BossNumber,
                 FinishFlag = false
             };
-        }
-
-        private IEnumerable<DeclarationData> DeclareDataOnSQL(ulong userID)
-        {
-            var userRole = m_UserRole;
-            var playerData = DatabasePlayerDataController.LoadPlayerData(userRole, userID);
-            var declarationData = DatabaseDeclarationController.LoadDeclarationData(playerData, m_UserClanData.GetNowBoss());
-
-            return declarationData;
-        }
 
         private async Task AttacheDefaultReaction(IUserMessage message)
         {
@@ -365,18 +325,11 @@ namespace PriconneBotConsoleApp.Script
             await message.AddReactionsAsync(emojiMatrix);
         }
 
+        {
+
         private async Task RemoveUserReaction()
         {
-            var declarationChannelID = m_UserClanData.ChannelData
-                .GetChannelID(m_UserClanData.ClanID, ChannelFeatureType.DeclareID);
-            var textChannnel = m_UserRole.Guild.GetTextChannel(declarationChannelID);
-
-            if(textChannnel == null)
-            {
-                return;
-            }
-
-            var message = await textChannnel.GetMessageAsync(m_UserReaction.MessageId);
+            var message = await m_DeclarationChannel.GetMessageAsync(m_UserReaction.MessageId);
 
             if (message == null)
             {
@@ -386,7 +339,7 @@ namespace PriconneBotConsoleApp.Script
             await message.RemoveReactionAsync(m_UserReaction.Emote, m_UserReaction.User.Value);
         }
 
-        private Embed CreateDeclarationDataEmbed(ClanData clanData)
+        private Embed CreateDeclarationDataEmbed()
         {
             if (!m_AllBattle)
             {
@@ -394,11 +347,11 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var reservationDataList =
-                DatabaseReservationController.LoadBossLapReservationData(clanData, m_BossNumber);
+                DatabaseReservationController.LoadBossLapReservationData(m_UserClanData, m_BossNumber);
             var declarationDataList =
-                DatabaseDeclarationController.LoadDeclarationData(clanData, (byte)m_BossNumber);
+                DatabaseDeclarationController.LoadDeclarationData(m_UserClanData, m_BossNumber);
 
-            var battleLap = clanData.GetBossLap(m_BossNumber);
+            var battleLap = m_UserClanData.GetBossLap(m_BossNumber);
             var updateTime = DateTime.Now;
             var updateTimeString = updateTime.ToString("T");
 
@@ -408,8 +361,7 @@ namespace PriconneBotConsoleApp.Script
                 .ToList();
 
             var reservationListMessage = NameListToMessageData(reservationNameList);
-            var reservationPlayerCount = reservationNameList.Count();
-            if (reservationPlayerCount == 0)
+            if (reservationNameList.Count == 0)
             {
                 reservationListMessage = "予約なし";
             }
@@ -421,8 +373,7 @@ namespace PriconneBotConsoleApp.Script
                 .ToList();
 
             var finishListMessage = NameListToMessageData(finishNameList);
-            var finishPlayerCount = finishNameList.Count();
-            if (finishPlayerCount == 0)
+            if (finishNameList.Count == 0)
             {
                 finishListMessage = "完了者なし";
             }
@@ -434,15 +385,14 @@ namespace PriconneBotConsoleApp.Script
                 .ToList();
 
             var nowBattleListMessage = NameListToMessageData(nowBattleNameList);
-            var nowBattlePlayerCount = nowBattleNameList.Count();
-            if (nowBattlePlayerCount == 0)
+            if (nowBattleNameList.Count == 0)
             {
                 nowBattleListMessage = "宣言なし";
             }
 
             var embedBuild = new EmbedBuilder
             {
-                Title = $"凸宣言({battleLap, 2}周目{m_BossNumber,1}ボス)"
+                Title = $"凸宣言({battleLap,2}周目{m_BossNumber,1}ボス)"
             };
 
             var explainMessage = "```python\n" +
@@ -455,21 +405,21 @@ namespace PriconneBotConsoleApp.Script
             embedBuild.AddField(new EmbedFieldBuilder()
             {
                 IsInline = true,
-                Name = $"本戦宣言中({nowBattlePlayerCount}人)",
+                Name = $"本戦宣言中({nowBattleNameList.Count}人)",
                 Value = nowBattleListMessage
             });
 
             embedBuild.AddField(new EmbedFieldBuilder()
             {
                 IsInline = true,
-                Name = $"予約中({reservationPlayerCount}人)",
+                Name = $"予約中({reservationNameList.Count}人)",
                 Value = reservationListMessage
             });
 
             embedBuild.AddField(new EmbedFieldBuilder()
             {
                 IsInline = false,
-                Name = $"本戦完了({finishPlayerCount}人)",
+                Name = $"本戦完了({finishNameList.Count}人)",
                 Value = finishListMessage
             });
 
@@ -491,7 +441,7 @@ namespace PriconneBotConsoleApp.Script
             return embed;
         }
 
-        private string CreateDeclarationDataMessage(ClanData clanData)
+        private string CreateDeclarationDataMessage()
         {
             if (!m_AllBattle)
             {
@@ -499,31 +449,17 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var reservationDataList =
-                DatabaseReservationController.LoadBossLapReservationData(clanData, m_BossNumber);
+                DatabaseReservationController.LoadBossLapReservationData(m_UserClanData, m_BossNumber);
 
             var reservationIDList = reservationDataList
                .OrderBy(d => d.CreateDateTime)
-               .Select(d => d.PlayerData.UserID)
-               .ToList();
+               .Select(d => d.PlayerData.UserID);
 
-            var mentionList = reservationIDList.Select(x => MentionUtils.MentionUser(x));
-
-            return string.Join(" ", mentionList);
+            return string.Join(" ", reservationIDList.Select(x => MentionUtils.MentionUser(x)));
         }
 
-        private string NameListToMessageData(List<string> nameDataSet)
-        {
-            var messageData = string.Empty;
-            var nameCount = 0;
-
-            foreach (var nameData in nameDataSet)
-            {
-                nameCount += 1;
-                messageData += $"{nameCount,2}. {nameData}\n";
-            }
-
-            return messageData;
-        }
+        private string NameListToMessageData(IEnumerable<string> nameDataSet)
+            => string.Join('\n', nameDataSet.Select((value, index) => $"{index + 1,2}. {value}"));
 
         private ChannelFeatureType GetDeclareChannelType(int bossNumber)
             => bossNumber switch
