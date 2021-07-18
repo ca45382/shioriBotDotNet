@@ -535,11 +535,22 @@ namespace PriconneBotConsoleApp.Script
         private void SetAllBossLaps(int bossNumber, int battleLap)
         {
             if (bossNumber <= 0 || bossNumber > 5 || battleLap < 0 || m_UserClanData == null)
+        private ChannelFeatureType GetDeclareChannelType(int bossNumber)
+            => bossNumber switch
             {
                 return;
             }
+                1 => ChannelFeatureType.DeclareBoss1ID,
+                2 => ChannelFeatureType.DeclareBoss2ID,
+                3 => ChannelFeatureType.DeclareBoss3ID,
+                4 => ChannelFeatureType.DeclareBoss4ID,
+                5 => ChannelFeatureType.DeclareBoss5ID,
+                _ => 0,
+            };
 
             for (int i = 0; i < Define.Common.MaxBossNumber; i++)
+        private MessageFeatureType GetDeclareMessageType(int bossNumber)
+            => bossNumber switch
             {
                 if (i >= bossNumber)
                 {
@@ -551,5 +562,12 @@ namespace PriconneBotConsoleApp.Script
                 }
             }
         }
+                1 => MessageFeatureType.DeclareBoss1ID,
+                2 => MessageFeatureType.DeclareBoss2ID,
+                3 => MessageFeatureType.DeclareBoss3ID,
+                4 => MessageFeatureType.DeclareBoss4ID,
+                5 => MessageFeatureType.DeclareBoss5ID,
+                _ => 0,
+            };
     }
 }
