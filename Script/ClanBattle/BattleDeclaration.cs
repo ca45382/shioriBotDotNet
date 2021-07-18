@@ -130,7 +130,7 @@ namespace PriconneBotConsoleApp.Script
 
         public async Task RunCommandByInteraction()
         {
-            if (m_UserInteraction == null)
+            if (m_UserInteraction == null || m_DeclarationChannel == null)
             {
                 return;
             }
@@ -170,7 +170,7 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         public async Task UpdateDeclarationBotMessage()
         {
-            if (m_UserRole == null || m_BossNumber == 0)
+            if (m_UserRole == null || m_BossNumber == 0 || m_DeclarationChannel == null)
             {
                 return;
             }
