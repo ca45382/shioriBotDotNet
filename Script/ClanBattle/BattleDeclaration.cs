@@ -128,23 +128,16 @@ namespace PriconneBotConsoleApp.Script
             await new BattleReservation(m_UserClanData, m_UserReaction).UpdateSystemMessage();
         }
 
-        private async Task<bool> DeclarationCallCommand()
         public async Task RunCommandByInteraction()
         {
-            var splitMessageContent = m_UserMessage.Content.ZenToHan()
-                .Split(new[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
             if (m_UserInteraction == null)
             {
                 return;
             }
 
-            if (splitMessageContent.Length != 3
-                || !(byte.TryParse(splitMessageContent[1], out byte battleLap) && battleLap > 0)
-                || !(byte.TryParse(splitMessageContent[2], out byte bossNumber) && bossNumber <= Define.Common.MaxBossNumber && bossNumber >= Define.Common.MinBossNumber))
             var messageComponent = (SocketMessageComponent)m_UserInteraction;
             if (!Enum.TryParse<ButtonType>(messageComponent.Data.CustomId, out var buttonType))
             {
-                return false;
                 return;
             }
             switch (buttonType)
@@ -153,14 +146,10 @@ namespace PriconneBotConsoleApp.Script
                     UserRegistorDeclareCommand();
                     break;
 
-            SetAllBossLaps(bossNumber, battleLap);
                 case ButtonType.FinishBattle:
                     UserFinishBattleCommand();
                     break;
 
-            if (!DatabaseClanDataController.UpdateClanData(m_UserClanData))
-            {
-                return false;
                 case ButtonType.SubdueBoss:
                     await NextBossCommand();
                     await new BattleReservation(m_UserRole).UpdateSystemMessage();
@@ -171,89 +160,91 @@ namespace PriconneBotConsoleApp.Script
                     break;
             }
 
-            return await SendDeclarationBotMessage();
             await UpdateDeclarationBotMessage();
             await new BattleReservation(m_UserRole).UpdateSystemMessage();
-        }
-
-        /// <summary>
-        /// 宣言データを送信するためのコード
-        /// </summary>
-        /// <returns></returns>
-        private async Task<bool> SendDeclarationBotMessage()
-        {
-            var embed = CreateDeclarationDataEmbed(m_UserClanData);
-            var content = CreateDeclarationDataMessage(m_UserClanData);
-            var messageComponent = CreateDeclareComponent();
-            var declarationChannelID = m_UserClanData.ChannelData
-                .GetChannelID(m_UserClanData.ClanID, ChannelFeatureType.DeclareID);
-
-            if (declarationChannelID == 0)
-            {
-                return false;
-            }
-
-            var declarationChannel = m_UserRole.Guild.GetTextChannel(declarationChannelID);
-            var sentMessage = await declarationChannel.SendMessageAsync(text: content, embed: embed);
-
-            if (sentMessage == null)
-            {
-                return false;
-            }
-
-            var sentMessageId = sentMessage.Id;
-
-            var result = DatabaseMessageDataController
-                .UpdateMessageID(m_UserClanData, sentMessageId, MessageFeatureType.DeclareID);
-
-            await AttacheDefaultReaction(sentMessage);
-
-            return result;
         }
 
         /// <summary>
         /// 宣言データをアップデートするためのコード
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> UpdateDeclarationBotMessage()
+        public async Task UpdateDeclarationBotMessage()
         {
-            var userClanData = m_UserClanData;
-            var userRole = m_UserRole;
-
-            var declarationMessageID = userClanData.MessageData
-                .GetMessageID(userClanData.ClanID, MessageFeatureType.DeclareID);
-            var declarationChannelID = userClanData.ChannelData
-                .GetChannelID(userClanData.ClanID, ChannelFeatureType.DeclareID);
-
-            if (declarationMessageID == 0 || declarationChannelID == 0)
+            if (m_UserRole == null || m_BossNumber == 0)
             {
-                return false;
+                return;
             }
-            
-            // ここでguildChannelは存在するチャンネルからしかメッセージが来ない
-            var guildChannel = userRole.Guild.GetChannel(declarationChannelID) as SocketTextChannel;
 
-            if (guildChannel.GetCachedMessage(declarationMessageID) is SocketUserMessage declarationBotMessage)
+            var declarationMessageID = m_UserClanData.MessageData
+                .GetMessageID(m_UserClanData.ClanID, GetDeclareMessageType(m_BossNumber));
+
+            if (declarationMessageID == 0)
             {
-                var embed = CreateDeclarationDataEmbed(userClanData);
+                return;
+            }
+
+            if (m_DeclarationChannel.GetCachedMessage(declarationMessageID) is SocketUserMessage declarationBotMessage)
+            {
+                var embed = CreateDeclarationDataEmbed();
                 await declarationBotMessage.ModifyAsync(msg => msg.Embed = embed);
             }
             else
             {
-                var message = await guildChannel
-                    .GetMessageAsync(declarationMessageID);
-                
+                var message = await m_DeclarationChannel.GetMessageAsync(declarationMessageID);
+
                 if (message == null)
                 {
-                    return false;
+                    return;
                 }
 
-                await guildChannel.DeleteMessageAsync(message);
+                await m_DeclarationChannel.DeleteMessageAsync(message);
                 await SendDeclarationBotMessage();
             }
+        }
 
-            return true;
+        /// <summary>
+        /// !callが実行された際の挙動
+        /// </summary>
+        /// <returns></returns>
+        private async Task DeclarationCallCommand()
+        {
+            var splitMessageContent = m_UserMessage.Content.ZenToHan()
+                .Split(new[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
+            if (!m_AllBattle || splitMessageContent.Length != 2
+                || !(int.TryParse(splitMessageContent[1], out int battleLap) && battleLap > 0))
+            {
+                return;
+            }
+
+            m_UserClanData.SetBossLap(m_BossNumber, battleLap);
+
+            if (!DatabaseClanDataController.UpdateClanData(m_UserClanData))
+            {
+                return;
+            }
+
+            await SendDeclarationBotMessage();
+        }
+
+        /// <summary>
+        /// 宣言データを送信するためのコード
+        /// </summary>
+        /// <returns></returns>
+        private async Task SendDeclarationBotMessage()
+        {
+            var embed = CreateDeclarationDataEmbed();
+            var content = CreateDeclarationDataMessage();
+            var messageComponent = CreateDeclareComponent();
+            var sentMessage = await m_DeclarationChannel.SendMessageAsync(text: content, embed: embed, component: messageComponent);
+
+            if (sentMessage == null)
+            {
+                return;
+            }
+
+            DatabaseMessageDataController.UpdateMessageID(m_UserClanData, sentMessage.Id, GetDeclareMessageType(m_BossNumber));
+            //await AttacheDefaultReaction(sentMessage);
         }
 
         /// <summary>
