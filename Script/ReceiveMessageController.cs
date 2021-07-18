@@ -80,6 +80,7 @@ namespace PriconneBotConsoleApp.Script
                 await new BattleReport(m_PlayerClanData, message).RunByMessage();
             }
 
+            
             if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.CarryOverID))
             {
                 await new BattleCarryOver(m_PlayerClanData, message).RunByMessage();
@@ -105,26 +106,41 @@ namespace PriconneBotConsoleApp.Script
                 await new BattleProgress(m_PlayerClanData, message).RunByMessage();
             }
 
-            if (featureID == (uint)ChannelFeatureType.ProgressBoss1ID)
+            var battleProgress = featureID switch
             {
-                await new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss1Number).RunByMessage();
-            }
-            else if(featureID == (uint)ChannelFeatureType.ProgressBoss2ID)
+                (uint)ChannelFeatureType.ProgressBoss1ID => new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss1Number),
+                (uint)ChannelFeatureType.ProgressBoss2ID => new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss2Number),
+                (uint)ChannelFeatureType.ProgressBoss3ID => new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss3Number),
+                (uint)ChannelFeatureType.ProgressBoss4ID => new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss4Number),
+                (uint)ChannelFeatureType.ProgressBoss5ID => new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss5Number),
+                _ => null,
+            };
+
+            if (battleProgress != null)
             {
-                await new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss2Number).RunByMessage();
+                await battleProgress.RunByMessage();
             }
-            else if (featureID == (uint)ChannelFeatureType.ProgressBoss3ID)
-            {
-                await new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss3Number).RunByMessage();
-            }
-            else if (featureID == (uint)ChannelFeatureType.ProgressBoss4ID)
-            {
-                await new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss4Number).RunByMessage();
-            }
-            else if (featureID == (uint)ChannelFeatureType.ProgressBoss5ID)
-            {
-                await new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss5Number).RunByMessage();
-            }
+
+            //if (featureID == (uint)ChannelFeatureType.ProgressBoss1ID)
+            //{
+            //    await new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss1Number).RunByMessage();
+            //}
+            //else if(featureID == (uint)ChannelFeatureType.ProgressBoss2ID)
+            //{
+            //    await new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss2Number).RunByMessage();
+            //}
+            //else if (featureID == (uint)ChannelFeatureType.ProgressBoss3ID)
+            //{
+            //    await new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss3Number).RunByMessage();
+            //}
+            //else if (featureID == (uint)ChannelFeatureType.ProgressBoss4ID)
+            //{
+            //    await new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss4Number).RunByMessage();
+            //}
+            //else if (featureID == (uint)ChannelFeatureType.ProgressBoss5ID)
+            //{
+            //    await new BattleProgress(m_PlayerClanData, message, (byte)BossNumberType.Boss5Number).RunByMessage();
+            //}
         }
     }
 }

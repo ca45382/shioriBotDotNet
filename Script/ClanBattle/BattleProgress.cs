@@ -483,7 +483,7 @@ namespace PriconneBotConsoleApp.Script
             remainAttackString.Append("残凸 ");
             for (int i = Common.MaxReportNumber; i >= 0; i--)
             {
-                remainAttackString.Append((i == 0 ? "完" : i + "凸:") + DatabaseReportDataController.GetRemainPlayerCount(m_UserClanData, i) + "人 ");
+                remainAttackString.Append((i == 0 ? "完凸:" : i + "凸:") + DatabaseReportDataController.GetRemainPlayerCount(m_UserClanData, i) + "人 ");
             }
             summaryStringBuilder.AppendLine(remainAttackString.ToString());
 
