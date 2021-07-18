@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Discord.WebSocket;
 using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.Define;
 
 namespace PriconneBotConsoleApp.Database
 {
@@ -26,7 +27,7 @@ namespace PriconneBotConsoleApp.Database
                 .FirstOrDefault(b => b.ServerID == role.Guild.Id && b.ClanRoleID == role.Id);
         }
 
-        public static bool UpdateClanData (ClanData clanData)
+        public static bool UpdateClanData(ClanData clanData)
         {
             using var databaseConnector = new DatabaseConnector();
             var transaction = databaseConnector.Database.BeginTransaction();
@@ -41,9 +42,9 @@ namespace PriconneBotConsoleApp.Database
             }
 
             // 周回数アップデート
-            for (var i = 0; i < Define.Common.MaxBossNumber; i++)
+            for (var i = 0; i < Common.MaxBossNumber; i++)
             {
-                databaseClanData.SetBossLap(i + 1,clanData.GetBossLap(i + 1));
+                databaseClanData.SetBossLap(i + 1, clanData.GetBossLap(i + 1));
             }
 
             //予約機能

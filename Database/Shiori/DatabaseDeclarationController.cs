@@ -8,7 +8,6 @@ namespace PriconneBotConsoleApp.Database
 {
     public static class DatabaseDeclarationController
     {
-
         public static IEnumerable<DeclarationData> LoadDeclarationData(ClanData clanData, byte bossNumber)
         {
             using var databaseConnector = new DatabaseConnector();

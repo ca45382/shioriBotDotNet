@@ -46,11 +46,21 @@ namespace PriconneBotConsoleApp.Script
         {
         }
 
+        public BattleReservation(SocketRole userRole)
+        {
+            m_UserRole = userRole;
+            m_UserClanData = DatabaseClanDataController.LoadClanData(userRole);
+        }
+
         public async Task RunReservationCommand()
         {
             var userMessage = m_UserMessage;
 
-            if (userMessage == null) return;
+            if (userMessage == null)
+            {
+                return;
+            }
+
             var messageContents = userMessage.Content;
 
             if (messageContents.StartsWith("予約"))
@@ -80,7 +90,7 @@ namespace PriconneBotConsoleApp.Script
                     return;
                 }
 
-                var allowReservationLap = m_UserClanData.ReservationLap + m_UserClanData.GetMinBossLap();
+                var allowReservationLap = (m_UserClanData.ReservationLap == 0 ? byte.MaxValue : m_UserClanData.ReservationLap) + m_UserClanData.GetMinBossLap();
 
                 if (reservationData.BattleLap > allowReservationLap)
                 {
@@ -92,10 +102,9 @@ namespace PriconneBotConsoleApp.Script
                 await SuccessAddEmoji();
                 await UpdateSystemMessage();
 
-                if (m_UserClanData.GetNowBoss() == reservationData.BossNumber
-                    && m_UserClanData.GetNowLap() == reservationData.BattleLap)
+                if (m_UserClanData.GetBossLap(reservationData.BossNumber) == reservationData.BattleLap)
                 {
-                    await new BattleDeclaration(m_UserClanData, m_UserMessage).UpdateDeclarationBotMessage();
+                    await new BattleDeclaration(m_UserRole, (BossNumberType)reservationData.BossNumber).UpdateDeclarationBotMessage();
                 }
             }
             else if (messageContents.StartsWith("削除"))
@@ -122,6 +131,14 @@ namespace PriconneBotConsoleApp.Script
                     || !DeleteUserReservationData(userReservationData))
                 {
                     return;
+                }
+
+                await SuccessAddEmoji();
+                await UpdateSystemMessage();
+
+                if (m_UserClanData.GetBossLap(userReservationData.BossNumber) == userReservationData.BattleLap)
+                {
+                    await new BattleDeclaration(m_UserRole, (BossNumberType)userReservationData.BossNumber).UpdateDeclarationBotMessage();
                 }
             }
         }
