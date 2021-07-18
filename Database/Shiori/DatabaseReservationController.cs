@@ -41,6 +41,22 @@ namespace PriconneBotConsoleApp.Database
                 .ToList();
         }
 
+        public static IEnumerable<ReservationData> LoadReservationData(ClanData clanData, int bossNumber)
+        {
+            if (bossNumber < Common.MinBossNumber || bossNumber > Common.MaxBossNumber)
+            {
+                return null;
+            }
+
+            using var databaseConnector = new DatabaseConnector();
+
+            return databaseConnector.ReservationData.AsQueryable()
+                .Include(x => x.PlayerData)
+                .Where(x => x.PlayerData.ClanID == clanData.ClanID && !x.DeleteFlag && x.BossNumber == bossNumber)
+                .ToArray();
+
+        }
+
         public static List<ReservationData> LoadBossLapReservationData(ClanData clanData, int bossNumber)
         {
             if ( bossNumber < Common.MinBossNumber || bossNumber > Common.MaxBossNumber)

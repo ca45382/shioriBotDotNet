@@ -79,7 +79,9 @@ namespace PriconneBotConsoleApp.Script
             if (m_UserMessage.Content.StartsWith("!call"))
             {
                 await DeclarationCallCommand();
-                await new BattleReservation(m_UserClanData, m_UserMessage).UpdateSystemMessage();
+                var battleReservation = new BattleReservation(m_UserRole);
+                battleReservation.DeleteUnusedData(m_BossNumber);
+                await battleReservation.UpdateSystemMessage();
             }
         }
 
@@ -290,7 +292,15 @@ namespace PriconneBotConsoleApp.Script
             var nowBattleLap = m_UserClanData.GetBossLap(m_BossNumber);
             m_UserClanData.SetBossLap(m_BossNumber, nowBattleLap + 1);
             DatabaseClanDataController.UpdateClanData(m_UserClanData);
-            await SendDeclarationBotMessage();
+
+            var taskList = new List<Task>();
+            var battleReservation = new BattleReservation(m_UserRole);
+            battleReservation.DeleteUnusedData(m_BossNumber);
+            
+            taskList.Add(SendDeclarationBotMessage());
+            taskList.Add(battleReservation.UpdateSystemMessage());
+
+            await Task.WhenAll(taskList);
         }
 
         /// <summary>

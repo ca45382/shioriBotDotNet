@@ -230,6 +230,14 @@ namespace PriconneBotConsoleApp.Script
             await serverMessage.ModifyAsync(x => x.Embed = embedData);
         }
 
+        public void DeleteUnusedData(byte bossNumber)
+        {
+            var clanReservationData = DatabaseReservationController.LoadReservationData(m_UserClanData, bossNumber);
+            var bossLap = m_UserClanData.GetBossLap(bossNumber);
+            var deleteData =  clanReservationData.Where(x => x.BattleLap < bossLap);
+            DatabaseReservationController.DeleteReservationData(deleteData);
+        }
+
         /// <summary>
         /// 受信した予約データを解析して保存する
         /// 例 : 「予約 35 1 1200万程度」
