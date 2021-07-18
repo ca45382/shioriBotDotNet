@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Discord.WebSocket;
+using System.Threading.Tasks;
+using Discord;
 using ShioriBot.Net.Model;
 using ShioriBot.Net.Database;
 
@@ -9,13 +11,22 @@ namespace ShioriBot.Net.Script
 {
     public class DiscordDataLoader
     {
-        private readonly IEnumerable<ClanData> m_ClanData;
+        private readonly IEnumerable<ClanData> m_ServerClanData;
+        private readonly SocketGuild m_Guild;
 
-        public DiscordDataLoader()
+        private class ClanMember
         {
+            public ulong SocketRoleID;
+            public IEnumerable<IUser> userList;
+        }
+
+        public DiscordDataLoader(SocketGuild guild)
+        {
+            m_Guild = guild;
+
             try
             {
-                m_ClanData = DatabaseClanDataController.LoadClanData();
+                m_ServerClanData = DatabaseClanDataController.LoadClanData(m_Guild);
             }
             catch (Exception e)
             {
@@ -23,32 +34,26 @@ namespace ShioriBot.Net.Script
             }
         }
 
-        public void UpdateServerData(SocketGuild guild)
+        public void UpdateServerData()
         {
-            var serverData = DatabaseServerDataController.LoadServerData(guild);
+            var serverData = DatabaseServerDataController.LoadServerData(m_Guild);
 
             if (serverData == null)
             {
-                DatabaseServerDataController.CreateServerData(guild);
+                DatabaseServerDataController.CreateServerData(m_Guild);
             }
             else
             {
-                DatabaseServerDataController.UpdateServerData(guild);
+                DatabaseServerDataController.UpdateServerData(m_Guild);
             }
         }
 
-        public void UpdateClanData(SocketGuild guild)
+        public void UpdateClanData()
         {
-            var clanDataList = m_ClanData
-                .Where(x => x.ServerID == guild.Id)
-                .ToList();
-
-            var removeDataList = new List<ClanData>();
-
-            foreach (var clanData in clanDataList)
+            foreach (var clanData in m_ServerClanData)
             {
                 var updateClanData = clanData;
-                var clanRole = guild.Roles
+                var clanRole = m_Guild.Roles
                     .FirstOrDefault(x => x.Id == clanData.ClanRoleID);
 
                 if (clanRole == null)
@@ -69,13 +74,11 @@ namespace ShioriBot.Net.Script
         /// SQLサーバー側とDiscord側のプレイヤーデータ同期
         /// </summary>
         /// <param name="guild"></param>
-        public void UpdatePlayerData(SocketGuild guild)
+        public void UpdatePlayerData()
         {
-            // サーバー上のクランメンバー
-            var usersOnDiscord = GetServerClanMember(guild);
 
-            // テーブル上のプレイヤーデータ
-            var usersOnSQLServer = DatabasePlayerDataController.LoadPlayerData(guild.Id);
+            var usersOnDiscord = GetServerClanMember();
+            var usersOnDatabase = DatabasePlayerDataController.LoadPlayerData(m_Guild.Id);
 
             // テーブルにユーザを追加・更新
             var createUserData = new List<PlayerData>();
@@ -86,14 +89,14 @@ namespace ShioriBot.Net.Script
                 var sameNameFlag = false;
                 var existFlag = false;
 
-                foreach (PlayerData mySQLUser in usersOnSQLServer)
+                foreach (PlayerData userDatabase in usersOnDatabase)
                 {
-                    if (mySQLUser.UserID == discordUser.UserID &&
-                        mySQLUser.ClanData.ClanRoleID == discordUser.ClanData.ClanRoleID)
+                    if (IsSameUser(discordUser,userDatabase))
                     {
+                        discordUser.PlayerID = userDatabase.PlayerID;
                         existFlag = true;
 
-                        if (mySQLUser.GuildUserName == discordUser.GuildUserName)
+                        if (userDatabase.GuildUserName == discordUser.GuildUserName)
                         {
                             sameNameFlag = true;
                         }
@@ -113,15 +116,11 @@ namespace ShioriBot.Net.Script
             DatabasePlayerDataController.CreatePlayerData(createUserData);
             DatabasePlayerDataController.UpdatePlayerData(updateUserData);
 
-            // テーブルからユーザを削除
-            static bool IsSameUser(PlayerData left, PlayerData right)
-                => left.UserID == right.UserID && left.ClanData.ClanRoleID == right.ClanData.ClanRoleID;
-
-            var deleteUsers = usersOnSQLServer
-                .Where(
-                    mySQLUser => !usersOnDiscord.Any(discordUser => IsSameUser(mySQLUser, discordUser))
+            var deleteUsers = usersOnDatabase
+                .Where(mySQLUser => !usersOnDiscord.Any(discordUser => IsSameUser(mySQLUser, discordUser))
                 );
 
+            // テーブルからユーザを削除
             DatabasePlayerDataController.DeletePlayerData(deleteUsers);
         }
 
@@ -130,62 +129,40 @@ namespace ShioriBot.Net.Script
         /// </summary>
         /// <param name="guild"></param>
         /// <returns></returns>
-        private IReadOnlyList<PlayerData> GetServerClanMember(SocketGuild guild)
+        private IEnumerable<PlayerData> GetServerClanMember()
         {
-            var clanMember = new List<PlayerData>();
+            var roleIDList = m_ServerClanData.Select(x => x.ClanRoleID);
+            var socketRoleList = m_Guild.Roles.Where(x => roleIDList.Any(y => y == x.Id));
 
-            // SQL側の情報から対象のクランロールを抽出
-            var guildClanIDs = ClanIDsOnServer(guild.Id);
+            List<PlayerData> serverClanMember = new();
 
-            // 現在のDiscord上の名前を抽出
-            // 同一サーバーで複数クランに所属している場合は弾く
-            foreach (SocketGuildUser user in guild.Users)
+            foreach (var socketRole in socketRoleList)
             {
-                if (user.IsBot)
+                var userList = socketRole.Members;
+                var clanData = m_ServerClanData.FirstOrDefault(x => x.ClanRoleID == socketRole.Id);
+
+                foreach (var socketUser in userList)
                 {
-                    continue;
-                }
-
-                var allUserRoleID = user.Roles
-                    .Where(x => guildClanIDs.Contains(x.Id))
-                    .Select(x => x.Id)
-                    .ToList();
-
-                if (allUserRoleID.Count != 1)
-                {
-                    continue;
-                }
-
-                var roleID = allUserRoleID.FirstOrDefault();
-                var nickName = user.Nickname ?? user.Username;
-
-                var playerData = new PlayerData
-                {
-                    ClanData = new ClanData() 
+                    if (socketUser.IsBot)
                     {
-                        ServerID = user.Guild.Id,
-                        ClanRoleID = roleID
-                    },
+                        continue;
+                    }
 
-                    UserID = user.Id,
-                    GuildUserName = nickName
-                };
+                    PlayerData playerData = new()
+                    {
+                        ClanID = clanData.ClanID,
+                        UserID = socketUser.Id,
+                        GuildUserName = socketUser.Nickname ?? socketUser.Username,
+                    };
 
-                clanMember.Add(playerData);
+                    serverClanMember.Add(playerData);
+                }
             }
 
-            return clanMember;
+            return serverClanMember;
         }
 
-        /// <summary>
-        /// サーバー内のクランIDの抽出
-        /// </summary>
-        /// <param name="guildID"></param>
-        /// <returns></returns>
-        private IReadOnlyList<ulong> ClanIDsOnServer(ulong guildID)
-            => m_ClanData
-                .Where(x => x.ServerID == guildID)
-                .Select(x => x.ClanRoleID)
-                .ToList();
+        private bool IsSameUser(PlayerData left, PlayerData right)
+                => left.UserID == right.UserID && left.ClanID == right.ClanID;
     }
 }

@@ -15,6 +15,16 @@ namespace ShioriBot.Net.Database
             return databaseConnector.ClanData.ToList();
         }
 
+        public static IEnumerable<ClanData> LoadClanData(SocketGuild guild)
+        {
+            using var databaseConnector = new DatabaseConnector();
+
+            return databaseConnector.ClanData
+                .Include(x => x.MessageData).Include(x => x.MessageData).Include(x => x.RoleData)
+                .Where(x => x.ServerID == guild.Id)
+                .ToArray();
+        }
+
         public static ClanData LoadClanData(SocketRole role)
         {
             using var databaseConnector = new ShioriDBContext();

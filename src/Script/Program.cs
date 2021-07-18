@@ -93,28 +93,28 @@ namespace ShioriBot.Net.Script
         /// <returns></returns>
         private Task GuildMembersDownloaded(SocketGuild guild)
         {
-            var discordDataLoader = new DiscordDataLoader();
-            discordDataLoader.UpdateServerData(guild);
-            discordDataLoader.UpdateClanData(guild);
-            discordDataLoader.UpdatePlayerData(guild);
+            var discordDataLoader = new DiscordDataLoader(guild);
+            discordDataLoader.UpdateServerData();
+            discordDataLoader.UpdateClanData();
+            discordDataLoader.UpdatePlayerData();
             return Task.CompletedTask;
         }
 
         private Task UserLeft(SocketGuildUser userInfo)
         {
-            var discordDataLoader = new DiscordDataLoader();
-            discordDataLoader.UpdateServerData(userInfo.Guild);
-            discordDataLoader.UpdateClanData(userInfo.Guild);
-            discordDataLoader.UpdatePlayerData(userInfo.Guild);
+            var discordDataLoader = new DiscordDataLoader(userInfo.Guild);
+            discordDataLoader.UpdateServerData();
+            discordDataLoader.UpdateClanData();
+            discordDataLoader.UpdatePlayerData();
             return Task.CompletedTask;
         }
 
         private Task GuildMemberUpdated(Cacheable<SocketGuildUser, ulong> cachedGuildUser, SocketGuildUser newUserInfo)
         {
-            var discordDataLoader = new DiscordDataLoader();
-            discordDataLoader.UpdateServerData(newUserInfo.Guild);
-            discordDataLoader.UpdateClanData(newUserInfo.Guild);
-            discordDataLoader.UpdatePlayerData(newUserInfo.Guild);
+            var discordDataLoader = new DiscordDataLoader(newUserInfo.Guild);
+            discordDataLoader.UpdateServerData();
+            discordDataLoader.UpdateClanData();
+            discordDataLoader.UpdatePlayerData();
             return Task.CompletedTask;
         }
 

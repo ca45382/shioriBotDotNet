@@ -92,17 +92,20 @@ namespace ShioriBot.Net.Database
             transaction.Commit();
         }
 
-        public static void UpdatePlayerData(IEnumerable<PlayerData> playersData)
+        public static void UpdatePlayerData(IEnumerable<PlayerData> playerDataList)
         {
             using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
             
-            foreach (PlayerData playerData in playersData)
+            foreach (var playerData in playerDataList)
             {
+                if (playerData.PlayerID == 0)
+                {
+                    return;
+                }
+
                 var updateData = databaseConnector.PlayerData
-                    .Include(d => d.ClanData)
-                    .FirstOrDefault(d => d.ClanData.ServerID == playerData.ClanData.ServerID 
-                    && d.ClanData.ClanRoleID == playerData.ClanData.ClanRoleID && d.UserID == playerData.UserID);
+                    .FirstOrDefault(x => x.PlayerID == playerData.PlayerID);
 
                 if (updateData != null)
                 {
