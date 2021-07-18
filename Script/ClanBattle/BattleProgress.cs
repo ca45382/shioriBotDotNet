@@ -58,23 +58,14 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
-        public BattleProgress(ClanData clanData, SocketUserMessage userMessage, byte bossNumber = 0)
+        public BattleProgress(ClanData clanData, SocketUserMessage userMessage, byte bossNumber)
         {
             if (clanData.RoleData == null || clanData.ChannelData == null || clanData.MessageData == null)
             {
                 clanData = DatabaseClanDataController.LoadClanData(m_UserRole);
             }
-
-            if (bossNumber == 0)
-            {
-                m_BossNumber = clanData.GetNowBoss();
-                m_AllBattleFlag = false;
-            }
-            else
-            {
-                m_BossNumber = bossNumber;
-            }
-
+            
+            m_BossNumber = bossNumber;
             m_UserClanData = clanData;
             m_UserMessage = userMessage;
             m_Guild = (userMessage.Channel as SocketTextChannel)?.Guild;
@@ -97,7 +88,12 @@ namespace PriconneBotConsoleApp.Script
                 }
                 else if (m_UserMessage.Content.StartsWith("!next"))
                 {
-                    await NextLap();
+                    await ChangeLap();
+                    return;
+                }
+                else if (m_UserMessage.Content.StartsWith("!call"))
+                {
+                    await CallProgress();
                     return;
                 }
                 else if (m_UserMessage.Content.StartsWith("!rm"))
@@ -189,29 +185,33 @@ namespace PriconneBotConsoleApp.Script
 
             return false;
         }
-        
-        private async Task<bool> NextLap()
+
+        private async Task CallProgress()
+        {
+            var messageData = m_UserMessage.Content.ZenToHan().Split(" ", StringSplitOptions.RemoveEmptyEntries);
+
+            if (messageData.Length != 2 || !ushort.TryParse(messageData[1], out var lap))
+            {
+                return;
+            }
+
+            await ChangeLap(lap);
+        }
+
+        private async Task<bool> ChangeLap(ushort lap = 0)
         {
             InitializeProgressData();
             var bossLap = m_UserClanData.GetBossLap(m_BossNumber);
 
-            if (m_AllBattleFlag)
+            if (lap == 0)
             {
                 m_UserClanData.SetBossLap(m_BossNumber, bossLap + 1);
-
             }
             else
             {
-                if (m_BossNumber >= Common.MaxBossNumber)
-                {
-                    m_UserClanData.SetBossLap(Common.MinBossNumber, bossLap + 1);
-                }
-                else
-                {
-                    m_UserClanData.SetBossLap(m_BossNumber + 1, bossLap);
-                }
+                m_UserClanData.SetBossLap(m_BossNumber, lap);
             }
-
+            
             DatabaseClanDataController.UpdateClanData(m_UserClanData);
             await SendClanProgressList();
 
