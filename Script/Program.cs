@@ -30,7 +30,8 @@ namespace PriconneBotConsoleApp.Script
 
             m_config = new DiscordSocketConfig
             {
-                MessageCacheSize = 10
+                MessageCacheSize = 10,
+                //AlwaysAcknowledgeInteractions = false,
             };
 
             var initialize = new BotInitialize();
@@ -44,6 +45,7 @@ namespace PriconneBotConsoleApp.Script
             m_client.GuildMemberUpdated += GuildMemberUpdated;
             m_client.ReactionAdded += ReactionAdded;
             m_client.Log += Log;
+            m_client.InteractionCreated += InteractionCreated;
 
             var commands = new CommandService();
             var services = new ServiceCollection().BuildServiceProvider();
@@ -102,7 +104,9 @@ namespace PriconneBotConsoleApp.Script
             return Task.CompletedTask;
         }
 
-        private Task GuildMemberUpdated(SocketGuildUser oldUserInfo, SocketGuildUser newUserInfo)
+        private Task GuildMemberUpdated(
+            Cacheable<SocketGuildUser, ulong> cacheGuildMember, 
+            SocketGuildUser newUserInfo)
         {
             var discordDataLoader = new DiscordDataLoader();
             discordDataLoader.UpdateServerData(newUserInfo.Guild);
@@ -112,8 +116,8 @@ namespace PriconneBotConsoleApp.Script
         }
 
         private async Task ReactionAdded(
-            Cacheable<IUserMessage, ulong> cachedMessage, 
-            ISocketMessageChannel channel,
+            Cacheable<IUserMessage, ulong> cachedMessage,
+            Cacheable<IMessageChannel, ulong> cachedChannel,
             SocketReaction reaction)
         {
             if (!reaction.User.Value.IsBot)
@@ -121,6 +125,16 @@ namespace PriconneBotConsoleApp.Script
                 await new ReceiveReactionController(reaction)
                     .RunReactionReceive();
             }
+        }
+
+        private async Task InteractionCreated(SocketInteraction socketInteraction)
+        {
+            if (socketInteraction.Type != InteractionType.MessageComponent)
+            {
+                return;
+            }
+
+            await new RecieveInteractionController(socketInteraction).RunSocketInteraction();
         }
 
         private async Task RefreshInUpdateDate()

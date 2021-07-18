@@ -48,19 +48,28 @@ namespace PriconneBotConsoleApp.Script
 
             var userClanData = m_PlayerClanData;
             var reactionChannelID = reaction.Channel.Id;
+            var fetureID = userClanData.ChannelData.FirstOrDefault(x => x.ChannelID == reactionChannelID)?.FeatureID ?? 0;
 
-            if (reactionChannelID == userClanData.ChannelData.GetChannelID(userClanData.ClanID,ChannelFeatureType.DeclareID))
-            {
-                await new BattleDeclaration(userClanData, reaction)
-                    .RunDeclarationCommandByReaction();
-            } 
-            else if (reactionChannelID == userClanData.ChannelData.GetChannelID(userClanData.ClanID, ChannelFeatureType.ReserveResultID))
+            if (reactionChannelID == userClanData.ChannelData.GetChannelID(userClanData.ClanID, ChannelFeatureType.ReserveResultID))
             {
                 await new BattleReservation(userClanData, reaction)
                     .RunReservationResultReaction();
             }
 
+            BattleDeclaration battleDeclaration = fetureID switch
+            {
+                (int)ChannelFeatureType.DeclareBoss1ID => new BattleDeclaration(m_PlayerClanData, reaction, BossNumberType.Boss1Number),
+                (int)ChannelFeatureType.DeclareBoss2ID => new BattleDeclaration(m_PlayerClanData, reaction, BossNumberType.Boss2Number),
+                (int)ChannelFeatureType.DeclareBoss3ID => new BattleDeclaration(m_PlayerClanData, reaction, BossNumberType.Boss3Number),
+                (int)ChannelFeatureType.DeclareBoss4ID => new BattleDeclaration(m_PlayerClanData, reaction, BossNumberType.Boss4Number),
+                (int)ChannelFeatureType.DeclareBoss5ID => new BattleDeclaration(m_PlayerClanData, reaction, BossNumberType.Boss5Number),
+                _ => null,
+            };
 
+            if (battleDeclaration != null)
+            {
+                await battleDeclaration.RunDeclarationCommandByReaction();
+            }
         }
     }
 }
