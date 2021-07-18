@@ -30,6 +30,7 @@ namespace PriconneBotConsoleApp.Script
             BossNumberType bossNumber,
             SocketUserMessage userMessage = null,
             SocketReaction userReaction = null,
+            SocketInteraction userInteraction = null)
         {
             m_UserClanData = userClanData;
             var channelData = m_UserClanData.ChannelData.FirstOrDefault(x => x.ChannelID == channel.Id);
@@ -56,6 +57,25 @@ namespace PriconneBotConsoleApp.Script
             m_UserReaction = reaction;
             m_User = reaction.User.Value;
         }
+
+        public BattleDeclaration(ClanData userClanData, SocketInteraction interaction, BossNumberType bossNumber = 0)
+            : this(userClanData, interaction.Channel, bossNumber, userInteraction: interaction)
+        {
+            m_UserInteraction = interaction;
+            m_User = interaction.User;
+        }
+
+        public BattleDeclaration(SocketRole role, BossNumberType bossType)
+        {
+            m_BossNumber = (byte)bossType;
+            m_UserRole = role;
+            m_UserClanData = DatabaseClanDataController.LoadClanData(role);
+            var channelID = m_UserClanData.ChannelData.GetChannelID(m_UserClanData.ClanID, GetDeclareChannelType(m_BossNumber));
+
+            if (channelID != 0)
+            {
+                m_DeclarationChannel = role.Guild.GetTextChannel(channelID);
+            }
         }
 
         public async Task RunDeclarationCommandByMessage()
@@ -109,25 +129,51 @@ namespace PriconneBotConsoleApp.Script
         }
 
         private async Task<bool> DeclarationCallCommand()
+        public async Task RunCommandByInteraction()
         {
             var splitMessageContent = m_UserMessage.Content.ZenToHan()
                 .Split(new[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
+            if (m_UserInteraction == null)
+            {
+                return;
+            }
 
             if (splitMessageContent.Length != 3
                 || !(byte.TryParse(splitMessageContent[1], out byte battleLap) && battleLap > 0)
                 || !(byte.TryParse(splitMessageContent[2], out byte bossNumber) && bossNumber <= Define.Common.MaxBossNumber && bossNumber >= Define.Common.MinBossNumber))
+            var messageComponent = (SocketMessageComponent)m_UserInteraction;
+            if (!Enum.TryParse<ButtonType>(messageComponent.Data.CustomId, out var buttonType))
             {
                 return false;
+                return;
             }
+            switch (buttonType)
+            {
+                case ButtonType.StartBattle:
+                    UserRegistorDeclareCommand();
+                    break;
 
             SetAllBossLaps(bossNumber, battleLap);
+                case ButtonType.FinishBattle:
+                    UserFinishBattleCommand();
+                    break;
 
             if (!DatabaseClanDataController.UpdateClanData(m_UserClanData))
             {
                 return false;
+                case ButtonType.SubdueBoss:
+                    await NextBossCommand();
+                    await new BattleReservation(m_UserRole).UpdateSystemMessage();
+                    return;
+
+                case ButtonType.CancelBattle:
+                    UserDeleteBattleData();
+                    break;
             }
 
             return await SendDeclarationBotMessage();
+            await UpdateDeclarationBotMessage();
+            await new BattleReservation(m_UserRole).UpdateSystemMessage();
         }
 
         /// <summary>
@@ -325,7 +371,17 @@ namespace PriconneBotConsoleApp.Script
             await message.AddReactionsAsync(emojiMatrix);
         }
 
+        private MessageComponent CreateDeclareComponent()
         {
+            ComponentBuilder componentBuilder = new();
+            // TODO : GetDescriptionを修正
+            componentBuilder.WithButton("", ButtonType.StartBattle.ToString(), emote: new Emoji(ButtonType.StartBattle.GetDescription()));
+            componentBuilder.WithButton("", ButtonType.FinishBattle.ToString(), emote: new Emoji(ButtonType.FinishBattle.GetDescription()));
+            componentBuilder.WithButton("", ButtonType.SubdueBoss.ToString(), emote: new Emoji(ButtonType.SubdueBoss.GetDescription()));
+            componentBuilder.WithButton("", ButtonType.CancelBattle.ToString(), emote: new Emoji(ButtonType.CancelBattle.GetDescription()));
+
+            return componentBuilder.Build();
+        }
 
         private async Task RemoveUserReaction()
         {
