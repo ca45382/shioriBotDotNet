@@ -17,11 +17,10 @@ namespace PriconneBotConsoleApp.Script
         public ReceiveReactionController(SocketReaction reaction)
         {
             m_ReceiveReaction = reaction;
-            var reactionChannel = reaction.Channel as SocketGuildChannel;
-
+            var reactionChannel = m_ReceiveReaction.Channel as SocketGuildChannel;
             m_PlayerData = DatabasePlayerDataController
-                .LoadPlayerData((ulong)reactionChannel?.Guild.Id, reaction.UserId);
-            var userRole = reactionChannel?.Guild.GetRole((ulong)m_PlayerData?.ClanData.ClanRoleID);
+                .LoadPlayerData(reactionChannel?.Guild.Id ?? 0, m_ReceiveReaction.UserId);
+            var userRole = reactionChannel?.Guild.GetRole(m_PlayerData?.ClanData.ClanRoleID ?? 0);
 
             if (userRole == null)
             {
