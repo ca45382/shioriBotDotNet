@@ -2,7 +2,6 @@
 using Discord.WebSocket;
 using System.Linq;
 using PriconneBotConsoleApp.DataType;
-using PriconneBotConsoleApp.Extension;
 using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.Database;
 
@@ -17,11 +16,10 @@ namespace PriconneBotConsoleApp.Script
         public ReceiveReactionController(SocketReaction reaction)
         {
             m_ReceiveReaction = reaction;
-            var reactionChannel = reaction.Channel as SocketGuildChannel;
-
+            var reactionChannel = m_ReceiveReaction.Channel as SocketGuildChannel;
             m_PlayerData = DatabasePlayerDataController
-                .LoadPlayerData((ulong)reactionChannel?.Guild.Id, reaction.UserId);
-            var userRole = reactionChannel?.Guild.GetRole((ulong)m_PlayerData?.ClanData.ClanRoleID);
+                .LoadPlayerData(reactionChannel?.Guild.Id ?? 0, m_ReceiveReaction.UserId);
+            var userRole = reactionChannel?.Guild.GetRole(m_PlayerData?.ClanData.ClanRoleID ?? 0);
 
             if (userRole == null)
             {
@@ -33,34 +31,25 @@ namespace PriconneBotConsoleApp.Script
 
         public async Task RunReactionReceive()
         {
-            if (m_ReceiveReaction != null)
-            {
-                await RunReactionReceive(m_ReceiveReaction); 
-            }
-        }
-
-        public async Task RunReactionReceive(SocketReaction reaction)
-        {
             if (m_PlayerClanData == null)
             {
                 return;
             }
 
-            var userClanData = m_PlayerClanData;
-            var reactionChannelID = reaction.Channel.Id;
+            var reactionChannelID = m_ReceiveReaction.Channel.Id;
+            var channelFeatureID = m_PlayerClanData.ChannelData
+                .FirstOrDefault(x => x.ChannelID == reactionChannelID)?.FeatureID ?? 0;
 
-            if (reactionChannelID == userClanData.ChannelData.GetChannelID(userClanData.ClanID,ChannelFeatureType.DeclareID))
+            if (channelFeatureID == (uint)ChannelFeatureType.DeclareID)
             {
-                await new BattleDeclaration(userClanData, reaction)
+                await new BattleDeclaration(m_PlayerClanData, m_ReceiveReaction)
                     .RunDeclarationCommandByReaction();
-            } 
-            else if (reactionChannelID == userClanData.ChannelData.GetChannelID(userClanData.ClanID, ChannelFeatureType.ReserveResultID))
+            }
+            else if (channelFeatureID == (uint)ChannelFeatureType.ReserveResultID)
             {
-                await new BattleReservation(userClanData, reaction)
+                await new BattleReservation(m_PlayerClanData, m_ReceiveReaction)
                     .RunReservationResultReaction();
             }
-
-
         }
     }
 }
