@@ -14,12 +14,6 @@ namespace ShioriBot.Net.Script
         private readonly IEnumerable<ClanData> m_ServerClanData;
         private readonly SocketGuild m_Guild;
 
-        private class ClanMember
-        {
-            public ulong SocketRoleID;
-            public IEnumerable<IUser> userList;
-        }
-
         public DiscordDataLoader(SocketGuild guild)
         {
             m_Guild = guild;
@@ -76,7 +70,6 @@ namespace ShioriBot.Net.Script
         /// <param name="guild"></param>
         public void UpdatePlayerData()
         {
-
             var usersOnDiscord = GetServerClanMember();
             var usersOnDatabase = DatabasePlayerDataController.LoadPlayerData(m_Guild.Id);
 
