@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using ShioriBot.Net.Interface;
 using ShioriBot.Net.Model;
 
@@ -26,6 +27,15 @@ namespace ShioriBot.Net.Database
             using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.RoleFeatures.ToList();
+        }
+
+        public static ChannelData GetChannelData(ulong channelID)
+        {
+            using var databaseConnector = new DatabaseConnector();
+
+            return databaseConnector.ChannelData.AsQueryable()
+                .Include(x => x.ClanData)
+                .FirstOrDefault(x => x.ChannelID == channelID);
         }
 
         public static void UpdateChannelFeature(IEnumerable<ChannelFeature> features)
