@@ -174,7 +174,9 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            m_UserClanData.SetBossLap(m_BossNumber, battleLap);
+            var declareBattleLap = Math.Clamp(battleLap, 0, ClanBattleDefine.MaxLapNumber);
+
+            m_UserClanData.SetBossLap(m_BossNumber, declareBattleLap);
 
             if (!DatabaseClanDataController.UpdateClanData(m_UserClanData))
             {
