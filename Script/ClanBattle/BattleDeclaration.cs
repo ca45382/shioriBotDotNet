@@ -290,7 +290,14 @@ namespace PriconneBotConsoleApp.Script
             DeleteAllBattleData();
 
             var nowBattleLap = m_UserClanData.GetBossLap(m_BossNumber);
-            m_UserClanData.SetBossLap(m_BossNumber, nowBattleLap + 1);
+            var nextBattleLap = nowBattleLap + 1;
+
+            if (nextBattleLap > ClanBattleDefine.MaxLapNumber)
+            {
+                nextBattleLap = ClanBattleDefine.MaxLapNumber;
+            }
+
+            m_UserClanData.SetBossLap(m_BossNumber, nextBattleLap);
             DatabaseClanDataController.UpdateClanData(m_UserClanData);
 
             var taskList = new List<Task>();
