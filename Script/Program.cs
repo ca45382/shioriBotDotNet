@@ -44,6 +44,7 @@ namespace PriconneBotConsoleApp.Script
             m_client.UserLeft += UserLeft;
             m_client.GuildMemberUpdated += GuildMemberUpdated;
             m_client.ReactionAdded += ReactionAdded;
+            m_client.InteractionCreated += InteractionCreated;
             m_client.Log += Log;
 
             var commands = new CommandService();
@@ -122,6 +123,16 @@ namespace PriconneBotConsoleApp.Script
                 await new ReceiveReactionController(reaction)
                     .RunReactionReceive();
             }
+        }
+
+        private async Task InteractionCreated(SocketInteraction socketInteraction)
+        {
+            if (socketInteraction.Type != InteractionType.MessageComponent)
+            {
+                return;
+            }
+
+            await new ReceiveInteractionController(socketInteraction).Run();
         }
 
         private async Task RefreshInUpdateDate()
