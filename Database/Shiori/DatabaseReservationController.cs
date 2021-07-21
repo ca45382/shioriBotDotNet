@@ -43,7 +43,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static IEnumerable<ReservationData> LoadReservationData(ClanData clanData, int bossNumber)
         {
-            if (bossNumber < Common.MinBossNumber || bossNumber > Common.MaxBossNumber)
+            if (bossNumber < CommonDefine.MinBossNumber || bossNumber > CommonDefine.MaxBossNumber)
             {
                 return null;
             }
@@ -59,7 +59,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static List<ReservationData> LoadBossLapReservationData(ClanData clanData, int bossNumber)
         {
-            if ( bossNumber < Common.MinBossNumber || bossNumber > Common.MaxBossNumber)
+            if ( bossNumber < CommonDefine.MinBossNumber || bossNumber > CommonDefine.MaxBossNumber)
             {
                 return null;
             }

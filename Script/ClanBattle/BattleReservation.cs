@@ -240,7 +240,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (splitMessageContent.Length < 3
                 || !(byte.TryParse(splitMessageContent[1], out byte battleLap) && battleLap > 0)
-                || !(byte.TryParse(splitMessageContent[2], out byte bossNumber) && bossNumber <= Common.MaxBossNumber && bossNumber >= Common.MinBossNumber)
+                || !(byte.TryParse(splitMessageContent[2], out byte bossNumber) && bossNumber <= CommonDefine.MaxBossNumber && bossNumber >= CommonDefine.MinBossNumber)
                 || battleLap < m_UserClanData.GetBossLap(bossNumber))
             {
                 return null;
@@ -294,7 +294,7 @@ namespace PriconneBotConsoleApp.Script
             if (splitMessageContent.Length != 4
                 || !ulong.TryParse(splitMessageContent[1], out ulong userID)
                 || !(byte.TryParse(splitMessageContent[2], out byte battleLap) && battleLap > 0)
-                || !(byte.TryParse(splitMessageContent[3], out byte bossNumber) && bossNumber <= Common.MaxBossNumber && bossNumber >= Common.MinBossNumber))
+                || !(byte.TryParse(splitMessageContent[3], out byte bossNumber) && bossNumber <= CommonDefine.MaxBossNumber && bossNumber >= CommonDefine.MinBossNumber))
             {
                 return null;
             }
@@ -368,7 +368,7 @@ namespace PriconneBotConsoleApp.Script
             var reservationDataSet = DatabaseReservationController.LoadReservationData(m_UserClanData);
             List<List<ReservationData>> reservationDataList = new();
 
-            for (var i = 0; i < Common.MaxBossNumber; i++)
+            for (var i = 0; i < CommonDefine.MaxBossNumber; i++)
             {
                 reservationDataList.Add(new List<ReservationData>());
             }
@@ -376,7 +376,7 @@ namespace PriconneBotConsoleApp.Script
             reservationDataSet.ForEach(x => reservationDataList[x.BossNumber - 1].Add(x));
             EmbedBuilder embedBuilder = new();
 
-            for (var i = 0; i < Common.MaxBossNumber; i++)
+            for (var i = 0; i < CommonDefine.MaxBossNumber; i++)
             {
                 EmbedFieldBuilder fieldBuilder = new();
 
@@ -469,17 +469,17 @@ namespace PriconneBotConsoleApp.Script
                 return true;
             }
 
-            if (startTime.Hours < Common.DateUpdateHour)
+            if (startTime.Hours < CommonDefine.DateUpdateHour)
             {
                 startTime = startTime.Add(new TimeSpan(1, 0, 0, 0));
             }
 
-            if (endTime.Hours < Common.DateUpdateHour)
+            if (endTime.Hours < CommonDefine.DateUpdateHour)
             {
                 endTime = endTime.Add(new TimeSpan(1, 0, 0, 0));
             }
 
-            if (nowTime.Hours < Common.DateUpdateHour)
+            if (nowTime.Hours < CommonDefine.DateUpdateHour)
             {
                 nowTime = nowTime.Add(new TimeSpan(1, 0, 0, 0));
             }

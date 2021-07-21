@@ -42,7 +42,7 @@ namespace PriconneBotConsoleApp.Database
             }
 
             // 周回数アップデート
-            for (var i = 0; i < Common.MaxBossNumber; i++)
+            for (var i = 0; i < CommonDefine.MaxBossNumber; i++)
             {
                 databaseClanData.SetBossLap(i + 1, clanData.GetBossLap(i + 1));
             }

@@ -57,7 +57,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var splitMessageContent = message.Content.Split( new[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
-            if (splitMessageContent.Length != 3 || !int.TryParse(splitMessageContent[2], out int timeData) || timeData < Common.MinBattleTime || timeData > Common.MaxBattleTime )
+            if (splitMessageContent.Length != 3 || !int.TryParse(splitMessageContent[2], out int timeData) || timeData < CommonDefine.MinBattleTime || timeData > CommonDefine.MaxBattleTime )
             {
                 return null;
             }
