@@ -56,6 +56,7 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var messageChannelID = message.Channel.Id;
+            var fetureID = m_PlayerClanData.ChannelData.FirstOrDefault(x => x.ChannelID == messageChannelID)?.FeatureID ?? 0;
 
             if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.ReserveID))
             {
@@ -65,11 +66,6 @@ namespace PriconneBotConsoleApp.Script
             if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.ReserveResultID))
             {
                 await new BattleReservation(m_PlayerClanData, message).RunReservationResultCommand();
-            }
-
-            if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.DeclareID))
-            {
-                await new BattleDeclaration(m_PlayerClanData, message).RunDeclarationCommandByMessage();
             }
 
             if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.TaskKillID))
@@ -86,6 +82,23 @@ namespace PriconneBotConsoleApp.Script
             {
                 await new BattleCarryOver(m_PlayerClanData, message).RunByMessage();
             }
+
+            BattleDeclaration battleDeclaration = fetureID switch
+            {
+                (int)ChannelFeatureType.DeclareBoss1ID => new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss1Number),
+                (int)ChannelFeatureType.DeclareBoss2ID => new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss2Number),
+                (int)ChannelFeatureType.DeclareBoss3ID => new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss3Number),
+                (int)ChannelFeatureType.DeclareBoss4ID => new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss4Number),
+                (int)ChannelFeatureType.DeclareBoss5ID => new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss5Number),
+                _ => null,
+            };
+
+            if (battleDeclaration != null)
+            {
+                await battleDeclaration.RunDeclarationCommandByMessage();
+            }
+
+            
         }
     }
 }

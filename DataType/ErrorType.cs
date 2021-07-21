@@ -16,7 +16,7 @@ namespace PriconneBotConsoleApp.DataType
         OutOfReservationTime,
         [Description("コメントが長いので切り取られました。\n 問題がある場合は予約削除をして再度予約してください。")]
         TooLongComment,
-        [Description("予約できません。予約が可能なボスは{0}周目{1}ボスまでです。")]
+        [Description("予約できません。予約は{0}周目まで可能です。")]
         OutOfReservationBossLaps,
 
         //凸報告関連

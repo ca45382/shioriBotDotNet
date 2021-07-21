@@ -57,7 +57,7 @@ namespace PriconneBotConsoleApp.DataModel
 
             foreach (var clanBattleData in clanBattleDataArray)
             {
-                for (int i = Common.MinBossNumber; i <= Common.MaxBossNumber; i++)
+                for (int i = CommonDefine.MinBossNumber; i <= CommonDefine.MaxBossNumber; i++)
                 {
                     bossStatusList.Add(new BossData()
                     {

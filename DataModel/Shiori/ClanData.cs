@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace PriconneBotConsoleApp.DataModel
 {
@@ -80,6 +81,13 @@ namespace PriconneBotConsoleApp.DataModel
                 _ => 0,
             };
         }
+
+        /// <summary>
+        /// 最も周回数を返す
+        /// </summary>
+        /// <returns></returns>
+        public int GetMinBossLap()
+            => Enumerable.Min(new int[] { Boss1Lap, Boss2Lap, Boss3Lap, Boss4Lap, Boss5Lap });
 
         /// <summary>
         /// 5つのボスデータから今のボスに変換。来月削除。

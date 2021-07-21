@@ -105,7 +105,7 @@ namespace PriconneBotConsoleApp.Script
 
             var userReportedData = DatabaseReportDataController.GetReportData(playerData);
 
-            if (userReportedData.Count() >= Common.MaxReportNumber)
+            if (userReportedData.Count() >= CommonDefine.MaxReportNumber)
             {
                 Task.Run(() => SendSystemMessage(m_UserMessage.Channel, EnumMapper.I.GetString(ErrorType.UpperLimitReport), 5));
                 return;
@@ -169,7 +169,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var splitContent = m_UserMessage.Content.ZenToHan().Split(" ", StringSplitOptions.RemoveEmptyEntries);
 
-            if (splitContent.Length != Common.MaxReportNumber)
+            if (splitContent.Length != CommonDefine.MaxReportNumber)
             {
                 return;
             }
@@ -197,7 +197,7 @@ namespace PriconneBotConsoleApp.Script
             // TODO : マジックナンバーどこかで定義
             var deleteSpan = 5;
 
-            if (userReportedData.Count() >= Common.MaxReportNumber)
+            if (userReportedData.Count() >= CommonDefine.MaxReportNumber)
             {
                 Task.Run(() => SendSystemMessage(m_UserMessage.Channel, EnumMapper.I.GetString(ErrorType.UpperLimitReport) , deleteSpan));
                 return;
@@ -259,7 +259,7 @@ namespace PriconneBotConsoleApp.Script
                 userReportData.BossNumber = (byte)bossNumber;
             }
 
-            if (userReportData.BossNumber < Common.MinBossNumber || userReportData.BossNumber > Common.MaxBossNumber)
+            if (userReportData.BossNumber < CommonDefine.MinBossNumber || userReportData.BossNumber > CommonDefine.MaxBossNumber)
             {
                 return null;
             }
@@ -287,13 +287,13 @@ namespace PriconneBotConsoleApp.Script
             ));
             
             
-            for (int i = 0; i <= Common.MaxReportNumber; i++)
+            for (int i = 0; i <= CommonDefine.MaxReportNumber; i++)
             {
                 var players = playerInfoList.Where(x => x.ReportData.Length == i);
 
-                if (players.Count() > Common.MaxClanPlayer)
+                if (players.Count() > CommonDefine.MaxClanPlayer)
                 {
-                    players = players.Take(Common.MaxClanPlayer);
+                    players = players.Take(CommonDefine.MaxClanPlayer);
                 }
 
                 var reportStringBuilder = new StringBuilder();
@@ -310,9 +310,9 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var nowAttackCount = reportDataList.Count();
-            var memberAttackCount = clanPlayerDataList.Count() * Common.MaxReportNumber;
-            var MaxAllReportNumber = Common.MaxClanPlayer * Common.MaxReportNumber;
-            var memberAttackString = memberAttackCount > Common.MaxReportNumber ? $"{MaxAllReportNumber}+" : memberAttackCount.ToString();
+            var memberAttackCount = clanPlayerDataList.Count() * CommonDefine.MaxReportNumber;
+            var MaxAllReportNumber = CommonDefine.MaxClanPlayer * CommonDefine.MaxReportNumber;
+            var memberAttackString = memberAttackCount > CommonDefine.MaxReportNumber ? $"{MaxAllReportNumber}+" : memberAttackCount.ToString();
             embedBuilder.Title = $"凸状況({nowAttackCount}凸/ {memberAttackString}凸)";
 
             embedBuilder.Footer = new EmbedFooterBuilder()
