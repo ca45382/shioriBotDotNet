@@ -40,24 +40,19 @@ namespace PriconneBotConsoleApp.Script
             var channelFeatureID = m_PlayerClanData.ChannelData
                 .FirstOrDefault(x => x.ChannelID == reactionChannelID)?.FeatureID ?? 0;
 
-            if (channelFeatureID == (uint)ChannelFeatureType.DeclareID)
-            {
-                await new BattleDeclaration(m_PlayerClanData, m_ReceiveReaction)
-                    .RunDeclarationCommandByReaction();
-            }
-            else if (channelFeatureID == (uint)ChannelFeatureType.ReserveResultID)
+            if (channelFeatureID == (uint)ChannelFeatureType.ReserveResultID)
             {
                 await new BattleReservation(m_PlayerClanData, m_ReceiveReaction)
                     .RunReservationResultReaction();
             }
 
-            BattleDeclaration battleDeclaration = fetureID switch
+            BattleDeclaration battleDeclaration = channelFeatureID switch
             {
-                (int)ChannelFeatureType.DeclareBoss1ID => new BattleDeclaration(m_PlayerClanData, reaction, BossNumberType.Boss1Number),
-                (int)ChannelFeatureType.DeclareBoss2ID => new BattleDeclaration(m_PlayerClanData, reaction, BossNumberType.Boss2Number),
-                (int)ChannelFeatureType.DeclareBoss3ID => new BattleDeclaration(m_PlayerClanData, reaction, BossNumberType.Boss3Number),
-                (int)ChannelFeatureType.DeclareBoss4ID => new BattleDeclaration(m_PlayerClanData, reaction, BossNumberType.Boss4Number),
-                (int)ChannelFeatureType.DeclareBoss5ID => new BattleDeclaration(m_PlayerClanData, reaction, BossNumberType.Boss5Number),
+                (int)ChannelFeatureType.DeclareBoss1ID => new BattleDeclaration(m_PlayerClanData, m_ReceiveReaction, BossNumberType.Boss1Number),
+                (int)ChannelFeatureType.DeclareBoss2ID => new BattleDeclaration(m_PlayerClanData, m_ReceiveReaction, BossNumberType.Boss2Number),
+                (int)ChannelFeatureType.DeclareBoss3ID => new BattleDeclaration(m_PlayerClanData, m_ReceiveReaction, BossNumberType.Boss3Number),
+                (int)ChannelFeatureType.DeclareBoss4ID => new BattleDeclaration(m_PlayerClanData, m_ReceiveReaction, BossNumberType.Boss4Number),
+                (int)ChannelFeatureType.DeclareBoss5ID => new BattleDeclaration(m_PlayerClanData, m_ReceiveReaction, BossNumberType.Boss5Number),
                 _ => null,
             };
 

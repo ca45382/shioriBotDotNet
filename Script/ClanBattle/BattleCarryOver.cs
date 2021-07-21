@@ -118,7 +118,7 @@ namespace PriconneBotConsoleApp.Script
                 var databaseCarryOverList = DatabaseCarryOverController.GetCarryOverData(playerData).ToArray();
                 var databaseCarryOverData = databaseCarryOverList.FirstOrDefault(x => x.BossNumber == userCarryOverData.BossNumber && x.RemainTime == userCarryOverData.RemainTime);
 
-                if (databaseCarryOverData == null && databaseCarryOverList.Length < Common.MaxCarryOverNumber)
+                if (databaseCarryOverData == null && databaseCarryOverList.Length < CommonDefine.MaxCarryOverNumber)
                 {
                     result = DatabaseCarryOverController.CreateCarryOverData(userCarryOverData);
                 }
@@ -233,8 +233,8 @@ namespace PriconneBotConsoleApp.Script
             const int remainTimeColumn = 2;
 
             if (!byte.TryParse(messageData[bossNumberColumn], out var bossNumber) || !byte.TryParse(messageData[remainTimeColumn], out var remainTime)
-                || bossNumber < Common.MinBossNumber || bossNumber > Common.MaxBossNumber
-                || remainTime < Common.MinBattleTime || remainTime > Common.MaxBattleTime)
+                || bossNumber < CommonDefine.MinBossNumber || bossNumber > CommonDefine.MaxBossNumber
+                || remainTime < CommonDefine.MinBattleTime || remainTime > CommonDefine.MaxBattleTime)
             {
                 return null;
             }
