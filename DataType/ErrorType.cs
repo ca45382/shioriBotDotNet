@@ -19,6 +19,10 @@ namespace PriconneBotConsoleApp.DataType
         [Description("予約できません。予約は{0}周目まで可能です。")]
         OutOfReservationBossLaps,
 
+        //凸宣言関連
+        [Description("!call [周回数] で宣言を開始してください。")]
+        FailedDeclaration,
+
         //凸報告関連
         [Description("報告件数が規定数を超えています。")]
         UpperLimitReport,
