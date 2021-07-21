@@ -54,7 +54,6 @@ namespace PriconneBotConsoleApp.Database
                 .Include(x => x.PlayerData)
                 .Where(x => x.PlayerData.ClanID == clanData.ClanID && !x.DeleteFlag && x.BossNumber == bossNumber)
                 .ToArray();
-
         }
 
         public static List<ReservationData> LoadBossLapReservationData(ClanData clanData, int bossNumber)
