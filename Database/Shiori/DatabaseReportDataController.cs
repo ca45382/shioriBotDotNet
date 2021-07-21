@@ -49,7 +49,7 @@ namespace PriconneBotConsoleApp.Database
                 .Where(x => x.ClanID == clanData.ClanID)
                 .Where(x => 
                     databaseConnector.ReportData.AsQueryable().Where(y => y.PlayerID == x.PlayerID && !y.SubdueFlag && !y.DeleteFlag).Count() 
-                    == (Common.MaxReportNumber - remainReport))
+                    == (CommonDefine.MaxReportNumber - remainReport))
                 .Count();
         }
 

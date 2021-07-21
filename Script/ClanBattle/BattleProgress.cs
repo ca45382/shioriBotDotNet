@@ -358,7 +358,7 @@ namespace PriconneBotConsoleApp.Script
             if (damageData != "")
             {
                 if (!uint.TryParse(Regex.Match(damageData, @"\d+").ToString(), out uint damageNumber)
-                   || damageNumber > Common.MaxDamageValue)
+                   || damageNumber > CommonDefine.MaxDamageValue)
                 {
                     return false;
                 }
@@ -389,7 +389,7 @@ namespace PriconneBotConsoleApp.Script
 
                 if (!uint.TryParse(Regex.Match(damageText, @"\d+").ToString(), out uint damageNumber)
                     || !byte.TryParse(Regex.Match(remainTimeText, @"\d+").ToString(), out byte remainTimeNumber)
-                    || damageNumber > Common.MaxDamageValue || remainTimeNumber > Common.MaxBattleTime)
+                    || damageNumber > CommonDefine.MaxDamageValue || remainTimeNumber > CommonDefine.MaxBattleTime)
                 {
                     return false;
                 }
@@ -481,7 +481,7 @@ namespace PriconneBotConsoleApp.Script
 
             var remainAttackString = new StringBuilder();
             remainAttackString.Append("残凸 ");
-            for (int i = Common.MaxReportNumber; i >= 0; i--)
+            for (int i = CommonDefine.MaxReportNumber; i >= 0; i--)
             {
                 remainAttackString.Append((i == 0 ? "完凸:" : i + "凸:") + DatabaseReportDataController.GetRemainPlayerCount(m_UserClanData, i) + "人 ");
             }
