@@ -97,8 +97,6 @@ namespace PriconneBotConsoleApp.Script
             {
                 await battleDeclaration.RunDeclarationCommandByMessage();
             }
-
-            
         }
     }
 }
