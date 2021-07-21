@@ -296,7 +296,7 @@ namespace PriconneBotConsoleApp.Script
             var taskList = new List<Task>();
             var battleReservation = new BattleReservation(m_UserRole);
             battleReservation.DeleteUnusedData(m_BossNumber);
-            
+
             taskList.Add(SendDeclarationBotMessage());
             taskList.Add(battleReservation.UpdateSystemMessage());
 
