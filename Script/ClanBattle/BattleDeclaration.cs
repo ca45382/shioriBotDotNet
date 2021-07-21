@@ -300,14 +300,9 @@ namespace PriconneBotConsoleApp.Script
             m_UserClanData.SetBossLap(m_BossNumber, nextBattleLap);
             DatabaseClanDataController.UpdateClanData(m_UserClanData);
 
-            var taskList = new List<Task>();
             var battleReservation = new BattleReservation(m_UserRole);
             battleReservation.DeleteUnusedData(m_BossNumber);
-
-            taskList.Add(SendDeclarationBotMessage());
-            taskList.Add(battleReservation.UpdateSystemMessage());
-
-            await Task.WhenAll(taskList);
+            await Task.WhenAll(SendDeclarationBotMessage(), battleReservation.UpdateSystemMessage());
         }
 
         /// <summary>
