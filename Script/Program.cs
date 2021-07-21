@@ -31,6 +31,7 @@ namespace PriconneBotConsoleApp.Script
             m_config = new DiscordSocketConfig
             {
                 MessageCacheSize = 10,
+                GatewayIntents = GatewayIntents.All,
             };
 
             var initialize = new BotInitialize();
@@ -102,7 +103,7 @@ namespace PriconneBotConsoleApp.Script
             return Task.CompletedTask;
         }
 
-        private Task GuildMemberUpdated(SocketGuildUser oldUserInfo, SocketGuildUser newUserInfo)
+        private Task GuildMemberUpdated(Cacheable<SocketGuildUser, ulong> cachedGuildUser, SocketGuildUser newUserInfo)
         {
             var discordDataLoader = new DiscordDataLoader();
             discordDataLoader.UpdateServerData(newUserInfo.Guild);
@@ -113,7 +114,7 @@ namespace PriconneBotConsoleApp.Script
 
         private async Task ReactionAdded(
             Cacheable<IUserMessage, ulong> cachedMessage,
-            ISocketMessageChannel cachedChannel,
+            Cacheable<IMessageChannel, ulong> cachedChannel,
             SocketReaction reaction)
         {
             if (!reaction.User.Value.IsBot)
