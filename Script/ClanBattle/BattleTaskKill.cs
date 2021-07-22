@@ -33,6 +33,23 @@ namespace PriconneBotConsoleApp.Script
             m_TaskKillRole = m_Guild?.GetRole(clanData.RoleData.GetRoleID(clanData.ClanID, RoleFeatureType.TaskKillRoleID));
         }
 
+        public BattleTaskKill(SocketRole role)
+        {
+            m_UserRole = role;
+            m_UserClanData = DatabaseClanDataController.LoadClanData(m_UserRole);
+            m_Guild = m_UserRole.Guild;
+            m_TaskKillRole = m_Guild?.GetRole(m_UserClanData.RoleData.GetRoleID(m_UserClanData.ClanID, RoleFeatureType.TaskKillRoleID));
+        }
+
+        public async Task SyncTaskKillData()
+        {
+            if (m_UserRole == null)
+            {
+                return;
+            }
+
+            await SyncTaskKillRole();
+        }
         /// <summary>
         /// メッセージからコマンドの実行
         /// </summary>
