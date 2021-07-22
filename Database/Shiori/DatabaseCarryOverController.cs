@@ -11,6 +11,15 @@ namespace PriconneBotConsoleApp.Database
 {
     public static class DatabaseCarryOverController
     {
+        public static IEnumerable<CarryOverData> GetCarryOverData()
+        {
+            using var databaseConnector = new DatabaseConnector();
+
+            return databaseConnector.CarryOverData.AsQueryable()
+                .Where(x => !x.DeleteFlag)
+                .ToArray();
+        }
+
         public static IEnumerable<CarryOverData> GetCarryOverData(PlayerData playerData)
         {
             if (playerData == null)

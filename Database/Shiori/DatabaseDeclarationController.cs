@@ -35,7 +35,7 @@ namespace PriconneBotConsoleApp.Database
             playerData = databaseConnector.PlayerData.AsQueryable()
                 .FirstOrDefault(d => d.PlayerID == playerData.PlayerID);
 
-            if(playerData == null)
+            if (playerData == null)
             {
                 return null;
             }
@@ -49,7 +49,7 @@ namespace PriconneBotConsoleApp.Database
 
             return databaseConnector.DeclarationData
                 .Include(b => b.PlayerData)
-                .Where(d => d.PlayerData.PlayerID == playerData.PlayerID && !d.DeleteFlag 
+                .Where(d => d.PlayerData.PlayerID == playerData.PlayerID && !d.DeleteFlag
                     && d.BattleLap == playerData.ClanData.GetBossLap(bossNumber) && d.BossNumber == bossNumber)
                 .ToList();
         }
@@ -57,7 +57,7 @@ namespace PriconneBotConsoleApp.Database
         public static bool CreateDeclarationData(DeclarationData declarationData)
         {
             var userData = declarationData.PlayerData;
-            
+
             if (declarationData.PlayerID == 0 && userData == null)
             {
                 return false;
@@ -69,7 +69,7 @@ namespace PriconneBotConsoleApp.Database
             if (declarationData.PlayerID == 0)
             {
                 declarationData.PlayerID = PlayerDataToPlayerID(userData);
-                    
+
                 if (declarationData.PlayerID == 0)
                 {
                     return false;
@@ -194,7 +194,7 @@ namespace PriconneBotConsoleApp.Database
             return databaseConnector.PlayerData
                 .Include(d => d.ClanData)
                 .Where(d => d.ClanData.ServerID == clanData.ServerID && d.ClanData.ClanRoleID == clanData.ClanRoleID
-                    && d.UserID == playerData.UserID 
+                    && d.UserID == playerData.UserID
                 )
                 .Select(d => d.PlayerID)
                 .FirstOrDefault();
