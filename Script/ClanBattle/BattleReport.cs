@@ -106,7 +106,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (userReportedData.Count() >= CommonDefine.MaxReportNumber)
             {
-                _ = SendSystemMessage(m_UserMessage.Channel, ErrorType.UpperLimitReport.ToLabel(), 5);
+                _ =  m_UserMessage.Channel.SendTimedMessageAsync(ErrorType.UpperLimitReport.ToLabel(), timeLimit: 5);
                 return;
             }
 
@@ -151,12 +151,7 @@ namespace PriconneBotConsoleApp.Script
 
                 if (playerData.UserID != m_UserMessage.Author.Id)
                 {
-                    // TODO : 送信用の関数を作成したい。
-                    _ = SendSystemMessage(
-                        m_UserMessage.Channel,
-                        string.Format(InfomationType.DeleteInsted.ToLabel(), playerData.UserID, deleteSpan),
-                        deleteSpan
-                    );
+                    _ = m_UserMessage.Channel.SendTimedMessageAsync(string.Format(EnumMapper.I.GetString(InfomationType.DeleteInsted), playerData.UserID, deleteSpan), timeLimit: deleteSpan);
                 }
             }
         }
@@ -198,7 +193,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (userReportedData.Count() >= CommonDefine.MaxReportNumber)
             {
-                _=  SendSystemMessage(m_UserMessage.Channel, ErrorType.UpperLimitReport.ToLabel() , deleteSpan);
+                _= m_UserMessage.Channel.SendTimedMessageAsync(ErrorType.UpperLimitReport.ToLabel() , deleteSpan);
                 return;
             }
 
@@ -318,32 +313,6 @@ namespace PriconneBotConsoleApp.Script
             };
 
             return embedBuilder.Build();
-        }
-
-        /// <summary>
-        /// メッセージ送信時に数秒後に削除する。
-        /// </summary>
-        /// <param name="channel"></param>
-        /// <param name="sendMessage"></param>
-        /// <param name="deleteSeconds"></param>
-        /// <returns></returns>
-        private async Task SendSystemMessage(ISocketMessageChannel channel, string sendMessage, int deleteSeconds = 0)
-        {
-            var delayTime = new TimeSpan(0, 0, deleteSeconds);
-            var messageData = await channel.SendMessageAsync(sendMessage);
-            if (deleteSeconds == 0)
-            {
-                return;
-            }
-            await Task.Delay(delayTime);
-            try
-            {
-                await messageData.DeleteAsync();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
         }
     }
 }
