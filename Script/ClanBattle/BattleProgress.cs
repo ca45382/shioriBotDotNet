@@ -490,8 +490,7 @@ namespace PriconneBotConsoleApp.Script
             summaryStringBuilder.AppendLine(remainAttackString.ToString());
 
             // ボスのHPをここに入力(万表示)
-            var bossHP = bossData?.HP/10000 ?? 0;
-
+            var bossHP = bossData?.HP / CommonDefine.DisplayDamageUnit ?? 0;
             var sumAttackDoneHP = progressPlayer.Where(x => x.ProgressData.Status == (byte)ProgressStatus.AttackDone).Select(x => (int)x.ProgressData.Damage).Sum();
             var sumAttackReadyHP = progressPlayer.Where(x => x.ProgressData.Status == (byte)ProgressStatus.AttackReady).Select(x => (int)x.ProgressData.Damage).Sum();
 
