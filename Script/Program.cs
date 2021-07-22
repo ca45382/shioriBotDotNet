@@ -8,6 +8,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.Define;
 
 namespace PriconneBotConsoleApp.Script
 {
@@ -130,7 +131,7 @@ namespace PriconneBotConsoleApp.Script
             TimeSpan updateTimeSpan;
 
             var initialize = new BotInitialize();
-            var updateTime = new TimeSpan(5, 0, 30);
+            var updateTime = TimeDefine.DailyRefreshTime;
 
             while (true)
             {

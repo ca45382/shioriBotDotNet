@@ -469,17 +469,17 @@ namespace PriconneBotConsoleApp.Script
                 return true;
             }
 
-            if (startTime.Hours < CommonDefine.DateUpdateHour)
+            if (startTime.Hours < TimeDefine.GameDateOffset.Hours)
             {
                 startTime = startTime.Add(new TimeSpan(1, 0, 0, 0));
             }
 
-            if (endTime.Hours < CommonDefine.DateUpdateHour)
+            if (endTime.Hours < TimeDefine.GameDateOffset.Hours)
             {
                 endTime = endTime.Add(new TimeSpan(1, 0, 0, 0));
             }
 
-            if (nowTime.Hours < CommonDefine.DateUpdateHour)
+            if (nowTime.Hours < TimeDefine.GameDateOffset.Hours)
             {
                 nowTime = nowTime.Add(new TimeSpan(1, 0, 0, 0));
             }

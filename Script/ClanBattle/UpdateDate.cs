@@ -19,9 +19,7 @@ namespace PriconneBotConsoleApp.Script
 
         public UpdateDate(DiscordSocketClient client)
         {
-            var nowTime = DateTime.Now;
-            var subTime = new TimeSpan(0, 0, nowTime.Second);
-            m_BoundaryTime = nowTime - subTime;
+            m_BoundaryTime = DateTime.Today + TimeDefine.GameDateOffset;
             m_ClanList = DatabaseClanDataController.LoadClanData();
             m_Client = client;
         }
