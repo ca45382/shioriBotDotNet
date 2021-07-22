@@ -481,9 +481,11 @@ namespace PriconneBotConsoleApp.Script
 
             var remainAttackString = new StringBuilder();
             remainAttackString.Append("残凸 ");
+            var reportCount = DatabaseReportDataController.GetRemainPlayerCount(m_UserClanData);
+
             for (int i = CommonDefine.MaxReportNumber; i >= 0; i--)
             {
-                remainAttackString.Append((i == 0 ? "完凸:" : i + "凸:") + DatabaseReportDataController.GetRemainPlayerCount(m_UserClanData, i) + "人 ");
+                remainAttackString.Append((i == 0 ? "完凸:" : i + "凸:") + reportCount[i] + "人 ");
             }
             summaryStringBuilder.AppendLine(remainAttackString.ToString());
 
