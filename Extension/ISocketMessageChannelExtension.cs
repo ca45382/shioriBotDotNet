@@ -24,18 +24,23 @@ namespace PriconneBotConsoleApp.Extension
                 return messageData;
             }
 
+            _ = DeleteMessageDelayAsync(messageData, delayTime);
+            
+            return messageData;
+        }
+
+        private static async Task DeleteMessageDelayAsync(RestUserMessage message, TimeSpan delayTime)
+        {
             await Task.Delay(delayTime);
 
             try
             {
-                await messageData.DeleteAsync();
+                await message.DeleteAsync();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
-
-            return null;
         }
     }
 }
