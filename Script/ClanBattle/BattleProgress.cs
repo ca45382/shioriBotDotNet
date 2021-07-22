@@ -513,7 +513,7 @@ namespace PriconneBotConsoleApp.Script
             var embedBuilder = new EmbedBuilder();
             embedBuilder.AddField(headerFieldBuilder);
             embedBuilder.AddField(embedFieldBuilder);
-            embedBuilder.Title = $"{m_UserClanData.GetBossLap(m_BossNumber)}周目 {m_BossNumber}ボス {bossData?.Name??""}";
+            embedBuilder.Title = $"{m_UserClanData.GetBossLap(m_BossNumber)}周目 {m_BossNumber}ボス {bossData?.Name}";
 
             embedBuilder.Footer = new EmbedFooterBuilder()
             {
