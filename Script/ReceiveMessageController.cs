@@ -49,6 +49,7 @@ namespace PriconneBotConsoleApp.Script
         {
             await new TimeLineConversion(message).RunByMessage();
             await new PriconneEventViewer(message).SendEventInfomationByMessage();
+            await new Dice(message).Run();
 
             if (m_PlayerData == null || m_PlayerClanData == null)
             {
