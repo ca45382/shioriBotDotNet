@@ -10,6 +10,16 @@ namespace PriconneBotConsoleApp.Database
 {
     public static class DatabaseTaskKillController
     {
+
+        public static IEnumerable<TaskKillData> LoadTaskKillData()
+        {
+            using var databaseConnector = new DatabaseConnector();
+
+            return databaseConnector.TaskKillData.AsQueryable()
+                .Where(x => !x.DeleteFlag)
+                .ToArray();
+        }
+
         /// <summary>
         /// クラン全体のタスキル情報を取得
         /// </summary>
@@ -129,6 +139,36 @@ namespace PriconneBotConsoleApp.Database
 
         }
 
+        public static void DeleteTaskKillData(IEnumerable<TaskKillData> taskKillDataList)
+        {
+            if (!taskKillDataList.Any())
+            {
+                return;
+            }
+
+            using var databaseConnector = new DatabaseConnector();
+            var transaction = databaseConnector.Database.BeginTransaction();
+
+            var deleteDataList = databaseConnector.TaskKillData.AsQueryable()
+                .Where(x => taskKillDataList.Select(y => y.TaskKillID).Any(y => y == x.TaskKillID))
+                .ToList();
+
+            deleteDataList.ForEach(x => x.DeleteFlag = true);
+
+            try
+            {
+                databaseConnector.SaveChanges();
+                transaction.Commit();
+            }
+            catch (DbUpdateException e)
+            {
+                transaction.Rollback();
+                Console.WriteLine(e.Message);
+            }
+
+            return;
+        }
+
         public static bool DeleteTaskKillData(ClanData clanData)
         {
             if (clanData == null)
@@ -161,7 +201,6 @@ namespace PriconneBotConsoleApp.Database
                 transaction.Rollback();
                 return false;
             }
-            
         }
     }
 }

@@ -8,6 +8,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.Define;
 
 namespace PriconneBotConsoleApp.Script
 {
@@ -130,7 +131,7 @@ namespace PriconneBotConsoleApp.Script
             TimeSpan updateTimeSpan;
 
             var initialize = new BotInitialize();
-            var updateTime = new TimeSpan(5, 0, 0);
+            var updateTime = TimeDefine.DailyRefreshTime;
 
             while (true)
             {
@@ -149,6 +150,7 @@ namespace PriconneBotConsoleApp.Script
                 await Task.Run(() => Thread.Sleep(updateTimeSpan));
                 initialize.UpdateRediveDatabase();
                 RediveClanBattleData.ReloadData();
+                await new UpdateDate(m_client).DeleteYesterdayData();
             }
         }
 

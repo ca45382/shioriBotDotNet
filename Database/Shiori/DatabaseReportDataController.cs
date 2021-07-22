@@ -12,6 +12,20 @@ namespace PriconneBotConsoleApp.Database
     public static class DatabaseReportDataController
     {
         /// <summary>
+        /// すべての凸報告データを取得する。
+        /// </summary>
+        /// <param name="clanData"></param>
+        /// <returns></returns>
+        public static IEnumerable<ReportData> GetReportData()
+        {
+            using var databaseConnector = new DatabaseConnector();
+
+            return databaseConnector.ReportData.AsQueryable()
+                .Where(x => !x.DeleteFlag)
+                .ToArray();
+        }
+
+        /// <summary>
         /// 個人の凸報告データを取得する。
         /// </summary>
         /// <param name="playerData"></param>
@@ -75,14 +89,14 @@ namespace PriconneBotConsoleApp.Database
         /// </summary>
         /// <param name="reportData"></param>
         /// <returns></returns>
-        public static bool DeleteReportData(ReportData reportData)
+        public static bool DeleteReportData(ReportData reportData, bool isValid = false)
         {
             var deleteData = new ReportData[]
             {
                 reportData,
             };
 
-            return DeleteReportData(deleteData);
+            return DeleteReportData(deleteData, isValid);
         }
 
         /// <summary>
@@ -90,17 +104,24 @@ namespace PriconneBotConsoleApp.Database
         /// </summary>
         /// <param name="reportData"></param>
         /// <returns></returns>
-        public static bool DeleteReportData(IEnumerable<ReportData> reportDataList)
+        public static bool DeleteReportData(IEnumerable<ReportData> reportDataList, bool isValid = false)
         {
             using var databaseConnector = new DatabaseConnector();
             var transaction = databaseConnector.Database.BeginTransaction();
 
-            var deleteDataList =  databaseConnector.ReportData.AsQueryable()               
+            var deleteDataList = databaseConnector.ReportData.AsQueryable()
                 .Where(x => reportDataList.Select(y => y.ReportID).Any(y => y == x.ReportID))
                 .ToList();
+
+            deleteDataList.ForEach(x => x.DeleteFlag = true);
+
+            if (isValid)
+            {
+                deleteDataList.ForEach(x => x.ValidFlag = true);
+            }
+
             try
             {
-                deleteDataList.ForEach(x => x.DeleteFlag = true);
                 databaseConnector.SaveChanges();
                 transaction.Commit();
                 return true;
@@ -110,7 +131,6 @@ namespace PriconneBotConsoleApp.Database
                 transaction.Rollback();
                 return false;
             }
-            
         }
     }
 }

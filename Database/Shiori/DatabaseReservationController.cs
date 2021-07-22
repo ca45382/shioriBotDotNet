@@ -11,6 +11,15 @@ namespace PriconneBotConsoleApp.Database
     public static class DatabaseReservationController
     {
 
+        public static IEnumerable<ReservationData> LoadReservationData()
+        {
+            using var databaseConnector = new DatabaseConnector();
+
+            return databaseConnector.ReservationData.AsQueryable()
+                .Where(x => !x.DeleteFlag)
+                .ToArray();
+        }
+
         public static List<ReservationData> LoadReservationData(ClanData clanData)
         {
             using var databaseConnector = new DatabaseConnector();
@@ -34,7 +43,7 @@ namespace PriconneBotConsoleApp.Database
             using var databaseConnector = new DatabaseConnector();
 
             var playerID = LoadPlayerID(databaseConnector.PlayerData, playerData);
-            
+
             return databaseConnector.ReservationData.AsQueryable()
                 .Where(b => b.PlayerID == playerID && !b.DeleteFlag)
                 .OrderBy(o => o.BattleLap).ThenBy(d => d.BossNumber)
@@ -58,7 +67,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static List<ReservationData> LoadBossLapReservationData(ClanData clanData, int bossNumber)
         {
-            if ( bossNumber < CommonDefine.MinBossNumber || bossNumber > CommonDefine.MaxBossNumber)
+            if (bossNumber < CommonDefine.MinBossNumber || bossNumber > CommonDefine.MaxBossNumber)
             {
                 return null;
             }
@@ -130,7 +139,7 @@ namespace PriconneBotConsoleApp.Database
 
             var updateData = databaseConnector.ReservationData
                 .FirstOrDefault(d => d.PlayerID == playerID && d.BattleLap == reservationData.BattleLap
-                    && d.BossNumber == reservationData.BossNumber && !d.DeleteFlag );
+                    && d.BossNumber == reservationData.BossNumber && !d.DeleteFlag);
 
             if (updateData == null)
             {
