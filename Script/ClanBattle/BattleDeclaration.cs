@@ -392,7 +392,7 @@ namespace PriconneBotConsoleApp.Script
 
             var embedBuild = new EmbedBuilder
             {
-                Title = $"凸宣言({battleLap,2}周目{m_BossNumber,1}ボス {bossData?.Name ?? string.Empty})"
+                Title = $"凸宣言({battleLap,2}周目{m_BossNumber,1}ボス {bossData?.Name})"
             };
 
             var explainMessage = "```python\n" +
