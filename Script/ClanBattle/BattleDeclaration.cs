@@ -348,6 +348,8 @@ namespace PriconneBotConsoleApp.Script
                 DatabaseReservationController.LoadBossLapReservationData(m_UserClanData, m_BossNumber);
             var declarationDataList =
                 DatabaseDeclarationController.LoadDeclarationData(m_UserClanData, m_BossNumber);
+            var bossData = RediveClanBattleData.BossDataList
+                .FirstOrDefault(x => x.BossNumber == m_BossNumber);
 
             var battleLap = m_UserClanData.GetBossLap(m_BossNumber);
             var updateTime = DateTime.Now;
@@ -390,7 +392,7 @@ namespace PriconneBotConsoleApp.Script
 
             var embedBuild = new EmbedBuilder
             {
-                Title = $"凸宣言({battleLap,2}周目{m_BossNumber,1}ボス)"
+                Title = $"凸宣言({battleLap,2}周目{m_BossNumber,1}ボス {bossData?.Name ?? string.Empty})"
             };
 
             var explainMessage = "```python\n" +
