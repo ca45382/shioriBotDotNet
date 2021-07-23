@@ -68,7 +68,7 @@ namespace PriconneBotConsoleApp.Script
                 }
                 else if (messageContent.StartsWith("!rm"))
                 {
-
+                    UpdateOtherPlayerData();
                 }
                 else if (messageContent.StartsWith("!list"))
                 {
@@ -159,21 +159,17 @@ namespace PriconneBotConsoleApp.Script
 
             if (splitMessage.Length > minCommandLength)
             {
-                userID = m_UserMessage.MentionedUsers.FirstOrDefault().Id;
+                userID = m_UserMessage.MentionedUsers.FirstOrDefault()?.Id ?? 0;
 
                 if (splitMessage.Length > minCommandLength + 1 && byte.TryParse(splitMessage[2], out var number))
                 {
                     deleteNumber = number;
                 }
             }
-            else
-            {
-                userID = m_UserMessage.Author.Id;
 
-                if (splitMessage.Length > minCommandLength && byte.TryParse(splitMessage[1], out var number))
-                {
-                    deleteNumber = number;
-                }
+            if (userID == 0)
+            {
+                return;
             }
 
             var playerData = DatabasePlayerDataController.LoadPlayerData(m_ClanRole, userID);
