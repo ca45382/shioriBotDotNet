@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using PriconneBotConsoleApp.Attribute;
-using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Script

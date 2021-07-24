@@ -1,15 +1,14 @@
-﻿using Discord.WebSocket;
-using PriconneBotConsoleApp.DataModel;
-using PriconneBotConsoleApp.Extension;
-using PriconneBotConsoleApp.Database;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using PriconneBotConsoleApp.Define;
-using PriconneBotConsoleApp.DataType;
 using Discord;
+using Discord.WebSocket;
+using PriconneBotConsoleApp.Database;
+using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.DataType;
+using PriconneBotConsoleApp.Define;
+using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Script
 {
