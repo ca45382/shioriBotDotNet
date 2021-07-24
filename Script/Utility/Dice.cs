@@ -20,7 +20,7 @@ namespace PriconneBotConsoleApp.Script
             var splitMessage = m_UserMessage.Content.ZenToHan().Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var diceMax = UtilityDefine.DefaultMaxDiceNumber;
 
-            if (splitMessage[0] != "!dice")
+            if (splitMessage.Length == 0 || splitMessage[0] != "!dice")
             {
                 return;
             }
