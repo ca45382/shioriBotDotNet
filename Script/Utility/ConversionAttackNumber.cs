@@ -15,7 +15,7 @@ namespace PriconneBotConsoleApp.Script
                 "物理" or "物" or "b" => 1,
                 "魔法" or "魔" or "m" => 2,
                 "ニャル" or "ニ" or "n" => 3,
-                "持ち越し" or "持越し" or "持" or "-" => 99,
+                "持ち越し" or "持越し" or "持越"or "持" or "-" => 99,
                 _ => 0,
             };
         }
