@@ -106,7 +106,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (userReportedData.Count() >= CommonDefine.MaxReportNumber)
             {
-                _ = m_UserMessage.Channel.SendTimedMessageAsync(ErrorType.UpperLimitReport.ToLabel(), timeLimit: 5);
+                _ = m_UserMessage.Channel.SendTimedMessageAsync(TimeDefine.ErrorMessageDisplayTime, ErrorType.UpperLimitReport.ToLabel());
                 return;
             }
 
@@ -143,15 +143,15 @@ namespace PriconneBotConsoleApp.Script
             var recentReportData = DatabaseReportDataController.GetReportData(playerData)
                 .OrderBy(x => x.DateTime).ToList();
             var removeData = recentReportData.Last();
+
             if (DatabaseReportDataController.DeleteReportData(removeData))
             {
                 _ = m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
-                // TODO : マジックナンバーどこかで定義
-                var deleteSpan = 30;
 
                 if (playerData.UserID != m_UserMessage.Author.Id)
                 {
-                    _ = m_UserMessage.Channel.SendTimedMessageAsync(string.Format(InfomationType.DeleteInsted.ToLabel(), playerData.UserID, deleteSpan), timeLimit: deleteSpan);
+                    _ = m_UserMessage.Channel.SendTimedMessageAsync(TimeDefine.SuccessMessageDisplayTime,
+                        string.Format(InfomationType.DeleteInsted.ToLabel(), playerData.UserID, TimeDefine.SuccessMessageDisplayTime));
                 }
             }
         }
@@ -188,12 +188,10 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var userReportedData = DatabaseReportDataController.GetReportData(registerPlayerData);
-            // TODO : マジックナンバーどこかで定義
-            var deleteSpan = 5;
 
             if (userReportedData.Count() >= CommonDefine.MaxReportNumber)
             {
-                _ = m_UserMessage.Channel.SendTimedMessageAsync(ErrorType.UpperLimitReport.ToLabel(), timeLimit: deleteSpan);
+                _ = m_UserMessage.Channel.SendTimedMessageAsync(TimeDefine.ErrorMessageDisplayTime, ErrorType.UpperLimitReport.ToLabel());
                 return;
             }
 
