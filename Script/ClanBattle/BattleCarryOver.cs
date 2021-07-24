@@ -146,7 +146,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (result)
             {
-                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel())));
+                _ = m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
             }
         }
 
@@ -169,7 +169,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (DeleteCarryOverData(playerData, deleteNumber))
             {
-                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel())));
+                _ = m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
             }
         }
 
@@ -213,7 +213,7 @@ namespace PriconneBotConsoleApp.Script
             }
 
             DatabaseCarryOverController.DeleteCarryOverData(carryOverList);
-            Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel())));
+            _ = m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
         }
 
         private CarryOverData CommandToCarryOverData(string[] messageData)

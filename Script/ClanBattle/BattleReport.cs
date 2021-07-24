@@ -106,13 +106,13 @@ namespace PriconneBotConsoleApp.Script
 
             if (userReportedData.Count() >= CommonDefine.MaxReportNumber)
             {
-                Task.Run(() => SendSystemMessage(m_UserMessage.Channel, ErrorType.UpperLimitReport.ToLabel(), 5));
+                _ = SendSystemMessage(m_UserMessage.Channel, ErrorType.UpperLimitReport.ToLabel(), 5);
                 return;
             }
 
             if (DatabaseReportDataController.CreateReportData(reportData))
             {
-                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel())));
+                _ = m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
             }
 
             return;
@@ -198,13 +198,13 @@ namespace PriconneBotConsoleApp.Script
 
             if (userReportedData.Count() >= CommonDefine.MaxReportNumber)
             {
-                Task.Run(() => SendSystemMessage(m_UserMessage.Channel, ErrorType.UpperLimitReport.ToLabel() , deleteSpan));
+                _=  SendSystemMessage(m_UserMessage.Channel, ErrorType.UpperLimitReport.ToLabel() , deleteSpan);
                 return;
             }
 
             if (DatabaseReportDataController.CreateReportData(reportData))
             {
-                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel())));
+                _ = m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
             }
 
             return;
@@ -219,7 +219,7 @@ namespace PriconneBotConsoleApp.Script
             var clanReportData = DatabaseReportDataController.GetReportData(m_ClanData);
             if (DatabaseReportDataController.DeleteReportData(clanReportData))
             {
-                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel())));
+                _ =m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
             }
         }
 
@@ -244,11 +244,9 @@ namespace PriconneBotConsoleApp.Script
 
             if (Regex.IsMatch(messageContent, @"\d\D{1,3}"))
             {
-                // TODO : 1-5をコンストで示す方法を調べる
                 var bossNumber = int.Parse(Regex.Match(messageContent, @"\d").Value );
                 var attackType = EnumMapper.Parse<AttackType>(Regex.Match(messageContent, @"\D{1,3}").Value);
 
-                // TODO:マジックナンバーを定数化
                 if (attackType == AttackType.Unknown || attackType == AttackType.CarryOver)
                 {
                     return null;
