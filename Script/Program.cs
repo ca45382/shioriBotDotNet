@@ -43,7 +43,6 @@ namespace PriconneBotConsoleApp.Script
             m_client.GuildMembersDownloaded += GuildMembersDownloaded;
             m_client.UserLeft += UserLeft;
             m_client.GuildMemberUpdated += GuildMemberUpdated;
-            m_client.ReactionAdded += ReactionAdded;
             m_client.InteractionCreated += InteractionCreated;
             m_client.Log += Log;
 
@@ -111,18 +110,6 @@ namespace PriconneBotConsoleApp.Script
             discordDataLoader.UpdateClanData(newUserInfo.Guild);
             discordDataLoader.UpdatePlayerData(newUserInfo.Guild);
             return Task.CompletedTask;
-        }
-
-        private async Task ReactionAdded(
-            Cacheable<IUserMessage, ulong> cachedMessage,
-            Cacheable<IMessageChannel, ulong> cachedChannel,
-            SocketReaction reaction)
-        {
-            if (!reaction.User.Value.IsBot)
-            {
-                await new ReceiveReactionController(reaction)
-                    .RunReactionReceive();
-            }
         }
 
         private async Task InteractionCreated(SocketInteraction socketInteraction)

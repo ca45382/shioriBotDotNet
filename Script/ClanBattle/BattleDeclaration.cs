@@ -19,7 +19,6 @@ namespace PriconneBotConsoleApp.Script
         private readonly IUser m_User;
         private readonly SocketTextChannel m_DeclarationChannel;
         private readonly SocketUserMessage m_UserMessage;
-        private readonly SocketReaction m_UserReaction;
         private readonly SocketInteraction m_UserInteraction;
         private readonly ulong m_SystemMessageID;
         private readonly byte m_BossNumber;
