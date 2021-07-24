@@ -41,6 +41,11 @@ namespace PriconneBotConsoleApp.Script
         {
         }
 
+        public BattleReservation(ClanData userClanData, SocketInteraction interaction)
+            : this(userClanData, interaction.Channel, userInterction: interaction)
+        {
+        }
+
         public BattleReservation(SocketRole userRole)
         {
             m_UserRole = userRole;
