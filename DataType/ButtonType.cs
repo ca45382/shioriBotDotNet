@@ -15,7 +15,7 @@ namespace PriconneBotConsoleApp.DataType
         [Description("🏁")]
         SubdueBoss,
 
-        [Description("❌")]
+        [Description("✖️")]
         CancelBattle,
 
         [Description("🔄")]
