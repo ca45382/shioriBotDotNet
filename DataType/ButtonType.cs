@@ -17,5 +17,8 @@ namespace PriconneBotConsoleApp.DataType
 
         [Description("❌")]
         CancelBattle,
+
+        [Description("🔄")]
+        Reload,
     }
 }

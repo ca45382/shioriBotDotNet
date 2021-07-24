@@ -169,7 +169,8 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         public async Task SendSystemMessage()
         {
-            var messageData = CreateAllReservationDataMessage();
+            var embedData = CreateAllReservationDataMessage();
+            var componentData = CreateSystemMessageComponent();
             var reservationResultChannelID = m_UserClanData.ChannelData
                 .GetChannelID(m_UserClanData.ClanID, ChannelFeatureType.ReserveResultID);
 
@@ -181,9 +182,8 @@ namespace PriconneBotConsoleApp.Script
             var resultChannel = m_UserRole.Guild
                 .GetTextChannel(reservationResultChannelID);
 
-            var sendedMessageData = await resultChannel.SendMessageAsync(embed: messageData);
+            var sendedMessageData = await resultChannel.SendMessageAsync(embed: embedData, component:componentData);
             DatabaseMessageDataController.UpdateMessageID(m_UserClanData, sendedMessageData.Id, MessageFeatureType.ReserveResultID);
-            await AttacheDefaultReaction(sendedMessageData);
         }
 
         public async Task UpdateSystemMessage()
@@ -226,6 +226,14 @@ namespace PriconneBotConsoleApp.Script
             var bossLap = m_UserClanData.GetBossLap(bossNumber);
             var deleteData = clanReservationData.Where(x => x.BattleLap < bossLap);
             DatabaseReservationController.DeleteReservationData(deleteData);
+        }
+
+        private MessageComponent CreateSystemMessageComponent()
+        {
+            ComponentBuilder componentBuilder = new();
+            componentBuilder.WithButton(
+                "更新", ButtonType.Reload.ToString(), style: ButtonStyle.Secondary, emote: new Emoji(ButtonType.Reload.GetDescription()));
+            return componentBuilder.Build();
         }
 
         /// <summary>
