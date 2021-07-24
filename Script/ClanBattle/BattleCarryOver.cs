@@ -68,7 +68,7 @@ namespace PriconneBotConsoleApp.Script
                 }
                 else if (messageContent.StartsWith("!rm"))
                 {
-
+                    UpdateOtherPlayerData();
                 }
                 else if (messageContent.StartsWith("!list"))
                 {
@@ -152,29 +152,17 @@ namespace PriconneBotConsoleApp.Script
         private void UpdateOtherPlayerData()
         {
             const int minCommandLength = 1;
-            ulong userID = 0;
-            byte deleteNumber = 0;
+
             // TODO : " "を定数化する。
             var splitMessage = m_UserMessage.Content.ZenToHan().Split(" ", StringSplitOptions.RemoveEmptyEntries);
 
-            if (splitMessage.Length > minCommandLength)
+            if (splitMessage.Length <= minCommandLength || m_UserMessage.MentionedUsers.FirstOrDefault()?.Id is not ulong userID)
             {
-                userID = m_UserMessage.MentionedUsers.FirstOrDefault().Id;
-
-                if (splitMessage.Length > minCommandLength + 1 && byte.TryParse(splitMessage[2], out var number))
-                {
-                    deleteNumber = number;
-                }
+                return;
             }
-            else
-            {
-                userID = m_UserMessage.Author.Id;
 
-                if (splitMessage.Length > minCommandLength && byte.TryParse(splitMessage[1], out var number))
-                {
-                    deleteNumber = number;
-                }
-            }
+            // コマンドは `!rm @削除対象のユーザー 古い方から何番目か` としている。
+            var deleteNumber = (splitMessage.Length > minCommandLength + 1 && byte.TryParse(splitMessage[minCommandLength + 1], out var number)) ? number : (byte)0;
 
             var playerData = DatabasePlayerDataController.LoadPlayerData(m_ClanRole, userID);
 
