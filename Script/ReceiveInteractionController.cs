@@ -40,6 +40,11 @@ namespace PriconneBotConsoleApp.Script
                 .FirstOrDefault(x => x.ChannelID == m_TextChannel.Id)
                 ?.FeatureID ?? 0;
 
+            if (channelFeatureID == (int)ChannelFeatureType.ReserveResultID)
+            {
+                await new BattleReservation(m_ClanData, m_Interaction).RunResultInteraction();
+            }
+
             BattleDeclaration battleDeclaration = channelFeatureID switch
             {
                 (int)ChannelFeatureType.DeclareBoss1ID => new BattleDeclaration(m_ClanData, m_Interaction, BossNumberType.Boss1Number),
