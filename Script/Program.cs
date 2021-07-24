@@ -32,6 +32,7 @@ namespace PriconneBotConsoleApp.Script
             m_config = new DiscordSocketConfig
             {
                 MessageCacheSize = 10,
+                GatewayIntents = GatewayIntents.All,
             };
 
             var initialize = new BotInitialize();
@@ -43,7 +44,7 @@ namespace PriconneBotConsoleApp.Script
             m_client.GuildMembersDownloaded += GuildMembersDownloaded;
             m_client.UserLeft += UserLeft;
             m_client.GuildMemberUpdated += GuildMemberUpdated;
-            m_client.ReactionAdded += ReactionAdded;
+            m_client.InteractionCreated += InteractionCreated;
             m_client.Log += Log;
 
             var commands = new CommandService();
@@ -103,7 +104,7 @@ namespace PriconneBotConsoleApp.Script
             return Task.CompletedTask;
         }
 
-        private Task GuildMemberUpdated(SocketGuildUser oldUserInfo, SocketGuildUser newUserInfo)
+        private Task GuildMemberUpdated(Cacheable<SocketGuildUser, ulong> cachedGuildUser, SocketGuildUser newUserInfo)
         {
             var discordDataLoader = new DiscordDataLoader();
             discordDataLoader.UpdateServerData(newUserInfo.Guild);
@@ -112,16 +113,14 @@ namespace PriconneBotConsoleApp.Script
             return Task.CompletedTask;
         }
 
-        private async Task ReactionAdded(
-            Cacheable<IUserMessage, ulong> cachedMessage,
-            ISocketMessageChannel cachedChannel,
-            SocketReaction reaction)
+        private async Task InteractionCreated(SocketInteraction socketInteraction)
         {
-            if (!reaction.User.Value.IsBot)
+            if (socketInteraction.Type != InteractionType.MessageComponent)
             {
-                await new ReceiveReactionController(reaction)
-                    .RunReactionReceive();
+                return;
             }
+
+            await new ReceiveInteractionController(socketInteraction).Run();
         }
 
         private async Task RefreshInUpdateDate()

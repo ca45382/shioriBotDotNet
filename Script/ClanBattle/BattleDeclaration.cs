@@ -19,22 +19,23 @@ namespace PriconneBotConsoleApp.Script
         private readonly IUser m_User;
         private readonly SocketTextChannel m_DeclarationChannel;
         private readonly SocketUserMessage m_UserMessage;
-        private readonly SocketReaction m_UserReaction;
+        private readonly SocketInteraction m_UserInteraction;
+        private readonly ulong m_SystemMessageID;
         private readonly byte m_BossNumber;
         private readonly bool m_AllBattle = true;
 
         private BattleDeclaration(
             ClanData userClanData,
             ISocketMessageChannel channel,
-            BossNumberType bossNumber,
-            SocketUserMessage userMessage = null,
-            SocketReaction userReaction = null)
+            BossNumberType bossNumber)
         {
             m_UserClanData = userClanData;
             var channelData = m_UserClanData.ChannelData.FirstOrDefault(x => x.ChannelID == channel.Id);
             var guild = (channel as SocketGuildChannel)?.Guild;
             m_UserRole = guild?.GetRole(m_UserClanData.ClanRoleID);
             m_BossNumber = (byte)bossNumber;
+            m_SystemMessageID = m_UserClanData.MessageData
+                .FirstOrDefault(x => x.FeatureID == (uint)GetDeclareMessageType(m_BossNumber))?.MessageID ?? 0;
 
             if (channelData == null || channelData.FeatureID == (uint)GetDeclareChannelType(m_BossNumber))
             {
@@ -43,17 +44,17 @@ namespace PriconneBotConsoleApp.Script
         }
 
         public BattleDeclaration(ClanData userClanData, SocketUserMessage message, BossNumberType bossNumber)
-            : this(userClanData, message.Channel, bossNumber, userMessage: message)
+            : this(userClanData, message.Channel, bossNumber)
         {
             m_UserMessage = message;
             m_User = message.Author;
         }
 
-        public BattleDeclaration(ClanData userClanData, SocketReaction reaction, BossNumberType bossNumber)
-            : this(userClanData, reaction.Channel, bossNumber, userReaction: reaction)
+        public BattleDeclaration(ClanData userClanData, SocketInteraction interaction, BossNumberType bossNumber)
+            : this(userClanData, interaction.Channel, bossNumber)
         {
-            m_UserReaction = reaction;
-            m_User = reaction.User.Value;
+            m_UserInteraction = interaction;
+            m_User = interaction.User;
         }
 
         public BattleDeclaration(SocketRole role, BossNumberType bossType)
@@ -85,40 +86,49 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
-        public async Task RunDeclarationCommandByReaction()
+        public async Task RunByInteraction()
         {
             if (m_DeclarationChannel == null)
             {
                 return;
             }
 
-            switch (m_UserReaction.Emote.Name)
+            if (m_SystemMessageID == 0)
             {
-                case "⚔️":
+                //TODO:そもそも宣言されていない場合ここにエラー文
+                return;
+            }
+
+            var messageComponent = (SocketMessageComponent)m_UserInteraction;
+
+            if (m_SystemMessageID != messageComponent.Message.Id
+               || !Enum.TryParse<ButtonType>(messageComponent.Data.CustomId, out var buttonType))
+            {
+                return;
+            }
+
+            switch (buttonType)
+            {
+                case ButtonType.StartBattle:
                     UserRegistorDeclareCommand();
                     break;
 
-                case "✅":
+                case ButtonType.FinishBattle:
                     UserFinishBattleCommand();
                     break;
 
-                case "🏁":
+                case ButtonType.SubdueBoss:
                     await NextBossCommand();
-                    await new BattleReservation(m_UserClanData, m_UserReaction).UpdateSystemMessage();
+                    await new BattleReservation(m_UserRole).UpdateSystemMessage();
                     return;
 
-                case "❌":
+                case ButtonType.CancelBattle:
                     UserDeleteBattleData();
-                    break;
-
-                case "🔄":
-                    await UpdateDeclarationBotMessage();
                     break;
             }
 
             await UpdateDeclarationBotMessage();
-            await RemoveUserReaction();
-            await new BattleReservation(m_UserClanData, m_UserReaction).UpdateSystemMessage();
+            await new BattleReservation(m_UserRole).UpdateSystemMessage();
         }
 
         /// <summary>
@@ -194,7 +204,8 @@ namespace PriconneBotConsoleApp.Script
         {
             var embed = CreateDeclarationDataEmbed();
             var content = CreateDeclarationDataMessage();
-            var sentMessage = await m_DeclarationChannel.SendMessageAsync(text: content, embed: embed);
+            var component = CreateDeclareComponent();
+            var sentMessage = await m_DeclarationChannel.SendMessageAsync(text: content, embed: embed, component: component);
 
             if (sentMessage == null)
             {
@@ -202,7 +213,6 @@ namespace PriconneBotConsoleApp.Script
             }
 
             DatabaseMessageDataController.UpdateMessageID(m_UserClanData, sentMessage.Id, GetDeclareMessageType(m_BossNumber));
-            await AttacheDefaultReaction(sentMessage);
         }
 
         /// <summary>
@@ -292,7 +302,7 @@ namespace PriconneBotConsoleApp.Script
             DeleteAllBattleData();
 
             var nowBattleLap = m_UserClanData.GetBossLap(m_BossNumber);
-            var nextBattleLap = Math.Clamp(nowBattleLap + 1, 0, ClanBattleDefine.MaxLapNumber);        
+            var nextBattleLap = Math.Clamp(nowBattleLap + 1, 0, ClanBattleDefine.MaxLapNumber);
 
             m_UserClanData.SetBossLap(m_BossNumber, nextBattleLap);
             DatabaseClanDataController.UpdateClanData(m_UserClanData);
@@ -317,24 +327,16 @@ namespace PriconneBotConsoleApp.Script
                 FinishFlag = false
             };
 
-        private async Task AttacheDefaultReaction(IUserMessage message)
+        private MessageComponent CreateDeclareComponent()
         {
+            ComponentBuilder componentBuilder = new();
+            // TODO : GetDescriptionを修正
+            componentBuilder.WithButton("開始", ButtonType.StartBattle.ToString(), style: ButtonStyle.Secondary, emote: new Emoji(EnumMapper.I.GetString(ButtonType.StartBattle)));
+            componentBuilder.WithButton("完了", ButtonType.FinishBattle.ToString(), style: ButtonStyle.Secondary, emote: new Emoji(EnumMapper.I.GetString(ButtonType.FinishBattle)));
+            componentBuilder.WithButton("討伐", ButtonType.SubdueBoss.ToString(), style: ButtonStyle.Secondary, emote: new Emoji(EnumMapper.I.GetString(ButtonType.SubdueBoss)));
+            componentBuilder.WithButton("取消", ButtonType.CancelBattle.ToString(), style: ButtonStyle.Danger, emote: new Emoji(EnumMapper.I.GetString(ButtonType.CancelBattle)));
 
-            string[] emojiData = { "⚔️", "✅", "🏁", "❌", "🔄" };
-            var emojiMatrix = emojiData.Select(x => new Emoji(x)).ToArray();
-            await message.AddReactionsAsync(emojiMatrix);
-        }
-
-        private async Task RemoveUserReaction()
-        {
-            var message = await m_DeclarationChannel.GetMessageAsync(m_UserReaction.MessageId);
-
-            if (message == null)
-            {
-                return;
-            }
-
-            await message.RemoveReactionAsync(m_UserReaction.Emote, m_UserReaction.User.Value);
+            return componentBuilder.Build();
         }
 
         private Embed CreateDeclarationDataEmbed()

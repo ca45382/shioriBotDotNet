@@ -22,27 +22,22 @@ namespace PriconneBotConsoleApp.Script
         private readonly ClanData m_UserClanData;
         private readonly SocketRole m_UserRole;
         private readonly SocketUserMessage m_UserMessage;
-        private readonly SocketReaction m_UserReaction;
+        private readonly SocketInteraction m_UserInteraction;
 
         private BattleReservation(
             ClanData userClanData,
             ISocketMessageChannel channel,
             SocketUserMessage userMessage = null,
-            SocketReaction userReaction = null)
+            SocketInteraction userInterction = null)
         {
             m_UserClanData = userClanData;
             m_UserRole = (channel as SocketGuildChannel)?.Guild.GetRole(m_UserClanData.ClanRoleID);
             m_UserMessage = userMessage;
-            m_UserReaction = userReaction;
+            m_UserInteraction = userInterction;
         }
 
         public BattleReservation(ClanData userClanData, SocketUserMessage message)
             : this(userClanData, message.Channel, userMessage: message)
-        {
-        }
-
-        public BattleReservation(ClanData userClanData, SocketReaction reaction)
-            : this(userClanData, reaction.Channel, userReaction: reaction)
         {
         }
 
@@ -152,15 +147,26 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
-        public async Task RunReservationResultReaction()
+        public async Task RunResultInteraction()
         {
-            switch (m_UserReaction.Emote.Name)
+            if (m_UserInteraction == null)
             {
-                case "🔄":
+                return;
+            }
+
+            var messageComponent = (SocketMessageComponent)m_UserInteraction;
+
+            if (!Enum.TryParse<ButtonType>(messageComponent.Data.CustomId, out var buttonType))
+            {
+                return;
+            }
+
+            switch (buttonType)
+            {
+                case ButtonType.Reload:
                     await UpdateSystemMessage();
                     break;
             }
-            await RemoveUserReaction();
         }
 
         /// <summary>
@@ -169,7 +175,8 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         public async Task SendSystemMessage()
         {
-            var messageData = CreateAllReservationDataMessage();
+            var embedData = CreateAllReservationDataMessage();
+            var componentData = CreateSystemMessageComponent();
             var reservationResultChannelID = m_UserClanData.ChannelData
                 .GetChannelID(m_UserClanData.ClanID, ChannelFeatureType.ReserveResultID);
 
@@ -181,9 +188,8 @@ namespace PriconneBotConsoleApp.Script
             var resultChannel = m_UserRole.Guild
                 .GetTextChannel(reservationResultChannelID);
 
-            var sendedMessageData = await resultChannel.SendMessageAsync(embed: messageData);
+            var sendedMessageData = await resultChannel.SendMessageAsync(embed: embedData, component: componentData);
             DatabaseMessageDataController.UpdateMessageID(m_UserClanData, sendedMessageData.Id, MessageFeatureType.ReserveResultID);
-            await AttacheDefaultReaction(sendedMessageData);
         }
 
         public async Task UpdateSystemMessage()
@@ -226,6 +232,14 @@ namespace PriconneBotConsoleApp.Script
             var bossLap = m_UserClanData.GetBossLap(bossNumber);
             var deleteData = clanReservationData.Where(x => x.BattleLap < bossLap);
             DatabaseReservationController.DeleteReservationData(deleteData);
+        }
+
+        private MessageComponent CreateSystemMessageComponent()
+        {
+            ComponentBuilder componentBuilder = new();
+            componentBuilder.WithButton(
+                "更新", ButtonType.Reload.ToString(), style: ButtonStyle.Secondary, emote: new Emoji(EnumMapper.I.GetString(ButtonType.Reload)));
+            return componentBuilder.Build();
         }
 
         /// <summary>
@@ -401,34 +415,6 @@ namespace PriconneBotConsoleApp.Script
             embedBuilder.Title = $"現在の予約状況:計{reservationDataSet.Count}件";
 
             return embedBuilder.Build();
-        }
-
-        private async Task AttacheDefaultReaction(IUserMessage message)
-        {
-            string[] emojiData = { "🔄" };
-            var emojiMatrix = emojiData.Select(x => new Emoji(x)).ToArray();
-            await message.AddReactionsAsync(emojiMatrix);
-        }
-
-        private async Task RemoveUserReaction()
-        {
-            var reservationResultChannelID = m_UserClanData.ChannelData
-                .GetChannelID(m_UserClanData.ClanID, ChannelFeatureType.ReserveResultID);
-            var textChannnel = m_UserRole.Guild.GetTextChannel(reservationResultChannelID);
-
-            if (textChannnel == null)
-            {
-                return;
-            }
-
-            var message = await textChannnel.GetMessageAsync(m_UserReaction.MessageId);
-
-            if (message == null)
-            {
-                return;
-            }
-
-            await message.RemoveReactionAsync(m_UserReaction.Emote, m_UserReaction.User.Value);
         }
 
         private async Task SendErrorMessage(ErrorType type, params string[] parameters)
