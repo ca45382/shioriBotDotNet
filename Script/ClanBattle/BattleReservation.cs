@@ -34,6 +34,7 @@ namespace PriconneBotConsoleApp.Script
             m_UserRole = (channel as SocketGuildChannel)?.Guild.GetRole(m_UserClanData.ClanRoleID);
             m_UserMessage = userMessage;
             m_UserReaction = userReaction;
+            m_UserInteraction = userInterction;
         }
 
         public BattleReservation(ClanData userClanData, SocketUserMessage message)
@@ -216,7 +217,7 @@ namespace PriconneBotConsoleApp.Script
         {
             ComponentBuilder componentBuilder = new();
             componentBuilder.WithButton(
-                "更新", ButtonType.Reload.ToString(), style: ButtonStyle.Secondary, emote: new Emoji(ButtonType.Reload.GetDescription()));
+                "更新", ButtonType.Reload.ToString(), style: ButtonStyle.Secondary, emote: new Emoji(EnumMapper.I.GetString(ButtonType.Reload)));
             return componentBuilder.Build();
         }
 
