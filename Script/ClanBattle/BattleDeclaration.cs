@@ -330,11 +330,10 @@ namespace PriconneBotConsoleApp.Script
         private MessageComponent CreateDeclareComponent()
         {
             ComponentBuilder componentBuilder = new();
-            // TODO : GetDescriptionを修正
-            componentBuilder.WithButton("開始", ButtonType.StartBattle.ToString(), style: ButtonStyle.Secondary, emote: new Emoji(ButtonType.StartBattle.ToLabel()));
-            componentBuilder.WithButton("完了", ButtonType.FinishBattle.ToString(), style: ButtonStyle.Secondary, emote: new Emoji(ButtonType.FinishBattle.ToLabel()));
-            componentBuilder.WithButton("討伐", ButtonType.SubdueBoss.ToString(), style: ButtonStyle.Secondary, emote: new Emoji(ButtonType.SubdueBoss.ToLabel()));
-            componentBuilder.WithButton("取消", ButtonType.CancelBattle.ToString(), style: ButtonStyle.Danger, emote: new Emoji(ButtonType.CancelBattle.ToLabel()));
+            componentBuilder.WithButton(ButtonType.StartBattle.ToLongLabel(), ButtonType.StartBattle.ToString(), ButtonStyle.Secondary, ButtonType.StartBattle.ToEmoji());
+            componentBuilder.WithButton(ButtonType.FinishBattle.ToLongLabel(), ButtonType.FinishBattle.ToString(), ButtonStyle.Secondary, ButtonType.FinishBattle.ToEmoji());
+            componentBuilder.WithButton(ButtonType.SubdueBoss.ToLongLabel(), ButtonType.SubdueBoss.ToString(), ButtonStyle.Secondary, ButtonType.SubdueBoss.ToEmoji());
+            componentBuilder.WithButton(ButtonType.CancelBattle.ToLongLabel(), ButtonType.CancelBattle.ToString(), ButtonStyle.Danger, ButtonType.CancelBattle.ToEmoji());
 
             return componentBuilder.Build();
         }

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using Discord;
 using PriconneBotConsoleApp.Attribute;
+using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Script
@@ -46,6 +48,12 @@ namespace PriconneBotConsoleApp.Script
         private static string[] GetAliases<T>(this T data) where T : Enum
             => GetMultiDescriptionData(data).Aliases;
 
+        public static Emoji ToEmoji(this ButtonType buttonType)
+            => new(buttonType.ToShortLabel());
+
+        public static Emoji emoji(this ReactionType reactionType)
+            => new(reactionType.ToLabel());
+
         private static DescriptionType GetDescriptionType<T>() where T : Enum
         {
             foreach (T member in typeof(T).GetEnumValues())
@@ -72,7 +80,7 @@ namespace PriconneBotConsoleApp.Script
             );
 
         public static bool IsMatched<T>(this T value, string input) where T : Enum
-            =>value.ToLabel() == input
+            => value.ToLabel() == input
                 || value.ToShortLabel() == input
                 || value.GetAliases().Any(x => x == input);
 
