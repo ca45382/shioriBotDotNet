@@ -1,52 +1,100 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Reflection;
+using Discord;
+using PriconneBotConsoleApp.Attribute;
 using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Script
 {
-    public class EnumMapper
+    public static class EnumMapper
     {
-        private Dictionary<Type, Dictionary<int, string>> m_EnumDictionary = new Dictionary<Type, Dictionary<int, string>>();
-
-        private Dictionary<int, string> m_ReactionTypes = new Dictionary<int, string>();
-        private Dictionary<int, string> m_ErrorTypes = new Dictionary<int, string>();
-        private Dictionary<int, string> m_ProgressStatus = new Dictionary<int, string>();
-        private Dictionary<int, string> m_InfomationTypes = new Dictionary<int, string>();
-        private Dictionary<int, string> m_ButtonType = new Dictionary<int, string>();
-
-        private static EnumMapper s_Instance;
-        public static EnumMapper I => s_Instance ??= new EnumMapper();
-
-        public EnumMapper()
+        private enum DescriptionType
         {
-            m_EnumDictionary.Add(typeof(ReactionType), m_ReactionTypes);
-            m_EnumDictionary.Add(typeof(ErrorType), m_ErrorTypes);
-            m_EnumDictionary.Add(typeof(ProgressStatus), m_ProgressStatus);
-            m_EnumDictionary.Add(typeof(InfomationType), m_InfomationTypes);
-            m_EnumDictionary.Add(typeof(ButtonType), m_ButtonType);
+            Single,
+            Multi,
         }
 
-        public string GetString<T>(T data) where T : Enum
+        private readonly static Dictionary<Type, DescriptionType> m_DescriptionTypeDictionary = new();
+
+        private readonly static Dictionary<(Type, Enum), string> m_SingleDescriptionDictionary = new();
+        private readonly static Dictionary<(Type, Enum), MultiDescriptionData> m_MultiDescriptionDictionary = new();
+        private readonly static Dictionary<string, Enum> m_ParseCache = new();
+
+
+        public static string ToLabel<T>(this T data) where T : Enum
+            => m_DescriptionTypeDictionary.GetValueOrInitialize(typeof(T), GetDescriptionType<T>) switch
+            {
+                DescriptionType.Single => ToSingleLabel(data),
+                DescriptionType.Multi => ToLongLabel(data),
+                _ => throw new InvalidProgramException(),
+            };
+
+        private static MultiDescriptionData GetMultiDescriptionData<T>(T data) where T : Enum
+            => m_MultiDescriptionDictionary.GetValueOrInitialize((typeof(T), data), data.GetMultiDescripion);
+
+        private static string ToSingleLabel<T>(this T data) where T : Enum
+            => m_SingleDescriptionDictionary.GetValueOrInitialize((typeof(T), data), data.GetDescription);
+
+        public static string ToLongLabel<T>(this T data) where T : Enum
+            => GetMultiDescriptionData(data).LongDescription;
+
+        public static string ToShortLabel<T>(this T data) where T : Enum
+            => GetMultiDescriptionData(data).ShortDescription;
+
+        private static string[] GetAliases<T>(this T data) where T : Enum
+            => GetMultiDescriptionData(data).Aliases;
+
+        public static Emoji ToEmoji(this ButtonType buttonType)
+            => new(buttonType.ToShortLabel());
+
+        public static Emoji emoji(this ReactionType reactionType)
+            => new(reactionType.ToLabel());
+
+        private static DescriptionType GetDescriptionType<T>() where T : Enum
         {
-            if (data == null)
+            foreach (T member in typeof(T).GetEnumValues())
             {
-                return null;
+                var field = typeof(T).GetField(member.ToString());
+                if (field.GetCustomAttribute<DescriptionAttribute>(false) != null)
+                {
+                    return DescriptionType.Single;
+                }
+
+                if (field.GetCustomAttribute<MultiDescriptionAttribute>(false) != null)
+                {
+                    return DescriptionType.Multi;
+                }
             }
 
-            var dictionaryData = m_EnumDictionary[typeof(T)];
-            var castEnum = Enum.Parse(typeof(T), data.ToString()) as Enum;
-            var castInt = Convert.ToInt32(castEnum);
+            return DescriptionType.Single;
+        }
 
-            if (dictionaryData.ContainsKey(castInt))
+        public static T Parse<T>(string input) where T : Enum
+            => (T)m_ParseCache.GetValueOrInitialize(
+                input,
+                () => typeof(T).GetEnumValues().Cast<T>().First(x => x.IsMatched(input))
+            );
+
+        public static bool IsMatched<T>(this T value, string input) where T : Enum
+            => value.ToLabel() == input
+                || value.ToShortLabel() == input
+                || value.GetAliases().Any(x => x == input);
+
+        public static bool TryParse<T>(string input, out T result) where T : Enum
+        {
+            try
             {
-                return dictionaryData[castInt];
+                result = Parse<T>(input);
+                return true;
             }
-            else
+            catch
             {
-                var descriptionString = castEnum.GetDescription();
-                dictionaryData[castInt] = descriptionString;
-                return descriptionString;
+                result = default;
+                return false;
             }
         }
     }

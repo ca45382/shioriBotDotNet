@@ -1,24 +1,25 @@
-﻿using System.ComponentModel;
+﻿using PriconneBotConsoleApp.Attribute;
 
 namespace PriconneBotConsoleApp.DataType
 {
+    /// <summary> Long : 文字列, Short : 絵文字 </summary>
     public enum ButtonType
     {
         Unknown,
 
-        [Description("⚔️")]
+        [MultiDescription("開始", "⚔️")]
         StartBattle,
 
-        [Description("✅")]
+        [MultiDescription("完了", "✅")]
         FinishBattle,
 
-        [Description("🏁")]
+        [MultiDescription("討伐", "🏁")]
         SubdueBoss,
 
-        [Description("✖️")]
+        [MultiDescription("取消", "✖️")]
         CancelBattle,
 
-        [Description("🔄")]
+        [MultiDescription("更新", "🔄")]
         Reload,
     }
 }
