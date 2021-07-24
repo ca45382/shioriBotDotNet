@@ -14,5 +14,10 @@
         public const int MaxReportNumber = 3;
         public const int MaxCarryOverNumber = 3;
         public const int MaxClanPlayer = 30;
+
+        /// <summary> 単位[万] 999999万 </summary>
+        public const int MaxDamageValue = 999999;
+
+        public const int DisplayDamageUnit = 10000;
     }
 }

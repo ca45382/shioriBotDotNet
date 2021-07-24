@@ -31,5 +31,17 @@ namespace PriconneBotConsoleApp.Script
                 _ => "不明",
             };
         }
+
+        public static string AttackNumberToShortString(int inputInt)
+        {
+            return inputInt switch
+            {
+                1 => "物",
+                2 => "魔",
+                3 => "ニ",
+                99 => "持",
+                _ => "不",
+            };
+        }
     }
 }

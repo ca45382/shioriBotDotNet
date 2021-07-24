@@ -57,7 +57,7 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var messageChannelID = message.Channel.Id;
-            var fetureID = m_PlayerClanData.ChannelData.FirstOrDefault(x => x.ChannelID == messageChannelID)?.FeatureID ?? 0;
+            var featureID = m_PlayerClanData.ChannelData.FirstOrDefault(x => x.ChannelID == messageChannelID)?.FeatureID ?? 0;
 
             if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.ReserveID))
             {
@@ -84,19 +84,34 @@ namespace PriconneBotConsoleApp.Script
                 await new BattleCarryOver(m_PlayerClanData, message).RunByMessage();
             }
 
-            BattleDeclaration battleDeclaration = fetureID switch
+            BattleDeclaration battleDeclaration = featureID switch
             {
-                (int)ChannelFeatureType.DeclareBoss1ID => new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss1Number),
-                (int)ChannelFeatureType.DeclareBoss2ID => new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss2Number),
-                (int)ChannelFeatureType.DeclareBoss3ID => new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss3Number),
-                (int)ChannelFeatureType.DeclareBoss4ID => new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss4Number),
-                (int)ChannelFeatureType.DeclareBoss5ID => new BattleDeclaration(m_PlayerClanData, message, BossNumberType.Boss5Number),
+                (int)ChannelFeatureType.DeclareBoss1ID => new(m_PlayerClanData, message, BossNumberType.Boss1Number),
+                (int)ChannelFeatureType.DeclareBoss2ID => new(m_PlayerClanData, message, BossNumberType.Boss2Number),
+                (int)ChannelFeatureType.DeclareBoss3ID => new(m_PlayerClanData, message, BossNumberType.Boss3Number),
+                (int)ChannelFeatureType.DeclareBoss4ID => new(m_PlayerClanData, message, BossNumberType.Boss4Number),
+                (int)ChannelFeatureType.DeclareBoss5ID => new(m_PlayerClanData, message, BossNumberType.Boss5Number),
                 _ => null,
             };
 
             if (battleDeclaration != null)
             {
                 await battleDeclaration.RunDeclarationCommandByMessage();
+            }
+
+            BattleProgress battleProgress = featureID switch
+            {
+                (uint)ChannelFeatureType.ProgressBoss1ID => new(m_PlayerClanData, message, (byte)BossNumberType.Boss1Number),
+                (uint)ChannelFeatureType.ProgressBoss2ID => new(m_PlayerClanData, message, (byte)BossNumberType.Boss2Number),
+                (uint)ChannelFeatureType.ProgressBoss3ID => new(m_PlayerClanData, message, (byte)BossNumberType.Boss3Number),
+                (uint)ChannelFeatureType.ProgressBoss4ID => new(m_PlayerClanData, message, (byte)BossNumberType.Boss4Number),
+                (uint)ChannelFeatureType.ProgressBoss5ID => new(m_PlayerClanData, message, (byte)BossNumberType.Boss5Number),
+                _ => null,
+            };
+
+            if (battleProgress != null)
+            {
+                await battleProgress.RunByMessage();
             }
         }
     }

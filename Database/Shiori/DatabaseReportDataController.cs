@@ -1,11 +1,9 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.Define;
+using PriconneBotConsoleApp.Extension;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using System.Text;
-using System.Threading.Tasks;
-using Discord.WebSocket;
-using PriconneBotConsoleApp.DataModel;
 
 namespace PriconneBotConsoleApp.Database
 {
@@ -52,6 +50,33 @@ namespace PriconneBotConsoleApp.Database
                 .Include(x => x.PlayerData)
                 .Where(x => x.PlayerData.ClanID == clanData.ClanID && !x.SubdueFlag && !x.DeleteFlag)
                 .ToList();
+        }
+
+        /// <summary>
+        /// 配列の前から0凸完了～3凸完了
+        /// </summary>
+        /// <param name="clanData"></param>
+        /// <returns></returns>
+        public static int[] GetRemainPlayerCount(ClanData clanData)
+        {
+            using var databaseConnector = new DatabaseConnector();
+
+            var reportCount = new int[CommonDefine.MaxReportNumber + 1];
+
+            databaseConnector.PlayerData.AsQueryable()
+                .Where(x => x.ClanID == clanData.ClanID)
+                .Include(x => x.ReportData.Where(y => !y.DeleteFlag && !y.SubdueFlag))
+                .AsEnumerable().ForEach(x => reportCount[x.ReportData.Count]++);
+
+            return reportCount;
+        }
+
+        public static int GetReportCount(PlayerData playerData)
+        {
+            using var databaseConnector = new DatabaseConnector();
+
+            return databaseConnector.ReportData.AsQueryable()
+                .Count(x => x.PlayerID == playerData.PlayerID && !x.SubdueFlag && !x.DeleteFlag);
         }
 
         /// <summary>

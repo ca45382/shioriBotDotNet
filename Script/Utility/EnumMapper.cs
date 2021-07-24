@@ -11,6 +11,7 @@ namespace PriconneBotConsoleApp.Script
 
         private Dictionary<int, string> m_ReactionTypes = new Dictionary<int, string>();
         private Dictionary<int, string> m_ErrorTypes = new Dictionary<int, string>();
+        private Dictionary<int, string> m_ProgressStatus = new Dictionary<int, string>();
         private Dictionary<int, string> m_InfomationTypes = new Dictionary<int, string>();
         private Dictionary<int, string> m_ButtonType = new Dictionary<int, string>();
 
@@ -21,6 +22,7 @@ namespace PriconneBotConsoleApp.Script
         {
             m_EnumDictionary.Add(typeof(ReactionType), m_ReactionTypes);
             m_EnumDictionary.Add(typeof(ErrorType), m_ErrorTypes);
+            m_EnumDictionary.Add(typeof(ProgressStatus), m_ProgressStatus);
             m_EnumDictionary.Add(typeof(InfomationType), m_InfomationTypes);
             m_EnumDictionary.Add(typeof(ButtonType), m_ButtonType);
         }
