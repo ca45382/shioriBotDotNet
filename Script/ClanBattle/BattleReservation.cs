@@ -41,11 +41,6 @@ namespace PriconneBotConsoleApp.Script
         {
         }
 
-        public BattleReservation(ClanData userClanData, SocketReaction reaction)
-            : this(userClanData, reaction.Channel, userReaction: reaction)
-        {
-        }
-
         public BattleReservation(SocketRole userRole)
         {
             m_UserRole = userRole;
@@ -150,17 +145,6 @@ namespace PriconneBotConsoleApp.Script
             {
                 await SendSystemMessage();
             }
-        }
-
-        public async Task RunReservationResultReaction()
-        {
-            switch (m_UserReaction.Emote.Name)
-            {
-                case "🔄":
-                    await UpdateSystemMessage();
-                    break;
-            }
-            await RemoveUserReaction();
         }
 
         /// <summary>
@@ -409,34 +393,6 @@ namespace PriconneBotConsoleApp.Script
             embedBuilder.Title = $"現在の予約状況:計{reservationDataSet.Count}件";
 
             return embedBuilder.Build();
-        }
-
-        private async Task AttacheDefaultReaction(IUserMessage message)
-        {
-            string[] emojiData = { "🔄" };
-            var emojiMatrix = emojiData.Select(x => new Emoji(x)).ToArray();
-            await message.AddReactionsAsync(emojiMatrix);
-        }
-
-        private async Task RemoveUserReaction()
-        {
-            var reservationResultChannelID = m_UserClanData.ChannelData
-                .GetChannelID(m_UserClanData.ClanID, ChannelFeatureType.ReserveResultID);
-            var textChannnel = m_UserRole.Guild.GetTextChannel(reservationResultChannelID);
-
-            if (textChannnel == null)
-            {
-                return;
-            }
-
-            var message = await textChannnel.GetMessageAsync(m_UserReaction.MessageId);
-
-            if (message == null)
-            {
-                return;
-            }
-
-            await message.RemoveReactionAsync(m_UserReaction.Emote, m_UserReaction.User.Value);
         }
 
         private async Task SendErrorMessage(ErrorType type, params string[] parameters)

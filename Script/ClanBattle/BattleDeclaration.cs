@@ -51,13 +51,6 @@ namespace PriconneBotConsoleApp.Script
             m_User = message.Author;
         }
 
-        public BattleDeclaration(ClanData userClanData, SocketReaction reaction, BossNumberType bossNumber)
-            : this(userClanData, reaction.Channel, bossNumber)
-        {
-            m_UserReaction = reaction;
-            m_User = reaction.User.Value;
-        }
-
         public BattleDeclaration(ClanData userClanData, SocketInteraction interaction, BossNumberType bossNumber)
             : this(userClanData, interaction.Channel, bossNumber)
         {
@@ -92,42 +85,6 @@ namespace PriconneBotConsoleApp.Script
                 battleReservation.DeleteUnusedData(m_BossNumber);
                 await battleReservation.UpdateSystemMessage();
             }
-        }
-
-        public async Task RunDeclarationCommandByReaction()
-        {
-            if (m_DeclarationChannel == null)
-            {
-                return;
-            }
-
-            switch (m_UserReaction.Emote.Name)
-            {
-                case "⚔️":
-                    UserRegistorDeclareCommand();
-                    break;
-
-                case "✅":
-                    UserFinishBattleCommand();
-                    break;
-
-                case "🏁":
-                    await NextBossCommand();
-                    await new BattleReservation(m_UserClanData, m_UserReaction).UpdateSystemMessage();
-                    return;
-
-                case "❌":
-                    UserDeleteBattleData();
-                    break;
-
-                case "🔄":
-                    await UpdateDeclarationBotMessage();
-                    break;
-            }
-
-            await UpdateDeclarationBotMessage();
-            await RemoveUserReaction();
-            await new BattleReservation(m_UserClanData, m_UserReaction).UpdateSystemMessage();
         }
 
         public async Task RunByInteraction()
@@ -370,26 +327,6 @@ namespace PriconneBotConsoleApp.Script
                 BossNumber = m_BossNumber,
                 FinishFlag = false
             };
-
-        private async Task AttacheDefaultReaction(IUserMessage message)
-        {
-
-            string[] emojiData = { "⚔️", "✅", "🏁", "❌", "🔄" };
-            var emojiMatrix = emojiData.Select(x => new Emoji(x)).ToArray();
-            await message.AddReactionsAsync(emojiMatrix);
-        }
-
-        private async Task RemoveUserReaction()
-        {
-            var message = await m_DeclarationChannel.GetMessageAsync(m_UserReaction.MessageId);
-
-            if (message == null)
-            {
-                return;
-            }
-
-            await message.RemoveReactionAsync(m_UserReaction.Emote, m_UserReaction.User.Value);
-        }
 
         private MessageComponent CreateDeclareComponent()
         {
