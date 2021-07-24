@@ -22,18 +22,17 @@ namespace PriconneBotConsoleApp.Script
         private readonly ClanData m_UserClanData;
         private readonly SocketRole m_UserRole;
         private readonly SocketUserMessage m_UserMessage;
-        private readonly SocketReaction m_UserReaction;
+        private readonly SocketInteraction m_UserInteraction;
 
         private BattleReservation(
             ClanData userClanData,
             ISocketMessageChannel channel,
             SocketUserMessage userMessage = null,
-            SocketReaction userReaction = null)
+            SocketInteraction userInterction = null)
         {
             m_UserClanData = userClanData;
             m_UserRole = (channel as SocketGuildChannel)?.Guild.GetRole(m_UserClanData.ClanRoleID);
             m_UserMessage = userMessage;
-            m_UserReaction = userReaction;
             m_UserInteraction = userInterction;
         }
 
@@ -148,6 +147,28 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
+        public async Task RunResultInteraction()
+        {
+            if (m_UserInteraction == null)
+            {
+                return;
+            }
+
+            var messageComponent = (SocketMessageComponent)m_UserInteraction;
+
+            if (!Enum.TryParse<ButtonType>(messageComponent.Data.CustomId, out var buttonType))
+            {
+                return;
+            }
+
+            switch (buttonType)
+            {
+                case ButtonType.Reload:
+                    await UpdateSystemMessage();
+                    break;
+            }
+        }
+
         /// <summary>
         /// 凸予約一覧チャンネルにメッセージを送信する。
         /// </summary>
@@ -167,7 +188,7 @@ namespace PriconneBotConsoleApp.Script
             var resultChannel = m_UserRole.Guild
                 .GetTextChannel(reservationResultChannelID);
 
-            var sendedMessageData = await resultChannel.SendMessageAsync(embed: embedData, component:componentData);
+            var sendedMessageData = await resultChannel.SendMessageAsync(embed: embedData, component: componentData);
             DatabaseMessageDataController.UpdateMessageID(m_UserClanData, sendedMessageData.Id, MessageFeatureType.ReserveResultID);
         }
 
