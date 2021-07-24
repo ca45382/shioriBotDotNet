@@ -152,25 +152,17 @@ namespace PriconneBotConsoleApp.Script
         private void UpdateOtherPlayerData()
         {
             const int minCommandLength = 1;
-            ulong userID = 0;
-            byte deleteNumber = 0;
+
             // TODO : " "を定数化する。
             var splitMessage = m_UserMessage.Content.ZenToHan().Split(" ", StringSplitOptions.RemoveEmptyEntries);
 
-            if (splitMessage.Length > minCommandLength)
-            {
-                userID = m_UserMessage.MentionedUsers.FirstOrDefault()?.Id ?? 0;
-
-                if (splitMessage.Length > minCommandLength + 1 && byte.TryParse(splitMessage[2], out var number))
-                {
-                    deleteNumber = number;
-                }
-            }
-
-            if (userID == 0)
+            if (splitMessage.Length <= minCommandLength || m_UserMessage.MentionedUsers.FirstOrDefault()?.Id is not ulong userID)
             {
                 return;
             }
+
+            // コマンドは `!rm @削除対象のユーザー 古い方から何番目か` としている。
+            var deleteNumber = (splitMessage.Length > minCommandLength + 1 && byte.TryParse(splitMessage[minCommandLength + 1], out var number)) ? number : (byte)0;
 
             var playerData = DatabasePlayerDataController.LoadPlayerData(m_ClanRole, userID);
 
