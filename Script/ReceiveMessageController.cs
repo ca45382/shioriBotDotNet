@@ -1,71 +1,117 @@
-﻿using Discord.WebSocket;
-using PriconneBotConsoleApp.DataTypes;
-using PriconneBotConsoleApp.MySQL;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Discord.WebSocket;
+using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.Database;
+using System.Linq;
+using PriconneBotConsoleApp.DataType;
+using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Script
 {
     public class ReceiveMessageController
     {
-        private readonly ClanData m_playerClanData;
-        private readonly PlayerData m_playerData;
-        private readonly SocketUserMessage m_message;
+        private readonly ClanData m_PlayerClanData;
+        private readonly PlayerData m_PlayerData;
+        private readonly SocketUserMessage m_ReceiveMessage;
 
         public ReceiveMessageController(SocketUserMessage message)
         {
-            m_message = message;
+            m_ReceiveMessage = message;
             var messageChannel = message.Channel as SocketGuildChannel;
             var guildID = messageChannel.Guild.Id;
             var userID = message.Author.Id;
-            m_playerData = new MySQLPlayerDataController().LoadPlayerData(guildID, userID);
-            
-            if (m_playerData == null)
+            m_PlayerData = DatabasePlayerDataController.LoadPlayerData(guildID, userID);
+
+            if (m_PlayerData == null)
             {
                 return;
             }
 
-            var userRole = messageChannel.Guild.GetRole(m_playerData.ClanData.ClanRoleID);
+            var userRole = messageChannel.Guild.GetRole(m_PlayerData.ClanData.ClanRoleID);
 
             if (userRole == null)
             {
                 return;
             }
 
-            m_playerClanData = new MySQLClanDataController().LoadClanData(userRole);
+            m_PlayerClanData = DatabaseClanDataController.LoadClanData(userRole);
         }
 
         public async Task RunMessageReceive()
         {
-            if (m_message != null)
+            if (m_ReceiveMessage != null)
             {
-                await RunMessageReceive(m_message);
+                await RunMessageReceive(m_ReceiveMessage);
             }
         }
 
         public async Task RunMessageReceive(SocketUserMessage message)
         {
-            await new TimeLineConversion(message).RunByMessage() ;
+            await new TimeLineConversion(message).RunByMessage();
+            await new PriconneEventViewer(message).SendEventInfomationByMessage();
+            await new Dice(message).Run();
 
-            if (m_playerData == null || m_playerClanData == null)
+            if (m_PlayerData == null || m_PlayerClanData == null)
             {
                 return;
             }
 
             var messageChannelID = message.Channel.Id;
+            var featureID = m_PlayerClanData.ChannelData.FirstOrDefault(x => x.ChannelID == messageChannelID)?.FeatureID ?? 0;
 
-            if (messageChannelID == m_playerClanData.ChannelIDs.ReservationChannelID)
+            if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.ReserveID))
             {
-                await new BattleReservation(m_playerClanData, message).RunReservationCommand();
+                await new BattleReservation(m_PlayerClanData, message).RunReservationCommand();
             }
 
-            if (messageChannelID == m_playerClanData.ChannelIDs.ReservationResultChannelID)
+            if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.ReserveResultID))
             {
-                await new BattleReservation(m_playerClanData, message).RunReservationResultCommand();
+                await new BattleReservation(m_PlayerClanData, message).RunReservationResultCommand();
             }
 
-            if (messageChannelID == m_playerClanData.ChannelIDs.DeclarationChannelID)
+            if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.TaskKillID))
             {
-                await new BattleDeclaration(m_playerClanData, message).RunDeclarationCommandByMessage();
+                await new BattleTaskKill(m_PlayerClanData, message).RunByMessageCommands();
+            }
+
+            if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.ReportID))
+            {
+                await new BattleReport(m_PlayerClanData, message).RunByMessage();
+            }
+
+            if (messageChannelID == m_PlayerClanData.ChannelData.GetChannelID(m_PlayerClanData.ClanID, ChannelFeatureType.CarryOverID))
+            {
+                await new BattleCarryOver(m_PlayerClanData, message).RunByMessage();
+            }
+
+            BattleDeclaration battleDeclaration = featureID switch
+            {
+                (int)ChannelFeatureType.DeclareBoss1ID => new(m_PlayerClanData, message, BossNumberType.Boss1Number),
+                (int)ChannelFeatureType.DeclareBoss2ID => new(m_PlayerClanData, message, BossNumberType.Boss2Number),
+                (int)ChannelFeatureType.DeclareBoss3ID => new(m_PlayerClanData, message, BossNumberType.Boss3Number),
+                (int)ChannelFeatureType.DeclareBoss4ID => new(m_PlayerClanData, message, BossNumberType.Boss4Number),
+                (int)ChannelFeatureType.DeclareBoss5ID => new(m_PlayerClanData, message, BossNumberType.Boss5Number),
+                _ => null,
+            };
+
+            if (battleDeclaration != null)
+            {
+                await battleDeclaration.RunDeclarationCommandByMessage();
+            }
+
+            BattleProgress battleProgress = featureID switch
+            {
+                (uint)ChannelFeatureType.ProgressBoss1ID => new(m_PlayerClanData, message, (byte)BossNumberType.Boss1Number),
+                (uint)ChannelFeatureType.ProgressBoss2ID => new(m_PlayerClanData, message, (byte)BossNumberType.Boss2Number),
+                (uint)ChannelFeatureType.ProgressBoss3ID => new(m_PlayerClanData, message, (byte)BossNumberType.Boss3Number),
+                (uint)ChannelFeatureType.ProgressBoss4ID => new(m_PlayerClanData, message, (byte)BossNumberType.Boss4Number),
+                (uint)ChannelFeatureType.ProgressBoss5ID => new(m_PlayerClanData, message, (byte)BossNumberType.Boss5Number),
+                _ => null,
+            };
+
+            if (battleProgress != null)
+            {
+                await battleProgress.RunByMessage();
             }
         }
     }
