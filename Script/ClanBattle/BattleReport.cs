@@ -41,7 +41,7 @@ namespace PriconneBotConsoleApp.Script
                 }
 
                 var stringData = string.Join(
-                    ',', 
+                    ',',
                     ReportData.Select(x => $"{x.BossNumber}{((AttackType)x.AttackType).ToLabel()}").ToArray()
                 );
                 return $"{PlayerGuildName}({stringData})";
@@ -106,7 +106,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (userReportedData.Count() >= CommonDefine.MaxReportNumber)
             {
-                _ =  m_UserMessage.Channel.SendTimedMessageAsync(ErrorType.UpperLimitReport.ToLabel(), timeLimit: 5);
+                _ = m_UserMessage.Channel.SendTimedMessageAsync(ErrorType.UpperLimitReport.ToLabel(), timeLimit: 5);
                 return;
             }
 
@@ -139,7 +139,7 @@ namespace PriconneBotConsoleApp.Script
             {
                 return;
             }
-            
+
             var recentReportData = DatabaseReportDataController.GetReportData(playerData)
                 .OrderBy(x => x.DateTime).ToList();
             var removeData = recentReportData.Last();
@@ -151,7 +151,7 @@ namespace PriconneBotConsoleApp.Script
 
                 if (playerData.UserID != m_UserMessage.Author.Id)
                 {
-                    _ = m_UserMessage.Channel.SendTimedMessageAsync(string.Format(EnumMapper.I.GetString(InfomationType.DeleteInsted), playerData.UserID, deleteSpan), timeLimit: deleteSpan);
+                    _ = m_UserMessage.Channel.SendTimedMessageAsync(string.Format(InfomationType.DeleteInsted.ToLabel(), playerData.UserID, deleteSpan), timeLimit: deleteSpan);
                 }
             }
         }
@@ -193,7 +193,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (userReportedData.Count() >= CommonDefine.MaxReportNumber)
             {
-                _= m_UserMessage.Channel.SendTimedMessageAsync(ErrorType.UpperLimitReport.ToLabel() , deleteSpan);
+                _ = m_UserMessage.Channel.SendTimedMessageAsync(ErrorType.UpperLimitReport.ToLabel(), timeLimit: deleteSpan);
                 return;
             }
 
@@ -214,7 +214,7 @@ namespace PriconneBotConsoleApp.Script
             var clanReportData = DatabaseReportDataController.GetReportData(m_ClanData);
             if (DatabaseReportDataController.DeleteReportData(clanReportData))
             {
-                _ =m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
+                _ = m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
             }
         }
 
@@ -260,7 +260,7 @@ namespace PriconneBotConsoleApp.Script
 
             return userReportData;
         }
-        
+
         /// <summary>
         /// クランごとの凸報告データをEmbedで返す。
         /// </summary>
@@ -273,12 +273,12 @@ namespace PriconneBotConsoleApp.Script
             var reportDataList = DatabaseReportDataController.GetReportData(m_ClanData);
 
             var playerInfoList = clanPlayerDataList.Select(x => new PlayerInfo(
-                x.PlayerID, 
-                x.GuildUserName, 
+                x.PlayerID,
+                x.GuildUserName,
                 reportDataList.Where(r => r.PlayerID == x.PlayerID).ToArray()
             ));
-            
-            
+
+
             for (int i = 0; i <= CommonDefine.MaxReportNumber; i++)
             {
                 var players = playerInfoList.Where(x => x.ReportData.Length == i);
@@ -292,7 +292,8 @@ namespace PriconneBotConsoleApp.Script
                 var reportMessage = string.Join("\n", players.Select(x => x.GetNameWithReport()).ToArray());
 
                 var nameHeader = i == 0 ? "未" : i.ToString();
-                var embedFieldBuilder = new EmbedFieldBuilder() {
+                var embedFieldBuilder = new EmbedFieldBuilder()
+                {
                     Name = $"▼{nameHeader}凸の方({players.Count()}人)",
                     Value = reportMessage.Length == 0 ? "該当者なし" : reportMessage,
                     IsInline = true,
