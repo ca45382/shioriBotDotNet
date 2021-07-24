@@ -46,7 +46,6 @@ namespace PriconneBotConsoleApp.Script
                 stringBuilder.Append(ProgressData.Damage.ToString().PadLeft(6, ' ') + "@");
                 stringBuilder.Append(ProgressData.RemainTime.ToString().PadLeft(2, '0') + " ");
                 stringBuilder.Append(EnumMapper.ToShortLabel((AttackType)ProgressData.AttackType) + " ");
-                //stringBuilder.Append(ConversionAttackNumber.AttackNumberToShortString(ProgressData.AttackType) + " ");
                 stringBuilder.Append(DatabaseReportDataController.GetReportCount(PlayerData).ToString() + " ");
                 stringBuilder.Append(PlayerData.GuildUserName + " ");
 

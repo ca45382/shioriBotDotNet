@@ -247,7 +247,6 @@ namespace PriconneBotConsoleApp.Script
             {
                 // TODO : 1-5をコンストで示す方法を調べる
                 var bossNumber = int.Parse(Regex.Match(messageContent, @"\d").Value );
-                //var attackNumber = ConversionAttackNumber.StringToAttackNumber(Regex.Match(messageContent, @"\D{1,3}").Value);
                 var attackType = EnumMapper.Parse<AttackType>(Regex.Match(messageContent, @"\D{1,3}").Value);
 
                 // TODO:マジックナンバーを定数化

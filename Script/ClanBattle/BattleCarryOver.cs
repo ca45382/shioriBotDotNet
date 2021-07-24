@@ -101,7 +101,6 @@ namespace PriconneBotConsoleApp.Script
 
             if (EnumMapper.TryParse<AttackType>(splitMessage.First(), out var attackType) 
                 && attackType == AttackType.CarryOver)
-            //if (ConversionAttackNumber.StringToAttackNumber(splitMessage.First()) == 99)
             {
                 var userCarryOverData = CommandToCarryOverData(splitMessage);
 

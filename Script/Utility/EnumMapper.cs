@@ -66,23 +66,6 @@ namespace PriconneBotConsoleApp.Script
             return DescriptionType.Single;
         }
 
-        //public static T Parse<T>(string input) where T : Enum
-        //{
-        //    foreach (T value in typeof(T).GetEnumValues())
-        //    {
-        //        var data = GetMultiDescriptionData(value);
-
-        //        if (data.LongDescription == input
-        //            || data.ShortDescription == input
-        //            || data.Aliases.Any(x => x == input))
-        //        {
-        //            return value;
-        //        }
-        //    }
-
-        //    throw new ArgumentException($"{input} is not found in {typeof(T).FullName}");
-        //}
-
         public static T Parse<T>(string input) where T : Enum
             => (T)m_ParseCache.GetValueOrInitialize(
                 input,
