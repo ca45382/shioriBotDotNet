@@ -43,7 +43,7 @@ namespace PriconneBotConsoleApp.Script
 
                 var stringData = string.Join(
                     ',', 
-                    ReportData.Select(x => $"{x.BossNumber}{ConversionAttackNumber.AttackNumberToString(x.AttackType)}").ToArray()
+                    ReportData.Select(x => $"{x.BossNumber}{((AttackType)x.AttackType).ToLabel()}").ToArray()
                 );
                 return $"{PlayerGuildName}({stringData})";
             }
@@ -107,13 +107,13 @@ namespace PriconneBotConsoleApp.Script
 
             if (userReportedData.Count() >= CommonDefine.MaxReportNumber)
             {
-                Task.Run(() => SendSystemMessage(m_UserMessage.Channel, EnumMapper.GetString(ErrorType.UpperLimitReport), 5));
+                Task.Run(() => SendSystemMessage(m_UserMessage.Channel, ErrorType.UpperLimitReport.ToLabel(), 5));
                 return;
             }
 
             if (DatabaseReportDataController.CreateReportData(reportData))
             {
-                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.GetString(ReactionType.Success))));
+                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel())));
             }
 
             return;
@@ -146,7 +146,7 @@ namespace PriconneBotConsoleApp.Script
             var removeData = recentReportData.Last();
             if (DatabaseReportDataController.DeleteReportData(removeData))
             {
-                _ = m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.GetString(ReactionType.Success)));
+                _ = m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
                 // TODO : マジックナンバーどこかで定義
                 var deleteSpan = 30;
 
@@ -155,7 +155,7 @@ namespace PriconneBotConsoleApp.Script
                     // TODO : 送信用の関数を作成したい。
                     _ = SendSystemMessage(
                         m_UserMessage.Channel,
-                        string.Format(EnumMapper.GetString(InfomationType.DeleteInsted), playerData.UserID, deleteSpan),
+                        string.Format(InfomationType.DeleteInsted.ToLabel(), playerData.UserID, deleteSpan),
                         deleteSpan
                     );
                 }
@@ -199,13 +199,13 @@ namespace PriconneBotConsoleApp.Script
 
             if (userReportedData.Count() >= CommonDefine.MaxReportNumber)
             {
-                Task.Run(() => SendSystemMessage(m_UserMessage.Channel, EnumMapper.GetString(ErrorType.UpperLimitReport) , deleteSpan));
+                Task.Run(() => SendSystemMessage(m_UserMessage.Channel, ErrorType.UpperLimitReport.ToLabel() , deleteSpan));
                 return;
             }
 
             if (DatabaseReportDataController.CreateReportData(reportData))
             {
-                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.GetString(ReactionType.Success))));
+                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel())));
             }
 
             return;
@@ -220,7 +220,7 @@ namespace PriconneBotConsoleApp.Script
             var clanReportData = DatabaseReportDataController.GetReportData(m_ClanData);
             if (DatabaseReportDataController.DeleteReportData(clanReportData))
             {
-                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.GetString(ReactionType.Success))));
+                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel())));
             }
         }
 
@@ -247,15 +247,16 @@ namespace PriconneBotConsoleApp.Script
             {
                 // TODO : 1-5をコンストで示す方法を調べる
                 var bossNumber = int.Parse(Regex.Match(messageContent, @"\d").Value );
-                var attackNumber = ConversionAttackNumber.StringToAttackNumber(Regex.Match(messageContent, @"\D{1,3}").Value);
+                //var attackNumber = ConversionAttackNumber.StringToAttackNumber(Regex.Match(messageContent, @"\D{1,3}").Value);
+                var attackType = EnumMapper.Parse<AttackType>(Regex.Match(messageContent, @"\D{1,3}").Value);
 
                 // TODO:マジックナンバーを定数化
-                if (attackNumber == 0 || attackNumber == 99)
+                if (attackType == AttackType.Unknown || attackType == AttackType.CarryOver)
                 {
                     return null;
                 }
 
-                userReportData.AttackType = (byte)attackNumber;
+                userReportData.AttackType = (byte)attackType;
                 userReportData.BossNumber = (byte)bossNumber;
             }
 

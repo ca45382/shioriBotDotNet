@@ -331,10 +331,10 @@ namespace PriconneBotConsoleApp.Script
         {
             ComponentBuilder componentBuilder = new();
             // TODO : GetDescriptionを修正
-            componentBuilder.WithButton("開始", ButtonType.StartBattle.ToString(), style: ButtonStyle.Secondary, emote: new Emoji(EnumMapper.I.GetString(ButtonType.StartBattle)));
-            componentBuilder.WithButton("完了", ButtonType.FinishBattle.ToString(), style: ButtonStyle.Secondary, emote: new Emoji(EnumMapper.I.GetString(ButtonType.FinishBattle)));
-            componentBuilder.WithButton("討伐", ButtonType.SubdueBoss.ToString(), style: ButtonStyle.Secondary, emote: new Emoji(EnumMapper.I.GetString(ButtonType.SubdueBoss)));
-            componentBuilder.WithButton("取消", ButtonType.CancelBattle.ToString(), style: ButtonStyle.Danger, emote: new Emoji(EnumMapper.I.GetString(ButtonType.CancelBattle)));
+            componentBuilder.WithButton("開始", ButtonType.StartBattle.ToString(), style: ButtonStyle.Secondary, emote: new Emoji(ButtonType.StartBattle.ToLabel()));
+            componentBuilder.WithButton("完了", ButtonType.FinishBattle.ToString(), style: ButtonStyle.Secondary, emote: new Emoji(ButtonType.FinishBattle.ToLabel()));
+            componentBuilder.WithButton("討伐", ButtonType.SubdueBoss.ToString(), style: ButtonStyle.Secondary, emote: new Emoji(ButtonType.SubdueBoss.ToLabel()));
+            componentBuilder.WithButton("取消", ButtonType.CancelBattle.ToString(), style: ButtonStyle.Danger, emote: new Emoji(ButtonType.CancelBattle.ToLabel()));
 
             return componentBuilder.Build();
         }

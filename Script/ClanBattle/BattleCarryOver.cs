@@ -98,7 +98,10 @@ namespace PriconneBotConsoleApp.Script
             }
 
             // TODO : 持ち越し番号をEnum化
-            if (ConversionAttackNumber.StringToAttackNumber(splitMessage.First()) == 99)
+
+            if (EnumMapper.TryParse<AttackType>(splitMessage.First(), out var attackType) 
+                && attackType == AttackType.CarryOver)
+            //if (ConversionAttackNumber.StringToAttackNumber(splitMessage.First()) == 99)
             {
                 var userCarryOverData = CommandToCarryOverData(splitMessage);
 
@@ -145,7 +148,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (result)
             {
-                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
+                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel())));
             }
         }
 
@@ -168,7 +171,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (DeleteCarryOverData(playerData, deleteNumber))
             {
-                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
+                Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel())));
             }
         }
 
@@ -212,15 +215,17 @@ namespace PriconneBotConsoleApp.Script
             }
 
             DatabaseCarryOverController.DeleteCarryOverData(carryOverList);
-            Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success))));
+            Task.Run(() => m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel())));
         }
 
         private CarryOverData CommandToCarryOverData(string[] messageData)
         {
             const int bossNumberColumn = 1;
             const int remainTimeColumn = 2;
+            const int messageMinLength = 3;
 
-            if (!byte.TryParse(messageData[bossNumberColumn], out var bossNumber) || !byte.TryParse(messageData[remainTimeColumn], out var remainTime)
+            if (messageData.Length < messageMinLength ||
+                !byte.TryParse(messageData[bossNumberColumn], out var bossNumber) || !byte.TryParse(messageData[remainTimeColumn], out var remainTime)
                 || bossNumber < CommonDefine.MinBossNumber || bossNumber > CommonDefine.MaxBossNumber
                 || remainTime < CommonDefine.MinBattleTime || remainTime > CommonDefine.MaxBattleTime)
             {

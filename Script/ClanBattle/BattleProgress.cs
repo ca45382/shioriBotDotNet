@@ -41,11 +41,12 @@ namespace PriconneBotConsoleApp.Script
             public string GetNameWithData()
             {
                 var stringBuilder = new StringBuilder();
-                stringBuilder.Append(new Emoji(EnumMapper.I.GetString((ProgressStatus)ProgressData.Status)).Name + " ");
+                stringBuilder.Append(new Emoji(((ProgressStatus)ProgressData.Status).ToLabel()).Name + " ");
                 stringBuilder.Append((ProgressData.CarryOverFlag ? "持" : "　") + " ");
                 stringBuilder.Append(ProgressData.Damage.ToString().PadLeft(6, ' ') + "@");
                 stringBuilder.Append(ProgressData.RemainTime.ToString().PadLeft(2, '0') + " ");
-                stringBuilder.Append(ConversionAttackNumber.AttackNumberToShortString(ProgressData.AttackType) + " ");
+                stringBuilder.Append(EnumMapper.ToShortLabel((AttackType)ProgressData.AttackType) + " ");
+                //stringBuilder.Append(ConversionAttackNumber.AttackNumberToShortString(ProgressData.AttackType) + " ");
                 stringBuilder.Append(DatabaseReportDataController.GetReportCount(PlayerData).ToString() + " ");
                 stringBuilder.Append(PlayerData.GuildUserName + " ");
 
@@ -168,7 +169,7 @@ namespace PriconneBotConsoleApp.Script
 
                 if (DatabaseProgressController.CreateProgressData(m_UserProgressData))
                 {
-                    _ = m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success)));
+                    _ = m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
                     await SendClanProgressList();
                     return true;
                 }
@@ -177,7 +178,7 @@ namespace PriconneBotConsoleApp.Script
             {
                 if (DatabaseProgressController.ModifyProgressData(m_UserProgressData))
                 {
-                    _ = m_UserMessage.AddReactionAsync(new Emoji(EnumMapper.I.GetString(ReactionType.Success)));
+                    _ = m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
                     await SendClanProgressList();
                     return true;
                 }
@@ -320,30 +321,30 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private bool UpdateAttackData(string inputCommand)
         {
-            var attackNumber = (byte)ConversionAttackNumber.StringToAttackNumber(inputCommand);
-
-            if (attackNumber != 0)
+            try
             {
-                var attackType = attackNumber;
+                var attackType = EnumMapper.Parse<AttackType>(inputCommand);
 
                 if (m_UserProgressData == null)
                 {
                     m_UserProgressData = new ProgressData();
                 }
 
-                if (attackType == 99)
+                if (attackType == AttackType.CarryOver)
                 {
                     m_UserProgressData.CarryOverFlag = true;
                 }
                 else
                 {
-                    m_UserProgressData.AttackType = attackType;
+                    m_UserProgressData.AttackType = (byte)attackType;
                 }
 
                 return true;
             }
-
-            return false;
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>

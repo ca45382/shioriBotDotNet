@@ -238,7 +238,7 @@ namespace PriconneBotConsoleApp.Script
         {
             ComponentBuilder componentBuilder = new();
             componentBuilder.WithButton(
-                "更新", ButtonType.Reload.ToString(), style: ButtonStyle.Secondary, emote: new Emoji(EnumMapper.I.GetString(ButtonType.Reload)));
+                "更新", ButtonType.Reload.ToString(), style: ButtonStyle.Secondary, emote: new Emoji(ButtonType.Reload.ToLabel()));
             return componentBuilder.Build();
         }
 
