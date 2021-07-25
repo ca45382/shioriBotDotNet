@@ -276,7 +276,6 @@ namespace PriconneBotConsoleApp.Script
                 reportDataList.Where(r => r.PlayerID == x.PlayerID).ToArray()
             ));
 
-
             for (int i = 0; i <= CommonDefine.MaxReportNumber; i++)
             {
                 var players = playerInfoList.Where(x => x.ReportData.Length == i);
