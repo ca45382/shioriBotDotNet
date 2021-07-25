@@ -43,10 +43,9 @@ namespace PriconneBotConsoleApp.Script
             DatabaseTaskKillController.DeleteTaskKillData(taskKillList);
             DatabaseReportDataController.DeleteReportData(reportList, true);
 
-            List<Task> taskList = new();
-
             foreach (var clanData in m_ClanList)
             {
+                List<Task> taskList = new();
                 var guild = m_Client.GetGuild(clanData.ServerID);
                 var clanRole = guild?.GetRole(clanData.ClanRoleID);
 
@@ -56,7 +55,6 @@ namespace PriconneBotConsoleApp.Script
                 }
 
                 taskList.Add(new BattleTaskKill(clanRole).SyncTaskKillData());
-            //TODO: 安定しないので一度コメントアウト
                 taskList.Add(new BattleReservation(clanRole).UpdateSystemMessage());
 
                 for (int i = 0; i < CommonDefine.MaxBossNumber; i++)
@@ -64,9 +62,9 @@ namespace PriconneBotConsoleApp.Script
                     taskList.Add(new BattleDeclaration(clanRole, (BossNumberType)(i + 1)).UpdateDeclarationBotMessage());
                     // TODO:ここに進行の方も追加
                 }
-            }
 
-            await Task.WhenAll(taskList);
+                await Task.WhenAll(taskList);
+            }
 
             sw.Stop();
 
