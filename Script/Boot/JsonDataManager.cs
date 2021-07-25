@@ -1,83 +1,29 @@
 ﻿using System.IO;
-using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using System.Text.Json;
+using PriconneBotConsoleApp.DataModel;
 
 namespace PriconneBotConsoleApp.Script
 {
-    public class JsonDataManager
+    public static class BotConfigManager
     {
-        public string Token { get; }
+        private static BotConfigData m_configData;
 
-        private static BotConfigSchema m_configData;
+        public static string Token { get; private set; } = string.Empty;
 
-        public JsonDataManager()
+        public static string SQLConnectionString { get; private set; } = string.Empty;
+
+        public static void SetJsonConfig(string path)
         {
+            var jsonData = File.ReadAllText(path);
+            m_configData = JsonSerializer.Deserialize<BotConfigData>(jsonData);
+            Token = m_configData.DiscordConfig.Token;
+
+            SQLConnectionString = $"server = {m_configData.DatabaseConfig.Host}; " +
+            $"port = {m_configData.DatabaseConfig.Port}; " +
+            $"user = {m_configData.DatabaseConfig.User}; " +
+            $"password = {m_configData.DatabaseConfig.Password};" +
+            $"database = {m_configData.DatabaseConfig.Database};" +
+            $"SslMode = {m_configData.DatabaseConfig.SSLMode}";
         }
-
-        public JsonDataManager(string path)
-        {
-            var sr = new StreamReader(path);
-            var jsonData = sr.ReadToEnd();
-            m_configData = JsonConvert.DeserializeObject<BotConfigSchema>(jsonData);
-            Token = m_configData.DiscordSettingValue.DisordToken;
-        }
-
-        public string MySQLConnectionString =>
-            $"server = {m_configData.SqlConnectorValue.Host}; " +
-            $"port = {m_configData.SqlConnectorValue.Port}; " +
-            $"user = {m_configData.SqlConnectorValue.User}; " +
-            $"password = {m_configData.SqlConnectorValue.Password};" +
-            $"database = {m_configData.SqlConnectorValue.Database};" +
-            $"SslMode = {m_configData.SqlConnectorValue.sslMode}";
-
-        [DataContract]
-        private class BotConfigSchema
-        {
-#pragma warning disable CS0649
-            [DataMember(Name = "discord")]
-            public DiscordSetupData DiscordSettingValue;
-
-            [DataMember(Name = "database")]
-            public SqlDatabase SqlConnectorValue;
-
-            [DataContract]
-            public class DiscordSetupData
-            {
-                [DataMember(Name = "token")]
-                public string DisordToken;
-
-                [DataMember(Name = "intents")]
-                public DiscordIntentsData DiscordIntents;
-
-                public class DiscordIntentsData
-                {
-                    [DataMember(Name = "members")]
-                    public bool members;
-                }
-            }
-
-            [DataContract]
-            public class SqlDatabase
-            {
-                [DataMember(Name = "host")]
-                public string Host;
-
-                [DataMember(Name = "port")]
-                public int Port;
-
-                [DataMember(Name = "user")]
-                public string User;
-
-                [DataMember(Name = "password")]
-                public string Password;
-
-                [DataMember(Name = "database")]
-                public string Database;
-
-                [DataMember(Name = "sslmode")]
-                public string sslMode;
-            }
-        }
-#pragma warning restore CA0649
     }
 }
