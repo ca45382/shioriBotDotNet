@@ -26,7 +26,6 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         public async Task MainAsync()
         {
-
             BotConfigManager.SetJsonConfig(ConfigPath);
 
             m_config = new DiscordSocketConfig

@@ -6,7 +6,7 @@ namespace PriconneBotConsoleApp.Script
 {
     public static class BotConfigManager
     {
-        private static BotConfigData m_configData;
+        private static BotConfigData s_ConfigData;
 
         public static string Token { get; private set; } = string.Empty;
 
@@ -15,15 +15,15 @@ namespace PriconneBotConsoleApp.Script
         public static void SetJsonConfig(string path)
         {
             var jsonData = File.ReadAllText(path);
-            m_configData = JsonSerializer.Deserialize<BotConfigData>(jsonData);
-            Token = m_configData.DiscordConfig.Token;
+            s_ConfigData = JsonSerializer.Deserialize<BotConfigData>(jsonData);
+            Token = s_ConfigData.DiscordConfig.Token;
 
-            SQLConnectionString = $"server = {m_configData.DatabaseConfig.Host}; " +
-            $"port = {m_configData.DatabaseConfig.Port}; " +
-            $"user = {m_configData.DatabaseConfig.User}; " +
-            $"password = {m_configData.DatabaseConfig.Password};" +
-            $"database = {m_configData.DatabaseConfig.Database};" +
-            $"SslMode = {m_configData.DatabaseConfig.SSLMode}";
+            SQLConnectionString = $"server = {s_ConfigData.DatabaseConfig.Host};" +
+            $"port = {s_ConfigData.DatabaseConfig.Port};" +
+            $"user = {s_ConfigData.DatabaseConfig.User};" +
+            $"password = {s_ConfigData.DatabaseConfig.Password};" +
+            $"database = {s_ConfigData.DatabaseConfig.Database};" +
+            $"SslMode = {s_ConfigData.DatabaseConfig.SSLMode}";
         }
     }
 }
