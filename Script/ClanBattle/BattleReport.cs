@@ -244,10 +244,10 @@ namespace PriconneBotConsoleApp.Script
 
             if (Regex.IsMatch(messageContent, @"\d\D{1,3}"))
             {
-                var bossNumber = int.Parse(Regex.Match(messageContent, @"\d").Value );
-                var attackType = EnumMapper.Parse<AttackType>(Regex.Match(messageContent, @"\D{1,3}").Value);
+                var bossNumber = int.Parse(Regex.Match(messageContent, @"\d").Value);
 
-                if (attackType == AttackType.Unknown || attackType == AttackType.CarryOver)
+                if (!EnumMapper.TryParse<AttackType>(Regex.Match(messageContent, @"\D{1,3}").Value, out var attackType)
+                    || attackType == AttackType.Unknown || attackType == AttackType.CarryOver)
                 {
                     return null;
                 }
