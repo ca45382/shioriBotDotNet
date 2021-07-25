@@ -31,9 +31,6 @@ namespace PriconneBotConsoleApp.Database
         public DbSet<CarryOverData> CarryOverData { get; set; }
         public DbSet<TaskKillData> TaskKillData { get; set; }
 
-
-        public static readonly JsonDataManager JsonData = new JsonDataManager();
-
         // TODO: 動的に取得する
         public static readonly MariaDbServerVersion ServerVersion = new MariaDbServerVersion(new Version(10, 3, 27));
 
@@ -42,7 +39,7 @@ namespace PriconneBotConsoleApp.Database
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseMySql(JsonData.MySQLConnectionString, ServerVersion);
+            => optionsBuilder.UseMySql(BotConfigManager.SQLConnectionString, ServerVersion);
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

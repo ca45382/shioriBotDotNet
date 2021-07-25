@@ -26,8 +26,7 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         public async Task MainAsync()
         {
-
-            var jsonSettingData = new JsonDataManager(ConfigPath);
+            BotConfigManager.SetJsonConfig(ConfigPath);
 
             m_config = new DiscordSocketConfig
             {
@@ -51,7 +50,7 @@ namespace PriconneBotConsoleApp.Script
             var services = new ServiceCollection().BuildServiceProvider();
 
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
-            await m_client.LoginAsync(TokenType.Bot, jsonSettingData.Token);
+            await m_client.LoginAsync(TokenType.Bot, BotConfigManager.Token);
             await m_client.StartAsync();
             await RefreshInUpdateDate();
             await Task.Delay(-1);
