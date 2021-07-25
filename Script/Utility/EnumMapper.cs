@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -18,11 +19,11 @@ namespace PriconneBotConsoleApp.Script
             Multi,
         }
 
-        private readonly static Dictionary<Type, DescriptionType> m_DescriptionTypeDictionary = new();
+        private readonly static ConcurrentDictionary<Type, DescriptionType> m_DescriptionTypeDictionary = new();
 
-        private readonly static Dictionary<(Type, Enum), string> m_SingleDescriptionDictionary = new();
-        private readonly static Dictionary<(Type, Enum), MultiDescriptionData> m_MultiDescriptionDictionary = new();
-        private readonly static Dictionary<string, Enum> m_ParseCache = new();
+        private readonly static ConcurrentDictionary<(Type, Enum), string> m_SingleDescriptionDictionary = new();
+        private readonly static ConcurrentDictionary<(Type, Enum), MultiDescriptionData> m_MultiDescriptionDictionary = new();
+        private readonly static ConcurrentDictionary<string, Enum> m_ParseCache = new();
 
 
         public static string ToLabel<T>(this T data) where T : Enum
