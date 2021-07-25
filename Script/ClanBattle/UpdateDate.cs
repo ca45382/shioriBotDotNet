@@ -56,13 +56,14 @@ namespace PriconneBotConsoleApp.Script
                 }
 
                 taskList.Add(new BattleTaskKill(clanRole).SyncTaskKillData());
-                taskList.Add(new BattleReservation(clanRole).UpdateSystemMessage());
+                // TODO : 安定しないので一度コメントアウト
+                //taskList.Add(new BattleReservation(clanRole).UpdateSystemMessage());
 
-                for (int i = 0; i < CommonDefine.MaxBossNumber; i++)
-                {
-                    taskList.Add(new BattleDeclaration(clanRole, (BossNumberType)(i + 1)).UpdateDeclarationBotMessage());
-                    // TODO:ここに進行の方も追加
-                }
+                //for (int i = 0; i < CommonDefine.MaxBossNumber; i++)
+                //{
+                //    taskList.Add(new BattleDeclaration(clanRole, (BossNumberType)(i + 1)).UpdateDeclarationBotMessage());
+                //    // TODO:ここに進行の方も追加
+                //}
             }
 
             await Task.WhenAll(taskList);
