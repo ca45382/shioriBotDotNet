@@ -41,7 +41,7 @@ namespace PriconneBotConsoleApp.Script
 
         public async Task SyncTaskKillData()
         {
-            if (m_UserRole == null)
+            if (m_TaskKillRole == null)
             {
                 return;
             }
