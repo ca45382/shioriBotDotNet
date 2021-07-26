@@ -27,6 +27,7 @@ namespace PriconneBotConsoleApp.Script
         public async Task MainAsync()
         {
             BotConfigManager.SetJsonConfig(ConfigPath);
+            CommandMapper.InitCommandCache();
 
             m_config = new DiscordSocketConfig
             {
@@ -59,24 +60,24 @@ namespace PriconneBotConsoleApp.Script
         /// <summary>
         /// メッセージの受信処理
         /// </summary>
-        /// <param name="messageParam"></param>
+        /// <param name="socketMessage"></param>
         /// <returns></returns>
-        private async Task CommandRecieved(SocketMessage messageParam)
+        private async Task CommandRecieved(SocketMessage socketMessage)
         {
-            if (messageParam is not SocketUserMessage message)
+            if (socketMessage is not SocketUserMessage socketUserMessage)
             {
                 return;
             }
 
-            Console.WriteLine($"{message.Channel.Name} {message.Author.Username}:{message}");
+            Console.WriteLine($"{socketUserMessage.Channel.Name} {socketUserMessage.Author.Username}:{socketUserMessage}");
 
-            if (message.Author.IsBot)
+            if (socketUserMessage.Author.IsBot)
             {
                 return;
             }
 
-            var receiveMessages = new ReceiveMessageController(message);
-            await receiveMessages.RunMessageReceive();
+            var commandEventArgs = new CommandEventArgs(socketUserMessage);
+            await CommandMapper.Invoke(commandEventArgs);
         }
 
         /// <summary>
