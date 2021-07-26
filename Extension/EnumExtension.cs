@@ -1,7 +1,8 @@
-﻿using PriconneBotConsoleApp.Attribute;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Reflection;
+using PriconneBotConsoleApp.Attribute;
+using PriconneBotConsoleApp.DataType;
 
 namespace PriconneBotConsoleApp.Extension
 {
@@ -26,5 +27,16 @@ namespace PriconneBotConsoleApp.Extension
                     ShortDescription = string.Empty,
                     Aliases = Array.Empty<string>(),
                 };
+
+        public static BossNumberType GetBossNumberType(this ChannelFeatureType channelFeatureType)
+            => channelFeatureType switch
+            {
+                ChannelFeatureType.ProgressBoss1ID => BossNumberType.Boss1Number,
+                ChannelFeatureType.ProgressBoss2ID => BossNumberType.Boss2Number,
+                ChannelFeatureType.ProgressBoss3ID => BossNumberType.Boss3Number,
+                ChannelFeatureType.ProgressBoss4ID => BossNumberType.Boss4Number,
+                ChannelFeatureType.ProgressBoss5ID => BossNumberType.Boss5Number,
+                _ => throw new ArgumentException($"Cannot cast to BossNumberType. {channelFeatureType}"),
+            };
     }
 }
