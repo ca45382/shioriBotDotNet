@@ -5,6 +5,9 @@
     {
         Unknown = 0,
 
+        /// <summary>すべてのチャンネルで利用できるコマンドにつけられる.</summary>
+        All = 9999,
+
         DeclareID = 1001,
         ReserveID = 1002,
         ReserveResultID = 1003,
