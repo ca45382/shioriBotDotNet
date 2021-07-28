@@ -14,9 +14,7 @@ namespace PriconneBotConsoleApp.Script
 {
     public class BattleCarryOver
     {
-        private readonly ClanData m_ClanData;
-        private readonly SocketUserMessage m_UserMessage;
-        private readonly SocketRole m_ClanRole;
+        private readonly CommandEventArgs m_CommandEventArgs;
 
         private class PlayerInfo
         {
@@ -47,165 +45,157 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
-        public BattleCarryOver(ClanData clanData, SocketUserMessage userMessage)
+        public BattleCarryOver(CommandEventArgs commandEventArgs)
         {
-            m_ClanData = clanData;
-            m_UserMessage = userMessage;
-            var guild = (userMessage.Channel as SocketTextChannel)?.Guild;
-            m_ClanRole = guild?.GetRole(clanData.ClanRoleID);
-        }
-
-        public async Task RunByMessage()
-        {
-            var messageContent = m_UserMessage.Content;
-
-            if (messageContent.StartsWith("!"))
-            {
-                if (messageContent.StartsWith("!init"))
-                {
-                    InitAllData();
-                }
-                else if (messageContent.StartsWith("!rm"))
-                {
-                    UpdateOtherPlayerData();
-                }
-                else if (messageContent.StartsWith("!list"))
-                {
-                    await SendClanCarryOverList();
-                }
-
-            }
-            else
-            {
-                UpdateCarryOverData();
-            }
+            m_CommandEventArgs = commandEventArgs;
         }
 
         /// <summary>
-        /// 個人の持ち越し所持・消化報告
+        /// 持ち越しを登録するか更新する. 引数は2以上
         /// </summary>
-        private void UpdateCarryOverData()
+        public void UpdateCarryOverData()
         {
-            const int minCommandLength = 1;
-            // TODO : " "を定数化する。
-            var splitMessage = m_UserMessage.Content.ZenToHan().Split(" ", StringSplitOptions.RemoveEmptyEntries);
-            var result = false;
+            var playerData = DatabasePlayerDataController
+                .LoadPlayerData(m_CommandEventArgs.Role, m_CommandEventArgs.SocketUserMessage.Author.Id);
 
-            if (splitMessage.Length < minCommandLength)
+            if (!byte.TryParse(m_CommandEventArgs.Arguments[0], out var bossNumber)
+                || !byte.TryParse(m_CommandEventArgs.Arguments[1], out var remainTime)
+                || bossNumber < CommonDefine.MinBossNumber || bossNumber > CommonDefine.MaxBossNumber
+                || remainTime < CommonDefine.MinBattleTime || remainTime > CommonDefine.MaxBattleTime
+                || playerData == null)
             {
                 return;
             }
 
-            // TODO : 持ち越し番号をEnum化
-
-            if (EnumMapper.TryParse<AttackType>(splitMessage.First(), out var attackType) 
-                && attackType == AttackType.CarryOver)
+            CarryOverData carryOverData = new()
             {
-                var userCarryOverData = CommandToCarryOverData(splitMessage);
+                BossNumber = bossNumber,
+                RemainTime = remainTime,
+                // TODO : " "を定数化する。
+                CommentData = string.Join(" ", m_CommandEventArgs.Arguments.Skip(2)),
+                PlayerID = playerData.PlayerID,
+            };
 
-                if (userCarryOverData == null)
-                {
-                    return;
-                }
+            var databaseCarryOverList = DatabaseCarryOverController.GetCarryOverData(playerData).ToArray();
+            var databaseCarryOverData = databaseCarryOverList.FirstOrDefault(x => x.BossNumber == carryOverData.BossNumber && x.RemainTime == carryOverData.RemainTime);
+            bool result = false;
 
-                var userID = m_UserMessage.Author.Id;
-                var playerData = DatabasePlayerDataController.LoadPlayerData(m_ClanRole, userID);
-
-                if (playerData == null)
-                {
-                    return;
-                }
-
-                var databaseCarryOverList = DatabaseCarryOverController.GetCarryOverData(playerData).ToArray();
-                var databaseCarryOverData = databaseCarryOverList.FirstOrDefault(x => x.BossNumber == userCarryOverData.BossNumber && x.RemainTime == userCarryOverData.RemainTime);
-
-                if (databaseCarryOverData == null && databaseCarryOverList.Length < CommonDefine.MaxCarryOverNumber)
-                {
-                    result = DatabaseCarryOverController.CreateCarryOverData(userCarryOverData);
-                }
-                else if (databaseCarryOverData != null)
-                {
-                    userCarryOverData.CarryOverID = databaseCarryOverData.CarryOverID;
-                    result = DatabaseCarryOverController.UpdateCarryOverData(userCarryOverData);
-                }
+            if (databaseCarryOverData != null)
+            {
+                carryOverData.CarryOverID = databaseCarryOverData.CarryOverID;
+                result = DatabaseCarryOverController.UpdateCarryOverData(carryOverData);
             }
-            // TODO:ここの消化記述を別にまとめたい
-            else if (splitMessage.First() == "消化")
+            else if (databaseCarryOverList.Length < CommonDefine.MaxCarryOverNumber)
             {
-                var playerData = DatabasePlayerDataController.LoadPlayerData(m_ClanRole, m_UserMessage.Author.Id);
-
-                if (splitMessage.Length > 1 && byte.TryParse(splitMessage[1], out byte deleteNumber))
-                {
-                    result = DeleteCarryOverData(playerData, deleteNumber);
-                }
-                else
-                {
-                    result = DeleteCarryOverData(playerData);
-                }
+                result = DatabaseCarryOverController.CreateCarryOverData(carryOverData);
             }
 
             if (result)
             {
-                _ = m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
+                _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
             }
         }
 
-        private void UpdateOtherPlayerData()
+        /// <summary>
+        /// 持ち越しデータを削除する時に用いる。引数0か1。
+        /// </summary>
+        public void DeleteCarryOverData()
         {
-            const int minCommandLength = 1;
+            const int defaultDeleteNumber = 1;
+            var playerData = DatabasePlayerDataController.LoadPlayerData(m_CommandEventArgs.Role, m_CommandEventArgs.Author.Id);
 
-            // TODO : " "を定数化する。
-            var splitMessage = m_UserMessage.Content.ZenToHan().Split(" ", StringSplitOptions.RemoveEmptyEntries);
-
-            if (splitMessage.Length <= minCommandLength || m_UserMessage.MentionedUsers.FirstOrDefault()?.Id is not ulong userID)
+            try
+            {
+                if (byte.TryParse(m_CommandEventArgs.Arguments.ElementAtOrDefault(0), out var deleteNumber))
+                {
+                    DeletePlayerCarryOverData(playerData, deleteNumber);
+                }
+                else
+                {
+                    DeletePlayerCarryOverData(playerData, defaultDeleteNumber);
+                }
+            }
+            catch
             {
                 return;
             }
 
-            // コマンドは `!rm @削除対象のユーザー 古い方から何番目か` としている。
-            var deleteNumber = (splitMessage.Length > minCommandLength + 1 && byte.TryParse(splitMessage[minCommandLength + 1], out var number)) ? number : (byte)0;
+            _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(ReactionType.Success.ToEmoji());
+        }
 
-            var playerData = DatabasePlayerDataController.LoadPlayerData(m_ClanRole, userID);
+        /// <summary>
+        /// 他人の持越しを削除する。引数は2つ必要とする。
+        /// </summary>
+        public void DeleteOtherPlayerData()
+        {
+            SocketGuildUser targetUser;
 
-            if (DeleteCarryOverData(playerData, deleteNumber))
+            if (MentionUtils.TryParseUser(m_CommandEventArgs.Arguments[0], out var userID) ||
+                ulong.TryParse(m_CommandEventArgs.Arguments[0], out userID))
             {
-                _ = m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
+                targetUser = m_CommandEventArgs.Role.Guild.GetUser(userID);
+            }
+            else
+            {
+                throw new ArgumentNullException();
+            }
+
+            // コマンドは `!rm @削除対象のユーザー 古い方から何番目か` としている。
+            if (!byte.TryParse(m_CommandEventArgs.Arguments[1], out var number)
+                || number > CommonDefine.MaxReportNumber || number <= 0)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            var playerData = DatabasePlayerDataController.LoadPlayerData(m_CommandEventArgs.Role, targetUser.Id);
+
+            try
+            {
+                DeletePlayerCarryOverData(playerData, number);
+                _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
         }
 
+        /// <summary>
+        /// 持ち越しリストを表示するコマンド。引数0か1。
+        /// </summary>
+        /// <returns></returns>
         private async Task SendClanCarryOverList()
         {
             var clanCarryOverEmbed = CreateEmbedData();
-            await m_UserMessage.Channel.SendMessageAsync(embed: clanCarryOverEmbed);
+            await m_CommandEventArgs.Channel.SendMessageAsync(embed: clanCarryOverEmbed);
         }
 
-        private bool DeleteCarryOverData(PlayerData playerData, byte deleteNumber = 0)
+        private void DeletePlayerCarryOverData(PlayerData playerData, byte deleteNumber)
         {
             var carryOverList = DatabaseCarryOverController.GetCarryOverData(playerData)
                 .OrderBy(x => x.DateTime).ToArray();
 
             if (carryOverList.Length == 0)
             {
-                return false;
+                throw new ArgumentOutOfRangeException();
             }
-
-            var result = false;
 
             if (deleteNumber > 0 && deleteNumber <= carryOverList.Length)
             {
-                result = DatabaseCarryOverController.DeleteCarryOverData(carryOverList[deleteNumber - 1]);
+                DatabaseCarryOverController.DeleteCarryOverData(carryOverList[deleteNumber - 1]);
             }
             else
             {
-                result = DatabaseCarryOverController.DeleteCarryOverData(carryOverList.First());
+                DatabaseCarryOverController.DeleteCarryOverData(carryOverList.First());
             }
-
-            return result;
         }
 
-        private void InitAllData()
+        /// <summary>
+        /// 全ての持ち越しを削除する。引数は0。
+        /// </summary>
+        public void InitAllData()
         {
-            var carryOverList = DatabaseCarryOverController.GetCarryOverData(m_ClanData);
+            var carryOverList = DatabaseCarryOverController.GetCarryOverData(m_CommandEventArgs.ClanData);
 
             if (!carryOverList.Any())
             {
@@ -213,41 +203,17 @@ namespace PriconneBotConsoleApp.Script
             }
 
             DatabaseCarryOverController.DeleteCarryOverData(carryOverList);
-            _ = m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
-        }
-
-        private CarryOverData CommandToCarryOverData(string[] messageData)
-        {
-            const int bossNumberColumn = 1;
-            const int remainTimeColumn = 2;
-            const int messageMinLength = 3;
-
-            if (messageData.Length < messageMinLength ||
-                !byte.TryParse(messageData[bossNumberColumn], out var bossNumber) || !byte.TryParse(messageData[remainTimeColumn], out var remainTime)
-                || bossNumber < CommonDefine.MinBossNumber || bossNumber > CommonDefine.MaxBossNumber
-                || remainTime < CommonDefine.MinBattleTime || remainTime > CommonDefine.MaxBattleTime)
-            {
-                return null;
-            }
-
-            var playerID = DatabasePlayerDataController.LoadPlayerData(m_ClanRole, m_UserMessage.Author.Id).PlayerID;
-
-            return new CarryOverData()
-            {
-                BossNumber = bossNumber,
-                RemainTime = remainTime,
-                // TODO : " "を定数化する。
-                CommentData = string.Join(" ", messageData.Skip(3)),
-                PlayerID = playerID,
-            };
+            _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
+            _ = m_CommandEventArgs.Channel.SendTimedMessageAsync(TimeDefine.SuccessMessageDisplayTime,
+                string.Format(EnumMapper.ToLabel(InfomationType.DeleteAllCarryOverData), TimeDefine.SuccessMessageDisplayTime));
         }
 
         // 持ち越しを表示するUIを考える
         private Embed CreateEmbedData()
         {
-            var carryOverArray = DatabaseCarryOverController.GetCarryOverData(m_ClanData)
+            var carryOverArray = DatabaseCarryOverController.GetCarryOverData(m_CommandEventArgs.ClanData)
                 .OrderBy(x => x.DateTime);
-            var playerArray = DatabasePlayerDataController.LoadPlayerData(m_ClanData);
+            var playerArray = DatabasePlayerDataController.LoadPlayerData(m_CommandEventArgs.ClanData);
             List<PlayerInfo> carryOverStringList = new();
 
             foreach (var playerData in playerArray)

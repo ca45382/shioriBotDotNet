@@ -14,5 +14,9 @@ namespace PriconneBotConsoleApp.DataType
         // 凸報告関連
         [Description("<@{0}>の凸報告を代理削除しました。\nこのメッセージは{1}秒後削除されます。")]
         DeleteInsted,
+
+        //持ち越し関連
+        [Description("持ち越しをすべて削除しました。\nこのメッセージは{0}秒後削除されます。")]
+        DeleteAllCarryOverData,
     }
 }

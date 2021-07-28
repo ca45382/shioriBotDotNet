@@ -52,7 +52,7 @@ namespace PriconneBotConsoleApp.Script
         public static Emoji ToEmoji(this ButtonType buttonType)
             => new(buttonType.ToShortLabel());
 
-        public static Emoji emoji(this ReactionType reactionType)
+        public static Emoji ToEmoji(this ReactionType reactionType)
             => new(reactionType.ToLabel());
 
         private static DescriptionType GetDescriptionType<T>() where T : Enum
