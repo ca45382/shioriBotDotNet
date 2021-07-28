@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 
 namespace PriconneBotConsoleApp.Extension
 {
-    public static class IEnumerableExtension
+    public static class EnumerableExtension
     {
-        public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
+        public static void ForEach<T>([NotNull] this IEnumerable<T> source, [NotNull] Action<T> action)
         {
-            foreach (T element in source)
+            foreach (var element in source)
             {
                 action(element);
-            }  
+            }
         }
     }
 }

@@ -7,56 +7,77 @@ using System.Threading.Tasks;
 using PriconneBotConsoleApp.Attribute;
 using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.DataType;
+using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Script
 {
     public static class CommandMapper
     {
-        private readonly static ConcurrentDictionary<(ChannelFeatureType, string), (CommandAttribute Info, Func<CommandEventArgs, Task> Handler)> m_CommandCache = new();
+        /// <summary>コマンドキャッシュのキーの型</summary>
+        /// <param name="ChannelFeature">対応するチャンネル</param>
+        /// <param name="Name">対応するコマンド名</param>
+        private record CacheKey(ChannelFeatureType ChannelFeature, string Name);
 
-        public static void InitCommandCache()
+        /// <summary>コマンドキャッシュの要素</summary>
+        private class CacheValue
         {
-            var searchOption = BindingFlags.Static | BindingFlags.Public;
-
-            foreach (var methodInfo in typeof(Commands).GetMethods(searchOption).AsEnumerable())
+            internal CacheValue(MethodInfo methodInfo)
             {
-                if (methodInfo.GetCustomAttribute<CommandAttribute>(false) is not CommandAttribute commandAttribute)
-                {
-                    continue;
-                }
+                Info = methodInfo.GetCustomAttribute<CommandAttribute>(false);
 
-                foreach (var commandName in commandAttribute.Names)
+                if (Info != null)
                 {
-                    foreach (var channelFeatureType in commandAttribute.ChannelTypes)
-                    {
-                        m_CommandCache[(channelFeatureType, commandName)] = (commandAttribute, (Func<CommandEventArgs, Task>)Delegate.CreateDelegate(typeof(Func<CommandEventArgs, Task>), methodInfo));
-                    }
+                    IsValid = true;
+                    Handler = (Func<CommandEventArgs, Task>)Delegate.CreateDelegate(typeof(Func<CommandEventArgs, Task>), methodInfo);
                 }
             }
 
-            return;
+            /// <summary>対象の<see cref="MethodInfo"/>に<see cref="CommandAttribute"/>がつけられているかどうか</summary>
+            internal bool IsValid { get; }
+
+            /// <summary>対象の<see cref="MethodInfo"/>につけられた<see cref="CommandAttribute"/></summary>
+            internal CommandAttribute Info { get; }
+
+            /// <summary>対象の<see cref="MethodInfo"/>の実体</summary>
+            internal Func<CommandEventArgs, Task> Handler { get; }
         }
+
+        private static ConcurrentDictionary<CacheKey, CacheValue> m_CommandCache;
+
+        public static void InitCommandCache()
+            => m_CommandCache = new(
+                typeof(Commands)
+                    .GetMethods(BindingFlags.Static | BindingFlags.Public)
+                    .Select(methodInfo => new CacheValue(methodInfo))
+                    .Where(cacheValue => cacheValue.IsValid)
+                    .SelectMany(
+                        valueTuple => valueTuple.Info.CompatibleChannels.SelectMany(
+                            _ => valueTuple.Info.Names,
+                            (channelFeature, name) => new CacheKey(channelFeature, name)
+                        ),
+                        (valueTuple, keyTuple) => (keyTuple, valueTuple))
+                    .ToDictionary(keyValueTuple => keyValueTuple.keyTuple, keyValueTuple => keyValueTuple.valueTuple)
+            );
 
         public static async Task Invoke(CommandEventArgs commandEventArgs)
         {
-            if ((m_CommandCache.TryGetValue((commandEventArgs.ChannelFeatureType, commandEventArgs.Name), out var functionData)
-                || m_CommandCache.TryGetValue((ChannelFeatureType.All, commandEventArgs.Name), out functionData)
-                || m_CommandCache.TryGetValue((commandEventArgs.ChannelFeatureType, string.Empty), out functionData)))
+            if (!m_CommandCache.TryGetValueMany(
+                out var functionData,
+                new(commandEventArgs.ChannelFeatureType, commandEventArgs.Name),
+                new(ChannelFeatureType.All, commandEventArgs.Name),
+                new(commandEventArgs.ChannelFeatureType, string.Empty)))
             {
-                if (functionData.Info.IsCompatibleArgumentLength(commandEventArgs.Arguments.Count))
-                {
-                    await functionData.Handler(commandEventArgs);
-                }
-                else
-                {
-                    throw new ArgumentException(
-                        $"Argument length {commandEventArgs.Arguments.Count} is incompatible; Expect : between {functionData.Info.MinArgumentLength} and {functionData.Info.MaxArgumentLength}\n{commandEventArgs.SocketUserMessage.Content}");
-                }
+                throw new KeyNotFoundException(commandEventArgs.SocketUserMessage.Content);
             }
-            else
+
+            if (!functionData.Info.IsCompatibleArgumentLength(commandEventArgs.Arguments.Count))
             {
-                throw new KeyNotFoundException($"{commandEventArgs.SocketUserMessage.Content}");
+                throw new ArgumentException(
+                    $"Argument length {commandEventArgs.Arguments.Count} is incompatible; Expect : between {functionData.Info.MinArgumentLength} and {functionData.Info.MaxArgumentLength}\n{commandEventArgs.SocketUserMessage.Content}"
+                );
             }
+
+            await functionData.Handler(commandEventArgs);
         }
     }
 }

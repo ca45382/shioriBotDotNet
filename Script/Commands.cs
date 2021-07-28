@@ -8,14 +8,13 @@ namespace PriconneBotConsoleApp.Script
 {
     public static class Commands
     {
-        [Command(
-            channelFeatureType: new[] { ChannelFeatureType.CarryOverID }
-        )]
+        [Command(compatibleChannels: ChannelFeatureType.CarryOverID)]
         public static async Task BattleCarryOver(CommandEventArgs commandEventArgs)
             => await new BattleCarryOver(commandEventArgs.ClanData, commandEventArgs.SocketUserMessage).RunByMessage();
 
         [Command(
-            channelFeatureType: new[]{ 
+            compatibleChannels: new[]
+            {
                 ChannelFeatureType.ProgressBoss1ID,
                 ChannelFeatureType.ProgressBoss2ID,
                 ChannelFeatureType.ProgressBoss3ID,
@@ -24,7 +23,10 @@ namespace PriconneBotConsoleApp.Script
             }
         )]
         public static async Task Progress(CommandEventArgs commandEventArgs)
-            => await new BattleProgress(commandEventArgs.ClanData, commandEventArgs.SocketUserMessage, (byte)commandEventArgs.ChannelFeatureType.GetBossNumberType())
+            => await new BattleProgress(
+                    commandEventArgs.ClanData,
+                    commandEventArgs.SocketUserMessage,
+                    (byte) commandEventArgs.ChannelFeatureType.GetBossNumberType())
                 .RunByMessage();
     }
 }
