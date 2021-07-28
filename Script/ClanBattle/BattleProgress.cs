@@ -61,7 +61,7 @@ namespace PriconneBotConsoleApp.Script
             {
                 clanData = DatabaseClanDataController.LoadClanData(m_UserRole);
             }
-            
+
             m_BossNumber = bossNumber;
             m_UserClanData = clanData;
             m_UserMessage = userMessage;
@@ -108,7 +108,7 @@ namespace PriconneBotConsoleApp.Script
             {
                 await UpdateProgressData();
             }
-            
+
             return;
         }
 
@@ -136,7 +136,7 @@ namespace PriconneBotConsoleApp.Script
             else if (UpdateDamageData(messageData))
             {
                 successFlag = true;
-            } 
+            }
             else if (m_UserProgressData == null)
             {
                 return false;
@@ -208,7 +208,7 @@ namespace PriconneBotConsoleApp.Script
             {
                 m_UserClanData.SetBossLap(m_BossNumber, lap);
             }
-            
+
             DatabaseClanDataController.UpdateClanData(m_UserClanData);
             await SendClanProgressList();
 
@@ -453,7 +453,7 @@ namespace PriconneBotConsoleApp.Script
             }
 
             m_UserProgressData.Damage = damegeData;
-            
+
             return true;
         }
 
