@@ -4,32 +4,38 @@ using PriconneBotConsoleApp.DataType;
 
 namespace PriconneBotConsoleApp.Attribute
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public class CommandAttribute : System.Attribute
     {
         public CommandAttribute(
+            string[] names = null,
             int minArgumentLength = 0,
             int maxArgumentLength = int.MaxValue,
-            string[] commandText = null,
-            params ChannelFeatureType[] channelFeatureType
-           )
+            params ChannelFeatureType[] compatibleChannels)
         {
-            Names = commandText ?? new[] { string.Empty };
-            ChannelTypes = channelFeatureType.Length == 0 ? new[] { ChannelFeatureType.All } : channelFeatureType;
-
+            Names = names ?? new[] { string.Empty };
             MinArgumentLength = minArgumentLength;
             MaxArgumentLength = maxArgumentLength;
+            CompatibleChannels = compatibleChannels.Length == 0 ? new[] { ChannelFeatureType.All } : compatibleChannels;
+        }
+
+        public CommandAttribute(
+            string name,
+            int minArgumentLength = 0,
+            int maxArgumentLength = int.MaxValue,
+            params ChannelFeatureType[] compatibleChannels)
+            : this(
+                name == null ? null : new[] { name },
+                minArgumentLength,
+                maxArgumentLength,
+                compatibleChannels)
+        {
         }
 
         /// <summary>
         /// 受け取ったコマンドを格納する
         /// </summary>
         public IReadOnlyList<string> Names { get; }
-
-        /// <summary>
-        /// 受け取ったコマンドが発信されたチャンネル
-        /// </summary>
-        public IReadOnlyList<ChannelFeatureType> ChannelTypes { get; }
 
         /// <summary>
         /// 引数の長さの最小値
@@ -41,7 +47,12 @@ namespace PriconneBotConsoleApp.Attribute
         /// </summary>
         public int MaxArgumentLength { get; }
 
+        /// <summary>
+        /// コマンドが対応するチャンネル
+        /// </summary>
+        public IReadOnlyList<ChannelFeatureType> CompatibleChannels { get; }
+
         public bool IsCompatibleArgumentLength(int argLength)
-            => (MinArgumentLength <= argLength && argLength <= MaxArgumentLength);
+            => MinArgumentLength <= argLength && argLength <= MaxArgumentLength;
     }
 }
