@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using PriconneBotConsoleApp.DataType;
+using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Attribute
 {
@@ -29,6 +30,19 @@ namespace PriconneBotConsoleApp.Attribute
                 minArgumentLength,
                 maxArgumentLength,
                 compatibleChannels)
+        {
+        }
+
+        public CommandAttribute(
+            AttackType attackType,
+            int minArgumentLength = 0,
+            int maxArgumentLength = int.MaxValue,
+            params ChannelFeatureType[] compatibleChannels)
+            : this(
+                  attackType.GetMultiDescription().Names,
+                  minArgumentLength,
+                  maxArgumentLength,
+                  compatibleChannels)
         {
         }
 

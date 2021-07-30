@@ -46,7 +46,7 @@ namespace PriconneBotConsoleApp.Script
         public static string ToShortLabel<T>(this T data) where T : Enum
             => GetMultiDescriptionData(data).ShortDescription;
 
-        private static string[] GetAliases<T>(this T data) where T : Enum
+        private static IReadOnlyList<string> GetAliases<T>(this T data) where T : Enum
             => GetMultiDescriptionData(data).Aliases;
 
         public static Emoji ToEmoji(this ButtonType buttonType)
