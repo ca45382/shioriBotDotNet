@@ -164,7 +164,7 @@ namespace PriconneBotConsoleApp.Script
         /// 持ち越しリストを表示するコマンド。引数0か1。
         /// </summary>
         /// <returns></returns>
-        private async Task SendClanCarryOverList()
+        public async Task SendClanCarryOverList()
         {
             var clanCarryOverEmbed = CreateEmbedData();
             await m_CommandEventArgs.Channel.SendMessageAsync(embed: clanCarryOverEmbed);

@@ -8,9 +8,67 @@ namespace PriconneBotConsoleApp.Script
 {
     public static class Commands
     {
-        [Command(compatibleChannels: ChannelFeatureType.CarryOverID)]
-        public static async Task BattleCarryOver(CommandEventArgs commandEventArgs)
-            => await new BattleCarryOver(commandEventArgs.ClanData, commandEventArgs.SocketUserMessage).RunByMessage();
+        // 持ち越し関連
+        [Command(AttackType.CarryOver,
+            2,
+            compatibleChannels: ChannelFeatureType.CarryOverID
+        )]
+        public static Task UpdateCarryOverData(CommandEventArgs commandEventArgs)
+        {
+            new BattleCarryOver(commandEventArgs).UpdateCarryOverData();
+            return Task.CompletedTask;
+        }
+
+        [Command("消化",
+            0,
+            1,
+            compatibleChannels: ChannelFeatureType.CarryOverID
+        )]
+        public static Task DeleteCarryOverData(CommandEventArgs commandEventArgs)
+        {
+            new BattleCarryOver(commandEventArgs).DeleteCarryOverData();
+            return Task.CompletedTask;
+        }
+
+        [Command( "!rm" ,
+            0,
+            2,
+            compatibleChannels: ChannelFeatureType.CarryOverID
+        )]
+        public static Task DeleteOtherPlayerCarryOverData(CommandEventArgs commandEventArgs)
+        {
+            if (commandEventArgs.Arguments.Count == 2)
+            {
+                new BattleCarryOver(commandEventArgs).DeleteOtherPlayerData();
+            }
+            else
+            {
+                new BattleCarryOver(commandEventArgs).DeleteCarryOverData();
+            }
+            
+            return Task.CompletedTask;
+        }
+
+        [Command("!list",
+            0,
+            0,
+            compatibleChannels: ChannelFeatureType.CarryOverID
+        )]
+        public static async Task DisplayCarryOverList(CommandEventArgs commandEventArgs)
+        {
+            await new BattleCarryOver(commandEventArgs).SendClanCarryOverList();
+        }
+
+        [Command("!init",
+            0,
+            0,
+            compatibleChannels: ChannelFeatureType.CarryOverID
+        )]
+        public static Task InitAllCarryOverData(CommandEventArgs commandEventArgs)
+        {
+            new BattleCarryOver(commandEventArgs).InitAllData();
+            return Task.CompletedTask;
+        }
 
         [Command(
             compatibleChannels: new[]
@@ -26,7 +84,7 @@ namespace PriconneBotConsoleApp.Script
             => await new BattleProgress(
                     commandEventArgs.ClanData,
                     commandEventArgs.SocketUserMessage,
-                    (byte) commandEventArgs.ChannelFeatureType.GetBossNumberType())
+                    (byte)commandEventArgs.ChannelFeatureType.GetBossNumberType())
                 .RunByMessage();
     }
 }
