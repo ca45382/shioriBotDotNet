@@ -35,10 +35,10 @@ namespace PriconneBotConsoleApp.Script
             };
 
         private static MultiDescriptionData GetMultiDescriptionData<T>(T data) where T : Enum
-            => m_MultiDescriptionDictionary.GetValueOrInitialize((typeof(T), data), data.GetMultiDescription);
+            => m_MultiDescriptionDictionary.GetValueOrInitialize((typeof(T), data), () =>  data.GetMultiDescription());
 
         private static string ToSingleLabel<T>(this T data) where T : Enum
-            => m_SingleDescriptionDictionary.GetValueOrInitialize((typeof(T), data), data.GetDescription);
+            => m_SingleDescriptionDictionary.GetValueOrInitialize((typeof(T), data), () => data.GetDescription());
 
         public static string ToLongLabel<T>(this T data) where T : Enum
             => GetMultiDescriptionData(data).LongDescription;
