@@ -1,4 +1,5 @@
 ﻿using PriconneBotConsoleApp.DataType;
+using PriconneBotConsoleApp.Extension;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -82,8 +83,30 @@ namespace PriconneBotConsoleApp.DataModel
             };
         }
 
+        public int GetBossLap(BossNumberType bossNumberType)
+            => GetBossLap((int)bossNumberType);
+
+        public void SetBossLap(BossNumberType bossNumberType, int bossLap)
+            => SetBossLap((int)bossNumberType, bossLap);
+
         /// <summary>
-        /// 最も周回数を返す
+        /// クラン内のチャンネルIDを返す。
+        /// </summary>
+        /// <param name="channelFeatureType"></param>
+        /// <returns></returns>
+        public ulong GetChannelID(ChannelFeatureType channelFeatureType)
+            => ChannelData?.GetChannelID(ClanID, channelFeatureType) ?? 0;
+
+        /// <summary>
+        /// クラン内のメッセージIDを返す。
+        /// </summary>
+        /// <param name="messageFeatureType"></param>
+        /// <returns></returns>
+        public ulong GetMessageID(MessageFeatureType messageFeatureType)
+            => MessageData?.GetMessageID(ClanID, messageFeatureType) ?? 0;
+
+        /// <summary>
+        /// 最も小さい周回数を返す
         /// </summary>
         /// <returns></returns>
         public int GetMinBossLap()
@@ -104,7 +127,7 @@ namespace PriconneBotConsoleApp.DataModel
             {
                 return (byte)BossNumberType.Boss5Number;
             }
-            if (Boss1Lap  == Boss2Lap + 1 )
+            if (Boss1Lap == Boss2Lap + 1)
             {
                 return (byte)BossNumberType.Boss1Number;
             }
@@ -145,5 +168,4 @@ namespace PriconneBotConsoleApp.DataModel
             }
         }
     }
-
 }
