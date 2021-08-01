@@ -2,7 +2,6 @@
 using PriconneBotConsoleApp.Attribute;
 using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.DataType;
-using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Script
 {
