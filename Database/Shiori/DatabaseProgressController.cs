@@ -23,10 +23,11 @@ namespace PriconneBotConsoleApp.Database
 
         public static IEnumerable<ProgressData> GetProgressData(PlayerData playerData, BossNumberType bossNumber)
         {
+            var playerID = playerData?.PlayerID ?? 0;
             using var databaseConnector = new DatabaseConnector();
 
             return databaseConnector.ProgressData.AsQueryable()
-                .Where(x => x.PlayerID == playerData.PlayerID && x.BossNumber == (byte)bossNumber && !x.DeleteFlag)
+                .Where(x => x.PlayerID == playerID && x.BossNumber == (byte)bossNumber && !x.DeleteFlag)
                 .ToArray();
         }
 
