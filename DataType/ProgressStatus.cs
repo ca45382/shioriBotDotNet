@@ -25,6 +25,6 @@ namespace PriconneBotConsoleApp.DataType
         SOS,
 
         [Description("🏃")]
-        CarryOver,
+        Fin,
     }
 }
