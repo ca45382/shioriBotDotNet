@@ -25,8 +25,8 @@ namespace PriconneBotConsoleApp.DataModel
             Author = SocketUserMessage.Author as SocketGuildUser;
             Channel = SocketUserMessage.Channel as SocketTextChannel;
 
-            var playerData = DatabasePlayerDataController.LoadPlayerData(Channel.Guild.Id, SocketUserMessage.Author.Id);
-            Role = Channel.Guild.GetRole(playerData?.ClanData.ClanRoleID ?? 0);
+            PlayerData = DatabasePlayerDataController.LoadPlayerData(Channel.Guild.Id, SocketUserMessage.Author.Id);
+            Role = Channel.Guild.GetRole(PlayerData?.ClanData.ClanRoleID ?? 0);
 
             if (Role == null)
             {
@@ -47,6 +47,7 @@ namespace PriconneBotConsoleApp.DataModel
         public SocketTextChannel Channel { get; }
         public SocketRole Role { get; }
         public ClanData ClanData { get; }
+        public PlayerData PlayerData { get; }
         public ChannelFeatureType ChannelFeatureType { get; }
     }
 }
