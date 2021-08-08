@@ -275,5 +275,37 @@ namespace PriconneBotConsoleApp.Script
          )]
         public static async Task UpdateProgressDamage(CommandEventArgs commandEventArgs)
              => await new BattleProgress(commandEventArgs).UpdateDamageData();
+
+        [Command("!list", 0, 0, ChannelFeatureType.ReportID)]
+        public static async Task ListReport(CommandEventArgs commandEventArgs)
+            => await new BattleReport(commandEventArgs).SendClanAttackList();
+
+        [Command("!rm", 0, 1, ChannelFeatureType.ReportID)]
+        public static Task RemovePlayerReportData(CommandEventArgs commandEventArgs)
+        {
+            new BattleReport(commandEventArgs).DeleteReportData();
+            return Task.CompletedTask;
+        }
+
+        [Command("!add", 3, 3, ChannelFeatureType.ReportID)]
+        public static Task RegisterOtherPlayerReportData(CommandEventArgs commandEventArgs)
+        {
+            new BattleReport(commandEventArgs).RegisterOtherUserReportData();
+            return Task.CompletedTask;
+        }
+
+        [Command("!init", 0, 0, ChannelFeatureType.ReportID)]
+        public static Task InitReportData(CommandEventArgs commandEventArgs)
+        {
+            new BattleReport(commandEventArgs).DeleteAllClanReport();
+            return Task.CompletedTask;
+        }
+
+        [Command(minArgumentLength: 0, maxArgumentLength: 0, compatibleChannels: ChannelFeatureType.ReportID)]
+        public static Task RegisterReportData(CommandEventArgs commandEventArgs)
+        {
+            new BattleReport(commandEventArgs).RegisterReportData();
+            return Task.CompletedTask;
+        }
     }
 }

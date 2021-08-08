@@ -4,7 +4,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
-using Discord.WebSocket;
 using PriconneBotConsoleApp.Database;
 using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.DataType;
@@ -15,10 +14,7 @@ namespace PriconneBotConsoleApp.Script
 {
     public class BattleReport
     {
-        private readonly ClanData m_ClanData;
-        private readonly SocketUserMessage m_UserMessage;
-        private readonly SocketRole m_ClanRole;
-        private readonly SocketGuild m_Guild;
+        private readonly CommandEventArgs m_CommandEventArgs;
 
         private class PlayerInfo
         {
@@ -48,71 +44,55 @@ namespace PriconneBotConsoleApp.Script
             }
         }
 
-        public BattleReport(ClanData clanData, SocketUserMessage userMessage)
+        public BattleReport(CommandEventArgs commandEventArgs)
         {
-            m_ClanData = clanData;
-            m_UserMessage = userMessage;
-            m_Guild = (userMessage.Channel as SocketTextChannel)?.Guild;
-            m_ClanRole = m_Guild?.GetRole(clanData.ClanRoleID);
-        }
-
-        public async Task RunByMessage()
-        {
-            if (m_UserMessage.Content.StartsWith("!"))
-            {
-                if (m_UserMessage.Content.StartsWith("!add"))
-                {
-                    RegisterOtherUserReportData();
-                }
-                else if (m_UserMessage.Content.StartsWith("!list"))
-                {
-                    await SendClanAttackList();
-                }
-                else if (m_UserMessage.Content.StartsWith("!rm"))
-                {
-                    DeleteReportData();
-                }
-                else if (m_UserMessage.Content.StartsWith("!init"))
-                {
-                    DeleteAllClanReport();
-                }
-            }
-            else
-            {
-                RegisterReportData();
-            }
+            m_CommandEventArgs = commandEventArgs;
         }
 
         /// <summary>
         /// 個人の凸報告
         /// </summary>
-        private void RegisterReportData()
+        public void RegisterReportData()
         {
-            var playerData = DatabasePlayerDataController.LoadPlayerData(m_ClanRole, m_UserMessage.Author.Id);
+            var reportData = new ReportData();
 
-            if (playerData == null)
+            if (Regex.IsMatch(m_CommandEventArgs.Name, @"\d\D{1,3}"))
+            {
+                var bossNumber = int.Parse(Regex.Match(m_CommandEventArgs.Name, @"\d").Value);
+
+                if (!EnumMapper.TryParse<AttackType>(Regex.Match(m_CommandEventArgs.Name, @"\D{1,3}").Value, out var attackType)
+                    || attackType == AttackType.Unknown || attackType == AttackType.CarryOver)
+                {
+                    return;
+                }
+
+                reportData.AttackType = (byte)attackType;
+                reportData.BossNumber = (byte)bossNumber;
+            }
+
+            if (reportData.BossNumber < CommonDefine.MinBossNumber || reportData.BossNumber > CommonDefine.MaxBossNumber)
             {
                 return;
             }
 
-            var reportData = StringToReportData(m_UserMessage.Content.ZenToHan(), playerData.PlayerID);
+            reportData.PlayerID = m_CommandEventArgs.PlayerData.PlayerID;
 
             if (reportData == null)
             {
                 return;
             }
 
-            var userReportedData = DatabaseReportDataController.GetReportData(playerData);
+            var userReportedData = DatabaseReportDataController.GetReportData(m_CommandEventArgs.PlayerData);
 
             if (userReportedData.Count() >= CommonDefine.MaxReportNumber)
             {
-                _ = m_UserMessage.Channel.SendTimedMessageAsync(TimeDefine.ErrorMessageDisplayTime, ErrorType.UpperLimitReport.ToLabel());
+                _ = m_CommandEventArgs.SocketUserMessage.Channel.SendTimedMessageAsync(TimeDefine.ErrorMessageDisplayTime, ErrorType.UpperLimitReport.ToLabel());
                 return;
             }
 
             if (DatabaseReportDataController.CreateReportData(reportData))
             {
-                _ = m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
+                _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
             }
 
             return;
@@ -121,18 +101,17 @@ namespace PriconneBotConsoleApp.Script
         /// <summary>
         /// 個人の最新の凸報告を削除する。
         /// </summary>
-        private void DeleteReportData()
+        public void DeleteReportData()
         {
-            var splitContent = m_UserMessage.Content.ZenToHan().Split(" ", StringSplitOptions.RemoveEmptyEntries);
             var playerData = new PlayerData();
-            if (splitContent.Length == 2
-                && ulong.TryParse(Regex.Match(splitContent[1], @"\d+").Value, out ulong registerUserID))
+            if (m_CommandEventArgs.Arguments.Count == 1
+                && ulong.TryParse(Regex.Match(m_CommandEventArgs.Arguments[0], @"\d+").Value, out ulong registerUserID))
             {
-                playerData = DatabasePlayerDataController.LoadPlayerData(m_ClanRole, registerUserID);
+                playerData = DatabasePlayerDataController.LoadPlayerData(m_CommandEventArgs.Role, registerUserID);
             }
             else
             {
-                playerData = DatabasePlayerDataController.LoadPlayerData(m_ClanRole, m_UserMessage.Author.Id);
+                playerData = m_CommandEventArgs.PlayerData;
             }
 
             if (playerData == null)
@@ -140,17 +119,16 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            var recentReportData = DatabaseReportDataController.GetReportData(playerData)
-                .OrderBy(x => x.DateTime).ToList();
-            var removeData = recentReportData.Last();
+            var removeData = DatabaseReportDataController.GetReportData(playerData)
+                .OrderBy(x => x.DateTime).Last();
 
             if (DatabaseReportDataController.DeleteReportData(removeData))
             {
-                _ = m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
+                _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
 
-                if (playerData.UserID != m_UserMessage.Author.Id)
+                if (playerData.UserID != m_CommandEventArgs.User.Id)
                 {
-                    _ = m_UserMessage.Channel.SendTimedMessageAsync(TimeDefine.SuccessMessageDisplayTime,
+                    _ = m_CommandEventArgs.SocketUserMessage.Channel.SendTimedMessageAsync(TimeDefine.SuccessMessageDisplayTime,
                         string.Format(InfomationType.DeleteInsted.ToLabel(), playerData.UserID, TimeDefine.SuccessMessageDisplayTime));
                 }
             }
@@ -159,60 +137,57 @@ namespace PriconneBotConsoleApp.Script
         /// <summary>
         /// 代理報告用
         /// </summary>
-        private void RegisterOtherUserReportData()
+        public void RegisterOtherUserReportData()
         {
-            var splitContent = m_UserMessage.Content.ZenToHan().Split(" ", StringSplitOptions.RemoveEmptyEntries);
-
-            if (splitContent.Length != CommonDefine.MaxReportNumber)
+            if ((!ulong.TryParse(m_CommandEventArgs.Arguments[0], out var registerUserID)
+                && !MentionUtils.TryParseUser(m_CommandEventArgs.Arguments[0], out registerUserID))
+                || !byte.TryParse(m_CommandEventArgs.Arguments[1], out var bossNumber)
+                || bossNumber > CommonDefine.MaxBossNumber || bossNumber < CommonDefine.MinBossNumber
+                || !EnumMapper.TryParse<AttackType>(m_CommandEventArgs.Arguments[2], out var attackType))
             {
                 return;
             }
 
-            if (!ulong.TryParse(Regex.Match(splitContent[1], @"\d+").Value, out ulong registerUserID))
-            {
-                return;
-            }
-
-            var registerPlayerData = DatabasePlayerDataController.LoadPlayerData(m_ClanRole, registerUserID);
+            var registerPlayerData = DatabasePlayerDataController.LoadPlayerData(m_CommandEventArgs.Role, registerUserID);
 
             if (registerPlayerData == null)
             {
                 return;
             }
 
-            var reportData = StringToReportData(splitContent[2], registerPlayerData.PlayerID);
-
-            if (reportData == null)
+            var reportData = new ReportData()
             {
-                return;
-            }
+                AttackType = (byte)attackType,
+                BossNumber = bossNumber,
+                PlayerID = registerUserID,
+            };
 
             var userReportedData = DatabaseReportDataController.GetReportData(registerPlayerData);
 
             if (userReportedData.Count() >= CommonDefine.MaxReportNumber)
             {
-                _ = m_UserMessage.Channel.SendTimedMessageAsync(TimeDefine.ErrorMessageDisplayTime, ErrorType.UpperLimitReport.ToLabel());
+                _ = m_CommandEventArgs.Channel.SendTimedMessageAsync(TimeDefine.ErrorMessageDisplayTime, ErrorType.UpperLimitReport.ToLabel());
                 return;
             }
 
             if (DatabaseReportDataController.CreateReportData(reportData))
             {
-                _ = m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
+                _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(EnumMapper.ToEmoji(ReactionType.Success));
             }
 
             return;
-
         }
 
         /// <summary>
         /// クランの凸報告を削除
         /// </summary>
-        private void DeleteAllClanReport()
+        public void DeleteAllClanReport()
         {
-            var clanReportData = DatabaseReportDataController.GetReportData(m_ClanData);
+            var clanReportData = DatabaseReportDataController.GetReportData(m_CommandEventArgs.ClanData);
             if (DatabaseReportDataController.DeleteReportData(clanReportData))
             {
-                _ = m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
+                _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(EnumMapper.ToEmoji(ReactionType.Success));
+                
             }
         }
 
@@ -220,43 +195,10 @@ namespace PriconneBotConsoleApp.Script
         /// 凸報告データ送信用
         /// </summary>
         /// <returns></returns>
-        private async Task SendClanAttackList()
+        public async Task SendClanAttackList()
         {
             var clanAttackEmbed = CreateClanReportData();
-            await m_UserMessage.Channel.SendMessageAsync(embed: clanAttackEmbed);
-        }
-
-        /// <summary>
-        /// メッセージ情報から報告データに変換する。
-        /// </summary>
-        /// <param name="messageContent">メッセージ内容</param>
-        /// <returns></returns>
-        private ReportData StringToReportData(string messageContent, ulong playerID)
-        {
-            var userReportData = new ReportData();
-
-            if (Regex.IsMatch(messageContent, @"\d\D{1,3}"))
-            {
-                var bossNumber = int.Parse(Regex.Match(messageContent, @"\d").Value);
-
-                if (!EnumMapper.TryParse<AttackType>(Regex.Match(messageContent, @"\D{1,3}").Value, out var attackType)
-                    || attackType == AttackType.Unknown || attackType == AttackType.CarryOver)
-                {
-                    return null;
-                }
-
-                userReportData.AttackType = (byte)attackType;
-                userReportData.BossNumber = (byte)bossNumber;
-            }
-
-            if (userReportData.BossNumber < CommonDefine.MinBossNumber || userReportData.BossNumber > CommonDefine.MaxBossNumber)
-            {
-                return null;
-            }
-
-            userReportData.PlayerID = playerID;
-
-            return userReportData;
+            await m_CommandEventArgs.SocketUserMessage.Channel.SendMessageAsync(embed: clanAttackEmbed);
         }
 
         /// <summary>
@@ -267,8 +209,8 @@ namespace PriconneBotConsoleApp.Script
         {
             var embedBuilder = new EmbedBuilder();
 
-            var clanPlayerDataList = DatabasePlayerDataController.LoadPlayerData(m_ClanData);
-            var reportDataList = DatabaseReportDataController.GetReportData(m_ClanData);
+            var clanPlayerDataList = DatabasePlayerDataController.LoadPlayerData(m_CommandEventArgs.ClanData);
+            var reportDataList = DatabaseReportDataController.GetReportData(m_CommandEventArgs.ClanData);
 
             var playerInfoList = clanPlayerDataList.Select(x => new PlayerInfo(
                 x.PlayerID,

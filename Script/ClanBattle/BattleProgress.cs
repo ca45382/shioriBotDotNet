@@ -9,7 +9,6 @@ using PriconneBotConsoleApp.Database;
 using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Define;
-using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Script
 {
