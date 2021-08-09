@@ -102,7 +102,7 @@ namespace PriconneBotConsoleApp.Script
         public void DeleteCarryOverData()
         {
             const int defaultDeleteNumber = 1;
-            var playerData = DatabasePlayerDataController.LoadPlayerData(m_CommandEventArgs.Role, m_CommandEventArgs.Author.Id);
+            var playerData = DatabasePlayerDataController.LoadPlayerData(m_CommandEventArgs.Role, m_CommandEventArgs.User.Id);
 
             try
             {

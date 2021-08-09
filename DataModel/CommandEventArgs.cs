@@ -22,7 +22,7 @@ namespace PriconneBotConsoleApp.DataModel
             var splitContents = SocketUserMessage.Content.ZenToHan().Split(' ', StringSplitOptions.RemoveEmptyEntries);
             Name = splitContents[0];
             Arguments = splitContents.Length > 1 ? splitContents.Skip(1).ToList() : Array.Empty<string>();
-            Author = SocketUserMessage.Author as SocketGuildUser;
+            User = SocketUserMessage.Author as SocketGuildUser;
             Channel = SocketUserMessage.Channel as SocketTextChannel;
 
             PlayerData = DatabasePlayerDataController.LoadPlayerData(Channel.Guild.Id, SocketUserMessage.Author.Id);
@@ -43,7 +43,7 @@ namespace PriconneBotConsoleApp.DataModel
         public SocketUserMessage SocketUserMessage { get; }
         public string Name { get; }
         public IReadOnlyList<string> Arguments { get; }
-        public SocketGuildUser Author { get; }
+        public SocketGuildUser User { get; }
         public SocketTextChannel Channel { get; }
         public SocketRole Role { get; }
         public ClanData ClanData { get; }
