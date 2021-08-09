@@ -5,10 +5,11 @@ using Discord.WebSocket;
 using PriconneBotConsoleApp.Database;
 using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Extension;
+using PriconneBotConsoleApp.Interface;
 
 namespace PriconneBotConsoleApp.Model
 {
-    public class CommandEventArgs : EventArgs
+    public class CommandEventArgs : EventArgs, IPlayerEvent
     {
         public CommandEventArgs(SocketUserMessage socketUserMessage)
         {
