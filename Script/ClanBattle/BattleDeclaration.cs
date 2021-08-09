@@ -80,9 +80,9 @@ namespace PriconneBotConsoleApp.Script
             if (m_UserMessage.Content.StartsWith("!call"))
             {
                 await DeclarationCallCommand();
-                var battleReservation = new BattleReservation(m_UserRole);
-                battleReservation.DeleteUnusedData(m_BossNumber);
-                await battleReservation.UpdateSystemMessage();
+                var battleReservationSummary = new BattleReservationSummary(m_UserRole);
+                battleReservationSummary.DeleteUnusedData(m_BossNumber);
+                await battleReservationSummary.UpdateMessage();
             }
         }
 
@@ -119,7 +119,7 @@ namespace PriconneBotConsoleApp.Script
 
                 case ButtonType.SubdueBoss:
                     await NextBossCommand();
-                    await new BattleReservation(m_UserRole).UpdateSystemMessage();
+                    await new BattleReservationSummary(m_UserRole).UpdateMessage();
                     return;
 
                 case ButtonType.CancelBattle:
@@ -128,7 +128,7 @@ namespace PriconneBotConsoleApp.Script
             }
 
             await UpdateDeclarationBotMessage();
-            await new BattleReservation(m_UserRole).UpdateSystemMessage();
+            await new BattleReservationSummary(m_UserRole).UpdateMessage();
         }
 
         /// <summary>
@@ -307,9 +307,9 @@ namespace PriconneBotConsoleApp.Script
             m_UserClanData.SetBossLap(m_BossNumber, nextBattleLap);
             DatabaseClanDataController.UpdateClanData(m_UserClanData);
 
-            var battleReservation = new BattleReservation(m_UserRole);
-            battleReservation.DeleteUnusedData(m_BossNumber);
-            await Task.WhenAll(SendDeclarationBotMessage(), battleReservation.UpdateSystemMessage());
+            var battleReservationSummary = new BattleReservationSummary(m_UserRole);
+            battleReservationSummary.DeleteUnusedData(m_BossNumber);
+            await Task.WhenAll(SendDeclarationBotMessage(), battleReservationSummary.UpdateMessage());
         }
 
         /// <summary>

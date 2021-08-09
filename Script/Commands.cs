@@ -307,5 +307,68 @@ namespace PriconneBotConsoleApp.Script
             new BattleReport(commandEventArgs).RegisterReportData();
             return Task.CompletedTask;
         }
+
+        [Command("予約", 0, compatibleChannels: ChannelFeatureType.ReserveID)]
+        public static Task ReservationCommand(CommandEventArgs commandEventArgs)
+        {
+            BattleReservation battleReservation = new(commandEventArgs);
+
+            if (commandEventArgs.Arguments.Count == 0)
+            {
+                battleReservation.PlayerReserveList();
+            }
+            else
+            {
+                battleReservation.RegisterReserveData();
+            }
+
+            return Task.CompletedTask;
+        }
+
+        [Command(new[] { "予約一覧, 予約確認, 予約状況, !list" }, 0, 0, ChannelFeatureType.ReserveID)]
+        public static Task ListReservation(CommandEventArgs commandEventArgs)
+        {
+            new BattleReservation(commandEventArgs).PlayerReserveList();
+            return Task.CompletedTask;
+        }
+
+        [Command(new[] { "削除", "!rm" }, 2, 2, ChannelFeatureType.ReserveID)]
+        public static Task DeleteReserveData(CommandEventArgs commandEventArgs)
+        {
+            new BattleReservation(commandEventArgs).DeleteReserveData();
+            return Task.CompletedTask;
+        }
+
+        [Command("!start", 0, 0, ChannelFeatureType.ReserveResultID)]
+        public static async Task SendReserveSummary(CommandEventArgs commandEventArgs)
+            => await new BattleReservationSummary(commandEventArgs.Role, commandEventArgs.ClanData).SendMessage();
+
+        [Command(compatibleChannels: new[]
+             {
+                ChannelFeatureType.DeclareBoss1ID,
+                ChannelFeatureType.DeclareBoss2ID,
+                ChannelFeatureType.DeclareBoss3ID,
+                ChannelFeatureType.DeclareBoss4ID,
+                ChannelFeatureType.DeclareBoss5ID,
+             })]
+        public static async Task StartDeclare(CommandEventArgs commandEventArgs)
+        {
+            var BossNumber = commandEventArgs.ChannelFeatureType switch
+            {
+                ChannelFeatureType.DeclareBoss1ID => BossNumberType.Boss1Number,
+                ChannelFeatureType.DeclareBoss2ID => BossNumberType.Boss2Number,
+                ChannelFeatureType.DeclareBoss3ID => BossNumberType.Boss3Number,
+                ChannelFeatureType.DeclareBoss4ID => BossNumberType.Boss4Number,
+                ChannelFeatureType.DeclareBoss5ID => BossNumberType.Boss5Number,
+                _ => BossNumberType.Unknown,
+            };
+
+            if (BossNumber == BossNumberType.Unknown)
+            {
+                return;
+            }
+
+            await new BattleDeclaration(commandEventArgs.ClanData, commandEventArgs.SocketUserMessage, BossNumber).RunDeclarationCommandByMessage();
+        }
     }
 }

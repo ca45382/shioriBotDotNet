@@ -1,17 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Reflection;
-using System.ComponentModel;
 using Discord;
 using Discord.WebSocket;
+using PriconneBotConsoleApp.Database;
 using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.DataType;
-using PriconneBotConsoleApp.Database;
-using PriconneBotConsoleApp.Extension;
-using System.Collections.Generic;
 using PriconneBotConsoleApp.Define;
+using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Script
 {
@@ -19,232 +17,87 @@ namespace PriconneBotConsoleApp.Script
     {
         private const int MaxCommentLength = 30;
 
-        private readonly ClanData m_UserClanData;
-        private readonly SocketRole m_UserRole;
-        private readonly SocketUserMessage m_UserMessage;
-        private readonly SocketInteraction m_UserInteraction;
+        private readonly CommandEventArgs m_CommandEventArgs;
 
-        private BattleReservation(
-            ClanData userClanData,
-            ISocketMessageChannel channel,
-            SocketUserMessage userMessage = null,
-            SocketInteraction userInterction = null)
+        public BattleReservation(CommandEventArgs commandEventArgs)
         {
-            m_UserClanData = userClanData;
-            m_UserRole = (channel as SocketGuildChannel)?.Guild.GetRole(m_UserClanData.ClanRoleID);
-            m_UserMessage = userMessage;
-            m_UserInteraction = userInterction;
-        }
-
-        public BattleReservation(ClanData userClanData, SocketUserMessage message)
-            : this(userClanData, message.Channel, userMessage: message)
-        {
-        }
-
-        public BattleReservation(ClanData userClanData, SocketInteraction interaction)
-            : this(userClanData, interaction.Channel, userInterction: interaction)
-        {
-        }
-
-        public BattleReservation(SocketRole userRole)
-        {
-            m_UserRole = userRole;
-            m_UserClanData = DatabaseClanDataController.LoadClanData(userRole);
-        }
-
-        public async Task RunReservationCommand()
-        {
-            var userMessage = m_UserMessage;
-
-            if (userMessage == null)
-            {
-                return;
-            }
-
-            var messageContents = userMessage.Content;
-
-            if (messageContents.StartsWith("予約"))
-            {
-                switch (messageContents)
-                {
-                    case "予約":
-                    case "予約確認":
-                    case "予約状況":
-                        Console.WriteLine("予約確認");
-                        await userMessage.Channel.SendMessageAsync(CreateUserReservationDataMessage());
-                        return;
-                }
-
-                if (!IsReservationAllowTime())
-                {
-                    await SendErrorMessage(ErrorType.OutOfReservationTime,
-                        $"{m_UserClanData.ReservationStartTime.Hours}:00", $"{m_UserClanData.ReservationEndTime.Hours}:00");
-                    return;
-                }
-
-                var reservationData = MessageToReservationData();
-
-                if (reservationData is null)
-                {
-                    await SendErrorMessage(ErrorType.FailedReservation);
-                    return;
-                }
-
-                var allowReservationLap = m_UserClanData.ReservationLap == 0
-                    ? ClanBattleDefine.MaxLapNumber : (m_UserClanData.ReservationLap + m_UserClanData.GetMinBossLap());
-
-                if (reservationData.BattleLap > allowReservationLap)
-                {
-                    await SendErrorMessage(ErrorType.OutOfReservationBossLaps, allowReservationLap.ToString());
-                    return;
-                }
-
-                RegisterReservationData(reservationData);
-                await SuccessAddEmoji();
-                await UpdateSystemMessage();
-
-                if (m_UserClanData.GetBossLap(reservationData.BossNumber) == reservationData.BattleLap)
-                {
-                    await new BattleDeclaration(m_UserRole, (BossNumberType)reservationData.BossNumber).UpdateDeclarationBotMessage();
-                }
-            }
-            else if (messageContents.StartsWith("削除"))
-            {
-                var deleteReservationData = MessageToReservationData();
-
-                if (deleteReservationData is null)
-                {
-                    // await FailedToRegisterMessage();
-                    return;
-                }
-
-                if (DeleteUserReservationData(deleteReservationData))
-                {
-                    await SuccessAddEmoji();
-                    await UpdateSystemMessage();
-                }
-            }
-            else if (messageContents.StartsWith("!rm"))
-            {
-                var userReservationData = MessageToUserReservationData();
-
-                if (userReservationData == null || !DeleteUserReservationData(userReservationData))
-                {
-                    return;
-                }
-
-                await SuccessAddEmoji();
-                await UpdateSystemMessage();
-
-                if (m_UserClanData.GetBossLap(userReservationData.BossNumber) == userReservationData.BattleLap)
-                {
-                    await new BattleDeclaration(m_UserRole, (BossNumberType)userReservationData.BossNumber).UpdateDeclarationBotMessage();
-                }
-            }
-        }
-
-
-        public async Task RunReservationResultCommand()
-        {
-            if (m_UserMessage.Content.StartsWith("!start"))
-            {
-                await SendSystemMessage();
-            }
-        }
-
-        public async Task RunResultInteraction()
-        {
-            if (m_UserInteraction == null)
-            {
-                return;
-            }
-
-            var messageComponent = (SocketMessageComponent)m_UserInteraction;
-
-            if (!Enum.TryParse<ButtonType>(messageComponent.Data.CustomId, out var buttonType))
-            {
-                return;
-            }
-
-            switch (buttonType)
-            {
-                case ButtonType.Reload:
-                    await UpdateSystemMessage();
-                    break;
-            }
+            m_CommandEventArgs = commandEventArgs;
         }
 
         /// <summary>
-        /// 凸予約一覧チャンネルにメッセージを送信する。
+        /// 個人の予約一覧を表示する。引数は無し。
         /// </summary>
-        /// <returns></returns>
-        public async Task SendSystemMessage()
+        public void PlayerReserveList()
         {
-            var embedData = CreateAllReservationDataMessage();
-            var componentData = CreateSystemMessageComponent();
-            var reservationResultChannelID = m_UserClanData.ChannelData
-                .GetChannelID(m_UserClanData.ClanID, ChannelFeatureType.ReserveResultID);
-
-            if (reservationResultChannelID == 0)
-            {
-                return;
-            }
-
-            var resultChannel = m_UserRole.Guild
-                .GetTextChannel(reservationResultChannelID);
-
-            var sendedMessageData = await resultChannel.SendMessageAsync(embed: embedData, component: componentData);
-            DatabaseMessageDataController.UpdateMessageID(m_UserClanData, sendedMessageData.Id, MessageFeatureType.ReserveResultID);
+            _ = m_CommandEventArgs.Channel.SendMessageAsync(
+                CreateUserReservationDataMessage(m_CommandEventArgs.PlayerData));
         }
 
-        public async Task UpdateSystemMessage()
+        public void RegisterReserveData()
         {
-            var reservationMessageID = m_UserClanData.MessageData
-                .GetMessageID(m_UserClanData.ClanID, MessageFeatureType.ReserveResultID);
-            var reservationResultChannelID = m_UserClanData.ChannelData
-                .GetChannelID(m_UserClanData.ClanID, ChannelFeatureType.ReserveResultID);
+            if (!IsReservationAllowTime())
+            {
+                _ = m_CommandEventArgs.Channel.SendTimedMessageAsync(
+                    TimeDefine.ErrorMessageDisplayTime,
+                    string.Format(ErrorType.OutOfReservationTime.ToLabel(),
+                        $"{m_CommandEventArgs.ClanData.ReservationStartTime.Hours}:00",
+                        $"{m_CommandEventArgs.ClanData.ReservationEndTime.Hours}:00")
+                    );
+                return;
+            }
 
-            if (reservationResultChannelID == 0 || reservationMessageID == 0)
+            var reservationData = MessageToReservationData();
+
+            if (reservationData is null)
+            {
+                _ = m_CommandEventArgs.Channel.SendTimedMessageAsync(
+                    TimeDefine.ErrorMessageDisplayTime,
+                    ErrorType.FailedReservation.ToLabel()
+                    );
+                return;
+            }
+
+            var allowReservationLap = m_CommandEventArgs.ClanData.ReservationLap == 0
+                ? ClanBattleDefine.MaxLapNumber : (m_CommandEventArgs.ClanData.ReservationLap + m_CommandEventArgs.ClanData.GetMinBossLap());
+
+            if (reservationData.BattleLap > allowReservationLap)
+            {
+                _ = m_CommandEventArgs.Channel.SendTimedMessageAsync(
+                    TimeDefine.ErrorMessageDisplayTime,
+                    string.Format(ErrorType.OutOfReservationBossLaps.ToLabel(), allowReservationLap.ToString())
+                    );
+                return;
+            }
+
+            RegisterReservationData(reservationData);
+            _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(ReactionType.Success.ToEmoji());
+            _ = new BattleReservationSummary(m_CommandEventArgs.Role, m_CommandEventArgs.ClanData).UpdateMessage();
+
+            if (m_CommandEventArgs.ClanData.GetBossLap(reservationData.BossNumber) == reservationData.BattleLap)
+            {
+                _ = new BattleDeclaration(m_CommandEventArgs.Role, (BossNumberType)reservationData.BossNumber).UpdateDeclarationBotMessage();
+            }
+        }
+
+        public void DeleteReserveData()
+        {
+            var deleteReservationData = MessageToReservationData();
+
+            if (deleteReservationData is null)
             {
                 return;
             }
 
-            var guildChannel = m_UserRole.Guild
-                .GetChannel(reservationResultChannelID) as SocketTextChannel;
-            var socketMessage = guildChannel.GetCachedMessage(reservationMessageID);
-
-            if (socketMessage == null || !(socketMessage is SocketUserMessage))
+            if (DeleteUserReservationData(deleteReservationData))
             {
-                var message = await guildChannel.GetMessageAsync(reservationMessageID);
+                _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(ReactionType.Success.ToEmoji());
+                _ = new BattleReservationSummary(m_CommandEventArgs.Role, m_CommandEventArgs.ClanData).UpdateMessage();
 
-                if (message != null)
+                if (m_CommandEventArgs.ClanData.GetBossLap(deleteReservationData.BossNumber) == deleteReservationData.BattleLap)
                 {
-                    await guildChannel.DeleteMessageAsync(message);
-                    await SendSystemMessage();
+                    _ = new BattleDeclaration(m_CommandEventArgs.Role, (BossNumberType)deleteReservationData.BossNumber).UpdateDeclarationBotMessage();
                 }
-
-                return;
             }
-
-            var serverMessage = socketMessage as SocketUserMessage;
-            var embedData = CreateAllReservationDataMessage();
-            await serverMessage.ModifyAsync(x => x.Embed = embedData);
-        }
-
-        public void DeleteUnusedData(byte bossNumber)
-        {
-            var clanReservationData = DatabaseReservationController.LoadReservationData(m_UserClanData, bossNumber);
-            var bossLap = m_UserClanData.GetBossLap(bossNumber);
-            var deleteData = clanReservationData.Where(x => x.BattleLap < bossLap);
-            DatabaseReservationController.DeleteReservationData(deleteData);
-        }
-
-        private MessageComponent CreateSystemMessageComponent()
-        {
-            ComponentBuilder componentBuilder = new();
-            componentBuilder.WithButton(
-                ButtonType.Reload.ToLongLabel(), ButtonType.Reload.ToString(), ButtonStyle.Secondary, ButtonType.Reload.ToEmoji());
-            return componentBuilder.Build();
         }
 
         /// <summary>
@@ -255,78 +108,45 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private ReservationData MessageToReservationData()
         {
-            var splitMessageContent = m_UserMessage.Content.ZenToHan().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-            if (splitMessageContent.Length < 3
-                || !(byte.TryParse(splitMessageContent[1], out byte battleLap) && battleLap > 0)
-                || !(byte.TryParse(splitMessageContent[2], out byte bossNumber) && bossNumber <= CommonDefine.MaxBossNumber && bossNumber >= CommonDefine.MinBossNumber)
-                || battleLap < m_UserClanData.GetBossLap(bossNumber))
+            if (!Enum.TryParse<BossNumberType>(m_CommandEventArgs.Arguments[1], out var bossNumber)
+                || !(byte.TryParse(m_CommandEventArgs.Arguments[0], out var battleLap) && battleLap > m_CommandEventArgs.ClanData.GetBossLap(bossNumber)))
             {
                 return null;
             }
-            var commentData = string.Join(' ', splitMessageContent.Skip(3));
+
+            var commentData = string.Join(' ', m_CommandEventArgs.Arguments.Skip(2));
 
             if (commentData.Length > MaxCommentLength)
             {
                 commentData = commentData.Substring(0, MaxCommentLength);
-                m_UserMessage.Channel.SendMessageAsync($"コメントが長いので切り取られました。\n 問題がある場合は予約削除をして再度予約してください。");
+                _ = m_CommandEventArgs.Channel.SendTimedMessageAsync(TimeDefine.WarningMessageDisplayTime, WarningType.LongComment.ToLabel());
             }
 
             return new ReservationData()
             {
-                PlayerData = new PlayerData
-                {
-                    ClanData = m_UserClanData,
-                    UserID = m_UserMessage.Author.Id,
-                },
+                PlayerID = m_CommandEventArgs.PlayerData.PlayerID,
                 BattleLap = battleLap,
-                BossNumber = bossNumber,
+                BossNumber = (byte)bossNumber,
                 CommentData = commentData,
             };
         }
 
         private void RegisterReservationData(ReservationData reservationData)
         {
-            var allSqlReservationData = DatabaseReservationController.LoadReservationData(reservationData.PlayerData);
+            var allSqlReservationData = DatabaseReservationController.LoadReservationData(m_CommandEventArgs.PlayerData);
 
-            var doesExistReservationData = allSqlReservationData
-                .Any(x => x.BossNumber == reservationData.BossNumber && x.BattleLap == reservationData.BattleLap);
+            var DatabaseReservationData = allSqlReservationData
+                .FirstOrDefault(x => x.BossNumber == reservationData.BossNumber && x.BattleLap == reservationData.BattleLap);
 
-            if (!doesExistReservationData)
+            if (DatabaseReservationData == null)
             {
                 DatabaseReservationController.CreateReservationData(reservationData);
             }
             else
             {
+                reservationData.ReserveID = DatabaseReservationData.ReserveID;
                 DatabaseReservationController.UpdateReservationData(reservationData);
             }
-        }
-
-        /// <summary>
-        /// 個人が予約しているデータの取得
-        /// </summary>
-        /// <returns></returns>
-        private ReservationData MessageToUserReservationData()
-        {
-            var splitMessageContent = m_UserMessage.Content.ZenToHan().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-            if (splitMessageContent.Length != 4
-                || !ulong.TryParse(splitMessageContent[1], out ulong userID)
-                || !(byte.TryParse(splitMessageContent[2], out byte battleLap) && battleLap > 0)
-                || !(byte.TryParse(splitMessageContent[3], out byte bossNumber) && bossNumber <= CommonDefine.MaxBossNumber && bossNumber >= CommonDefine.MinBossNumber))
-            {
-                return null;
-            }
-
-            var playerData = DatabasePlayerDataController.LoadPlayerData(m_UserRole, userID);
-
-            if (playerData == null)
-            {
-                return null;
-            }
-
-            return DatabaseReservationController.LoadReservationData(playerData)
-                .FirstOrDefault(d => d.BattleLap == battleLap && d.BossNumber == bossNumber);
         }
 
         private bool DeleteUserReservationData(ReservationData reservationData)
@@ -346,11 +166,6 @@ namespace PriconneBotConsoleApp.Script
 
             return true;
         }
-
-        private string CreateUserReservationDataMessage()
-            => CreateUserReservationDataMessage(
-                DatabasePlayerDataController.LoadPlayerData(m_UserRole, m_UserMessage.Author.Id)
-            );
 
         private string CreateUserReservationDataMessage(PlayerData playerData)
         {
@@ -378,81 +193,18 @@ namespace PriconneBotConsoleApp.Script
         }
 
         /// <summary>
-        /// 予約メッセージを作成する
-        /// </summary>
-        /// <param name="clanData"></param>
-        /// <returns></returns>
-        private Embed CreateAllReservationDataMessage()
-        {
-            var reservationDataSet = DatabaseReservationController.LoadReservationData(m_UserClanData);
-            List<List<ReservationData>> reservationDataList = new();
-
-            for (var i = 0; i < CommonDefine.MaxBossNumber; i++)
-            {
-                reservationDataList.Add(new List<ReservationData>());
-            }
-
-            reservationDataSet.ForEach(x => reservationDataList[x.BossNumber - 1].Add(x));
-            EmbedBuilder embedBuilder = new();
-
-            for (var i = 0; i < CommonDefine.MaxBossNumber; i++)
-            {
-                EmbedFieldBuilder fieldBuilder = new();
-
-                if (!reservationDataList[i].Any())
-                {
-                    // 何かの空白代入して空行を生成している。
-                    fieldBuilder.Value = "\n\u200b";
-                }
-                else
-                {
-                    StringBuilder messageData = new();
-                    messageData.AppendLine("```python");
-                    reservationDataList[i].ForEach(x => messageData.AppendLine($"{x.BattleLap,2}周目 {x.PlayerData.GuildUserName} {x.CommentData}"));
-                    messageData.AppendLine("```");
-                    fieldBuilder.Value = messageData.ToString();
-                }
-
-                fieldBuilder.Name = $"{i + 1}ボス({reservationDataList[i].Count}件)";
-                embedBuilder.AddField(fieldBuilder);
-            }
-
-            embedBuilder.Title = $"現在の予約状況:計{reservationDataSet.Count}件";
-
-            return embedBuilder.Build();
-        }
-
-        private async Task SendErrorMessage(ErrorType type, params string[] parameters)
-        {
-            var descriptionString = type.GetDescription();
-            var sendMessage = string.Empty;
-            if (descriptionString == null)
-            {
-                sendMessage = type.ToString();
-            }
-            else
-            {
-                sendMessage = string.Format(descriptionString, parameters);
-            }
-            await m_UserMessage.Channel.SendMessageAsync(sendMessage);
-        }
-
-        private async Task SuccessAddEmoji()
-            => await m_UserMessage.AddReactionAsync(new Emoji(ReactionType.Success.GetDescription()));
-
-        /// <summary>
         /// 予約できる時間かどうか判断する。
         /// </summary>
         /// <returns></returns>
         private bool IsReservationAllowTime()
         {
-            if (m_UserClanData == null)
+            if (m_CommandEventArgs.ClanData == null)
             {
                 return false;
             }
 
-            var startTime = m_UserClanData.ReservationStartTime;
-            var endTime = m_UserClanData.ReservationEndTime;
+            var startTime = m_CommandEventArgs.ClanData.ReservationStartTime;
+            var endTime = m_CommandEventArgs.ClanData.ReservationEndTime;
             var nowTime = DateTime.Now.TimeOfDay;
 
             if (startTime.Hours == 0 && endTime.Hours == 0)

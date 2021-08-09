@@ -13,6 +13,7 @@ namespace PriconneBotConsoleApp.Script
         private readonly SocketTextChannel m_TextChannel;
         private readonly PlayerData m_PlayerData;
         private readonly ClanData m_ClanData;
+        private readonly SocketRole m_Role;
 
         public ReceiveInteractionController(SocketInteraction interaction)
         {
@@ -25,8 +26,8 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            var playerRole = m_TextChannel.Guild.GetRole(m_PlayerData.ClanData.ClanRoleID);
-            m_ClanData = DatabaseClanDataController.LoadClanData(playerRole);
+            m_Role = m_TextChannel.Guild.GetRole(m_PlayerData.ClanData.ClanRoleID);
+            m_ClanData = DatabaseClanDataController.LoadClanData(m_Role);
         }
 
         public async Task Run()
@@ -42,7 +43,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (channelFeatureID == (int)ChannelFeatureType.ReserveResultID)
             {
-                await new BattleReservation(m_ClanData, m_Interaction).RunResultInteraction();
+                await new BattleReservationSummary(m_Role, m_ClanData).RunInteraction(m_Interaction);
             }
 
             BattleDeclaration battleDeclaration = channelFeatureID switch

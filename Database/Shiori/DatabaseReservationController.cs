@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using PriconneBotConsoleApp.DataModel;
@@ -35,17 +36,15 @@ namespace PriconneBotConsoleApp.Database
 
         public static List<ReservationData> LoadReservationData(PlayerData playerData)
         {
-            if (playerData == null)
+            if (playerData == null|| playerData.PlayerID == 0)
             {
                 return null;
             }
 
             using var databaseConnector = new DatabaseConnector();
 
-            var playerID = LoadPlayerID(databaseConnector.PlayerData, playerData);
-
             return databaseConnector.ReservationData.AsQueryable()
-                .Where(b => b.PlayerID == playerID && !b.DeleteFlag)
+                .Where(b => b.PlayerID == playerData.PlayerID && !b.DeleteFlag)
                 .OrderBy(o => o.BattleLap).ThenBy(d => d.BossNumber)
                 .ToList();
         }
@@ -96,28 +95,24 @@ namespace PriconneBotConsoleApp.Database
         /// <param name="reservationData"></param>
         public static void CreateReservationData(ReservationData reservationData)
         {
-            var playerData = reservationData.PlayerData;
-            using var databaseConnector = new DatabaseConnector();
-            var transaction = databaseConnector.Database.BeginTransaction();
-            var playerID = LoadPlayerID(databaseConnector.PlayerData, playerData);
-
-            if (playerID == 0)
+            if (reservationData.PlayerID == 0)
             {
-                transaction.Rollback();
                 return;
             }
 
-            databaseConnector.ReservationData.Add(
-                new ReservationData()
-                {
-                    PlayerID = playerID,
-                    BattleLap = reservationData.BattleLap,
-                    BossNumber = reservationData.BossNumber,
-                    CommentData = reservationData.CommentData
-                });
+            using var databaseConnector = new DatabaseConnector();
+            var transaction = databaseConnector.Database.BeginTransaction();
 
-            databaseConnector.SaveChanges();
-            transaction.Commit();
+            databaseConnector.ReservationData.Add(reservationData);
+            try
+            {
+                databaseConnector.SaveChanges();
+                transaction.Commit();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         /// <summary>
@@ -126,30 +121,21 @@ namespace PriconneBotConsoleApp.Database
         /// <param name="reservationData"></param>
         public static void UpdateReservationData(ReservationData reservationData)
         {
-            var playerData = reservationData.PlayerData;
             using var databaseConnector = new DatabaseConnector();
             var transaction = databaseConnector.Database.BeginTransaction();
-            var playerID = LoadPlayerID(databaseConnector.PlayerData, playerData);
-
-            if (playerID == 0)
-            {
-                transaction.Rollback();
-                return;
-            }
-
             var updateData = databaseConnector.ReservationData
-                .FirstOrDefault(d => d.PlayerID == playerID && d.BattleLap == reservationData.BattleLap
-                    && d.BossNumber == reservationData.BossNumber && !d.DeleteFlag);
+                .FirstOrDefault(x => x.ReserveID == reservationData.ReserveID);
 
-            if (updateData == null)
+            try
+            {
+                updateData.CommentData = reservationData.CommentData;
+                databaseConnector.SaveChanges();
+                transaction.Commit();
+            }
+            catch
             {
                 transaction.Rollback();
-                return;
             }
-
-            updateData.CommentData = reservationData.CommentData;
-            databaseConnector.SaveChanges();
-            transaction.Commit();
         }
 
         public static void DeleteReservationData(ReservationData reservationData)
@@ -175,16 +161,6 @@ namespace PriconneBotConsoleApp.Database
 
             databaseConnector.SaveChanges();
             transaction.Commit();
-        }
-
-        private static ulong LoadPlayerID(IQueryable<PlayerData> queryable, PlayerData playerData)
-        {
-            return queryable
-                .Include(b => b.ClanData)
-                .FirstOrDefault(b => b.ClanData.ServerID == playerData.ClanData.ServerID
-                    && b.ClanData.ClanRoleID == playerData.ClanData.ClanRoleID
-                    && b.UserID == playerData.UserID)
-                ?.PlayerID ?? 0;
         }
     }
 }
