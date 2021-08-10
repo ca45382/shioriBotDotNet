@@ -370,5 +370,9 @@ namespace PriconneBotConsoleApp.Script
 
             await new BattleDeclaration(commandEventArgs.ClanData, commandEventArgs.SocketUserMessage, BossNumber).RunDeclarationCommandByMessage();
         }
+
+        [Command(compatibleChannels: ChannelFeatureType.TaskKillID)]
+        public static async Task StartTaskkill(CommandEventArgs commandEventArgs)
+            => await new BattleTaskKill(commandEventArgs.ClanData, commandEventArgs.SocketUserMessage).RunByMessageCommands();
     }
 }
