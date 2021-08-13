@@ -77,7 +77,15 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var commandEventArgs = new CommandEventArgs(socketUserMessage);
-            await CommandMapper.Invoke(commandEventArgs);
+
+            try
+            {
+                await CommandMapper.Invoke(commandEventArgs);
+            }
+            catch 
+            {
+                
+            }
         }
 
         /// <summary>
