@@ -40,7 +40,7 @@ namespace ShioriBot.Net.Script
                     ((ProgressStatus)ProgressData.Status).ToLabel(),
                     ProgressData.CarryOverFlag ? "持" : fullSizeWhitespace,
                     $"{ProgressData.Damage,6}@{ProgressData.RemainTime:D2}",
-                    ((AttackType)ProgressData.AttackType).ToShortLabel(),
+                    ProgressData.AttackType != 0 ? ((AttackType)ProgressData.AttackType).ToShortLabel() : "　",
                     DatabaseReportDataController.GetReportCount(PlayerData),
                     PlayerData.GuildUserName,
                     ProgressData.Status != 1 ? ProgressData.CommentData : string.Empty
@@ -101,7 +101,8 @@ namespace ShioriBot.Net.Script
                 userProgressData.AttackType = (byte)attackType;
             }
 
-            await UpdateProgressData(userProgressData, m_CommandEventArgs.PlayerData);
+            UpdateProgressData(userProgressData, m_CommandEventArgs.PlayerData);
+            await SendClanProgressList();
         }
 
         /// <summary>
@@ -168,7 +169,8 @@ namespace ShioriBot.Net.Script
             userProgressData.Damage = (uint)damageNumber;
             userProgressData.RemainTime = remainTimeNumber;
             userProgressData.CommentData = string.Join(" ", m_CommandEventArgs.Arguments);
-            await UpdateProgressData(userProgressData, m_CommandEventArgs.PlayerData);
+            UpdateProgressData(userProgressData, m_CommandEventArgs.PlayerData);
+            await SendClanProgressList();
         }
 
         /// <summary>
@@ -178,13 +180,42 @@ namespace ShioriBot.Net.Script
         /// <returns></returns>
         public async Task UpdateStatusData(ProgressStatus progressStatus)
         {
-            if (!TryGetProgressData(out var userProgressData))
+            if (!TryGetProgressData(out var userProgressData)
+                || userProgressData.Status == (byte)progressStatus
+                || userProgressData.Status == (byte)ProgressStatus.AttackDone)
             {
+                await SendClanProgressList();
                 return;
             }
 
             userProgressData.Status = (byte)progressStatus;
-            await UpdateProgressData(userProgressData, m_CommandEventArgs.PlayerData);
+
+            if (progressStatus == ProgressStatus.SubdueBoss)
+            {
+                var nowLap = m_CommandEventArgs.ClanData.GetBossLap(m_BossNumberType);
+                var damageSum = DatabaseProgressController.GetProgressData(m_CommandEventArgs.ClanData, m_BossNumberType)
+                    .Where(x => x.Status == (byte)ProgressStatus.AttackDone)
+                    .Select(x => (int)x.Damage).Sum();
+                var bossHP = RediveClanBattleData.BossDataList
+                    .FirstOrDefault(x => x.BossNumber == (byte)m_BossNumberType && x.LapNumberFrom <= nowLap && (x.LapNumberTo == -1 || x.LapNumberTo >= nowLap))
+                    ?.HP ?? 0;
+
+                userProgressData.Damage = (uint)(bossHP - damageSum > 0 ? bossHP - damageSum : 0);
+
+                UpdateReportData(userProgressData, m_CommandEventArgs.PlayerData);
+                await ChangeLap();
+                _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
+
+                return;
+            }
+
+            if (progressStatus == ProgressStatus.AttackDone)
+            {
+                UpdateReportData(userProgressData, m_CommandEventArgs.PlayerData);
+            }
+
+            UpdateProgressData(userProgressData, m_CommandEventArgs.PlayerData);
+            await SendClanProgressList();
         }
 
         /// <summary>
@@ -198,6 +229,7 @@ namespace ShioriBot.Net.Script
 
             if (userData == null)
             {
+                await SendClanProgressList();
                 return;
             }
 
@@ -206,10 +238,14 @@ namespace ShioriBot.Net.Script
             var playerProgressData = DatabaseProgressController.GetProgressData(playerData, m_BossNumberType)
                 .OrderByDescending(x => x.UpdateDateTime).FirstOrDefault();
 
-            if (playerProgressData == null)
+            if (playerProgressData == null
+                || (playerProgressData.Status == (byte)ProgressStatus.AttackDone && !deleteFlag))
             {
+                await SendClanProgressList();
                 return;
             }
+
+            RemoveReportData(playerProgressData);
 
             if (deleteFlag)
             {
@@ -234,7 +270,7 @@ namespace ShioriBot.Net.Script
             await SendClanProgressList();
         }
 
-        private async Task UpdateProgressData(ProgressData progressData, PlayerData playerData)
+        private void UpdateProgressData(ProgressData progressData, PlayerData playerData)
         {
 
             if (progressData.Status == (byte)ProgressStatus.Unknown)
@@ -249,7 +285,6 @@ namespace ShioriBot.Net.Script
                 if (DatabaseProgressController.CreateProgressData(progressData))
                 {
                     _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
-                    await SendClanProgressList();
                 }
             }
             else
@@ -257,7 +292,6 @@ namespace ShioriBot.Net.Script
                 if (DatabaseProgressController.ModifyProgressData(progressData))
                 {
                     _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
-                    await SendClanProgressList();
                 }
             }
         }
@@ -277,7 +311,7 @@ namespace ShioriBot.Net.Script
             }
 
             DatabaseClanDataController.UpdateClanData(m_CommandEventArgs.ClanData);
-            await SendClanProgressList();
+            await SendClanProgressList(false);
         }
 
         /// <summary>
@@ -357,7 +391,7 @@ namespace ShioriBot.Net.Script
 
             for (int i = CommonDefine.MaxReportNumber; i >= 0; i--)
             {
-                remainAttackString.Append((i == 0 ? "完凸:" : i + "凸:") + reportCount[i] + "人 ");
+                remainAttackString.Append((i == 0 ? "完凸:" : i + "凸:") + reportCount[CommonDefine.MaxReportNumber - i] + "人 ");
             }
 
             summaryStringBuilder.AppendLine(remainAttackString.ToString());
@@ -404,12 +438,98 @@ namespace ShioriBot.Net.Script
             }
 
             return DatabaseProgressController.GetProgressData(playerData, m_BossNumberType)
-               .Where(x => x.Status != (byte)ProgressStatus.AttackDone || x.Status != (byte)ProgressStatus.SubdueBoss)
+               .Where(x => x.Status != (byte)ProgressStatus.AttackDone && x.Status != (byte)ProgressStatus.SubdueBoss)
                .FirstOrDefault();
         }
 
-        private bool TryGetProgressData(out ProgressData progressData)
-            => (progressData = GetProgressData()) != null;
+        private bool TryGetProgressData(out ProgressData progressData, PlayerData playerData = null)
+            => (progressData = GetProgressData(playerData)) != null;
+
+        /// <summary>
+        /// 凸報告を自動で行いIDを進行データに登録する。
+        /// </summary>
+        /// <param name="progressData"></param>
+        private void UpdateReportData(ProgressData progressData, PlayerData playerData)
+        {
+            var reportedDataList = DatabaseReportDataController.GetReportData(playerData).ToArray();
+            var reportData = reportedDataList.FirstOrDefault(x => x.ReportID == progressData.ReportID);
+
+            if (reportData == null)
+            {
+                reportData = new()
+                {
+                    PlayerID = playerData.PlayerID,
+                };
+            }
+
+            reportData.AttackType = progressData.AttackType;
+            reportData.BattleLap = (ushort)m_CommandEventArgs.ClanData.GetBossLap(m_BossNumberType);
+            reportData.BossNumber = (byte)m_BossNumberType;
+            reportData.FinalDamage = progressData.Damage;
+
+            if (progressData.Status == (byte)ProgressStatus.SubdueBoss)
+            {
+                reportData.SubdueFlag = true;
+                UpdateCarryOverData(progressData, playerData);
+            }
+
+            if (reportData.ReportID != 0)
+            {
+                DatabaseReportDataController.UpdateReportData(reportData);
+
+                return;
+            }
+
+            if (reportedDataList.Length >= CommonDefine.MaxReportNumber)
+            {
+                return;
+            }
+
+            reportData.PlayerID = playerData.PlayerID;
+            var reportedData = DatabaseReportDataController.CreateReportData(reportData);
+            progressData.ReportID = reportedData.ReportID;
+        }
+
+        /// <summary>
+        /// 進行データに連動している凸報告を削除。
+        /// </summary>
+        /// <param name="progressData"></param>
+        private void RemoveReportData(ProgressData progressData)
+        {
+            var reportedData = DatabaseReportDataController.GetReportData(progressData);
+
+            if (reportedData == null)
+            {
+                return;
+            }
+
+            DatabaseReportDataController.DeleteReportData(reportedData);
+        }
+
+        private void UpdateCarryOverData(ProgressData progressData, PlayerData playerData)
+        {
+            if (progressData.CarryOverFlag)
+            {
+                return;
+            }
+
+            var carryOverDataList = DatabaseCarryOverController.GetCarryOverData(playerData).ToArray();
+
+            if (carryOverDataList.Length >= CommonDefine.MaxReportNumber)
+            {
+                return;
+            }
+
+            CarryOverData carryOverData = new()
+            {
+                BattleLap = (ushort)m_CommandEventArgs.ClanData.GetBossLap(m_BossNumberType),
+                BossNumber = (byte)m_BossNumberType,
+                PlayerID = progressData.PlayerID,
+                RemainTime = (byte)(progressData.RemainTime + CommonDefine.AddBattleTime),
+            };
+
+            DatabaseCarryOverController.CreateCarryOverData(carryOverData);
+        }
 
         private MessageFeatureType BossNumberToMessageType(BossNumberType bossNumberType)
         {
