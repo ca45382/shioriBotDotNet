@@ -21,6 +21,7 @@ namespace PriconneBotConsoleApp.Script
         public BattleReservationSummary(SocketRole role, ClanData clanData = null)
         {
             m_Role = role;
+
             if (clanData == null)
             {
                 m_ClanData = DatabaseClanDataController.LoadClanData(m_Role);
@@ -29,24 +30,20 @@ namespace PriconneBotConsoleApp.Script
             {
                 m_ClanData = clanData;
             }
-            m_SocketTextChannel = m_Role.Guild.GetChannel(m_ClanData.GetChannelID(ChannelFeatureType.ReserveResultID))
-                as SocketTextChannel;
+
+            m_SocketTextChannel = m_Role.Guild.GetChannel(m_ClanData.GetChannelID(ChannelFeatureType.ReserveResultID)) as SocketTextChannel;
         }
 
-        public async Task RunInteraction(SocketInteraction socketInteraction)
+        public async Task RunInteraction(SocketMessageComponent messageComponent)
         {
-            var messageComponent = (SocketMessageComponent)socketInteraction;
-
             if (!Enum.TryParse<ButtonType>(messageComponent.Data.CustomId, out var buttonType))
             {
                 return;
             }
 
-            switch (buttonType)
+            if(buttonType == ButtonType.Reload)
             {
-                case ButtonType.Reload:
-                    await UpdateMessage();
-                    break;
+                await UpdateMessage();
             }
         }
 
@@ -147,9 +144,13 @@ namespace PriconneBotConsoleApp.Script
         {
             ComponentBuilder componentBuilder = new();
             componentBuilder.WithButton(
-                ButtonType.Reload.ToLongLabel(), ButtonType.Reload.ToString(), ButtonStyle.Secondary, ButtonType.Reload.ToEmoji());
+                ButtonType.Reload.ToLongLabel(),
+                ButtonType.Reload.ToString(),
+                ButtonStyle.Secondary,
+                ButtonType.Reload.ToEmoji()
+            );
+
             return componentBuilder.Build();
         }
-
     }
 }
