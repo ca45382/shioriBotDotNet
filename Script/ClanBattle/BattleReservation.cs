@@ -20,18 +20,13 @@ namespace PriconneBotConsoleApp.Script
         private readonly CommandEventArgs m_CommandEventArgs;
 
         public BattleReservation(CommandEventArgs commandEventArgs)
-        {
-            m_CommandEventArgs = commandEventArgs;
-        }
+            => m_CommandEventArgs = commandEventArgs;
 
         /// <summary>
         /// 個人の予約一覧を表示する。引数は無し。
         /// </summary>
         public void PlayerReserveList()
-        {
-            _ = m_CommandEventArgs.Channel.SendMessageAsync(
-                CreateUserReservationDataMessage(m_CommandEventArgs.PlayerData));
-        }
+            => m_CommandEventArgs.Channel.SendMessageAsync(CreateUserReservationDataMessage(m_CommandEventArgs.PlayerData));
 
         public void RegisterReserveData()
         {
@@ -40,8 +35,8 @@ namespace PriconneBotConsoleApp.Script
                 _ = m_CommandEventArgs.Channel.SendTimedMessageAsync(
                     TimeDefine.ErrorMessageDisplayTime,
                     string.Format(ErrorType.OutOfReservationTime.ToLabel(),
-                        $"{m_CommandEventArgs.ClanData.ReservationStartTime.Hours}:00",
-                        $"{m_CommandEventArgs.ClanData.ReservationEndTime.Hours}:00")
+                        $"{m_CommandEventArgs.ClanData.ReservationStartTime.Hours}",
+                        $"{m_CommandEventArgs.ClanData.ReservationEndTime.Hours}")
                     );
                 return;
             }
@@ -58,7 +53,8 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var allowReservationLap = m_CommandEventArgs.ClanData.ReservationLap == 0
-                ? ClanBattleDefine.MaxLapNumber : (m_CommandEventArgs.ClanData.ReservationLap + m_CommandEventArgs.ClanData.GetMinBossLap());
+                ? ClanBattleDefine.MaxLapNumber
+                : (m_CommandEventArgs.ClanData.ReservationLap + m_CommandEventArgs.ClanData.GetMinBossLap());
 
             if (reservationData.BattleLap > allowReservationLap)
             {
