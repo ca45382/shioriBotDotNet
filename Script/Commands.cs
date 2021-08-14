@@ -55,14 +55,11 @@ namespace PriconneBotConsoleApp.Script
             AttackType.Physics,
             0,
             0,
-            new[]
-            {
-                ChannelFeatureType.ProgressBoss1ID,
-                ChannelFeatureType.ProgressBoss2ID,
-                ChannelFeatureType.ProgressBoss3ID,
-                ChannelFeatureType.ProgressBoss4ID,
-                ChannelFeatureType.ProgressBoss5ID,
-            }
+            ChannelFeatureType.ProgressBoss1ID,
+            ChannelFeatureType.ProgressBoss2ID,
+            ChannelFeatureType.ProgressBoss3ID,
+            ChannelFeatureType.ProgressBoss4ID,
+            ChannelFeatureType.ProgressBoss5ID
         )]
         public static async Task AttackPhysics(CommandEventArgs commandEventArgs)
             => await new BattleProgress(commandEventArgs).UpdateAttackData(AttackType.Physics);
@@ -71,14 +68,11 @@ namespace PriconneBotConsoleApp.Script
             AttackType.Magic,
             0,
             0,
-            new[]
-            {
-                ChannelFeatureType.ProgressBoss1ID,
-                ChannelFeatureType.ProgressBoss2ID,
-                ChannelFeatureType.ProgressBoss3ID,
-                ChannelFeatureType.ProgressBoss4ID,
-                ChannelFeatureType.ProgressBoss5ID,
-            }
+            ChannelFeatureType.ProgressBoss1ID,
+            ChannelFeatureType.ProgressBoss2ID,
+            ChannelFeatureType.ProgressBoss3ID,
+            ChannelFeatureType.ProgressBoss4ID,
+            ChannelFeatureType.ProgressBoss5ID
         )]
         public static async Task AttackMagic(CommandEventArgs commandEventArgs)
             => await new BattleProgress(commandEventArgs).UpdateAttackData(AttackType.Magic);
@@ -87,14 +81,11 @@ namespace PriconneBotConsoleApp.Script
             AttackType.NewYearKaryl,
             0,
             0,
-            new[]
-            {
-                ChannelFeatureType.ProgressBoss1ID,
-                ChannelFeatureType.ProgressBoss2ID,
-                ChannelFeatureType.ProgressBoss3ID,
-                ChannelFeatureType.ProgressBoss4ID,
-                ChannelFeatureType.ProgressBoss5ID,
-            }
+            ChannelFeatureType.ProgressBoss1ID,
+            ChannelFeatureType.ProgressBoss2ID,
+            ChannelFeatureType.ProgressBoss3ID,
+            ChannelFeatureType.ProgressBoss4ID,
+            ChannelFeatureType.ProgressBoss5ID
         )]
         public static async Task AttackNewYearKaryl(CommandEventArgs commandEventArgs)
             => await new BattleProgress(commandEventArgs).UpdateAttackData(AttackType.NewYearKaryl);
@@ -103,14 +94,11 @@ namespace PriconneBotConsoleApp.Script
             AttackType.CarryOver,
             0,
             0,
-            new[]
-            {
-                ChannelFeatureType.ProgressBoss1ID,
-                ChannelFeatureType.ProgressBoss2ID,
-                ChannelFeatureType.ProgressBoss3ID,
-                ChannelFeatureType.ProgressBoss4ID,
-                ChannelFeatureType.ProgressBoss5ID,
-            }
+            ChannelFeatureType.ProgressBoss1ID,
+            ChannelFeatureType.ProgressBoss2ID,
+            ChannelFeatureType.ProgressBoss3ID,
+            ChannelFeatureType.ProgressBoss4ID,
+            ChannelFeatureType.ProgressBoss5ID
         )]
         public static async Task AttackCarryOver(CommandEventArgs commandEventArgs)
             => await new BattleProgress(commandEventArgs).UpdateAttackData(AttackType.CarryOver);
@@ -119,14 +107,11 @@ namespace PriconneBotConsoleApp.Script
             new[] { "kari", "仮確定" },
             0,
             0,
-            new[]
-            {
-                ChannelFeatureType.ProgressBoss1ID,
-                ChannelFeatureType.ProgressBoss2ID,
-                ChannelFeatureType.ProgressBoss3ID,
-                ChannelFeatureType.ProgressBoss4ID,
-                ChannelFeatureType.ProgressBoss5ID,
-            }
+            ChannelFeatureType.ProgressBoss1ID,
+            ChannelFeatureType.ProgressBoss2ID,
+            ChannelFeatureType.ProgressBoss3ID,
+            ChannelFeatureType.ProgressBoss4ID,
+            ChannelFeatureType.ProgressBoss5ID
         )]
         public static async Task UpdateProgressStatusReady(CommandEventArgs commandEventArgs)
             => await new BattleProgress(commandEventArgs).UpdateStatusData(ProgressStatus.AttackReady);
@@ -135,14 +120,11 @@ namespace PriconneBotConsoleApp.Script
             new[] { "atk", "確定" },
             0,
             0,
-            new[]
-            {
-                ChannelFeatureType.ProgressBoss1ID,
-                ChannelFeatureType.ProgressBoss2ID,
-                ChannelFeatureType.ProgressBoss3ID,
-                ChannelFeatureType.ProgressBoss4ID,
-                ChannelFeatureType.ProgressBoss5ID,
-            }
+            ChannelFeatureType.ProgressBoss1ID,
+            ChannelFeatureType.ProgressBoss2ID,
+            ChannelFeatureType.ProgressBoss3ID,
+            ChannelFeatureType.ProgressBoss4ID,
+            ChannelFeatureType.ProgressBoss5ID
         )]
         public static async Task UpdateProgressStatusDone(CommandEventArgs commandEventArgs)
             => await new BattleProgress(commandEventArgs).UpdateStatusData(ProgressStatus.AttackDone);
@@ -151,14 +133,11 @@ namespace PriconneBotConsoleApp.Script
             new[] { "sos", "jiko", "ziko", "事故" },
             0,
             0,
-            new[]
-            {
-                ChannelFeatureType.ProgressBoss1ID,
-                ChannelFeatureType.ProgressBoss2ID,
-                ChannelFeatureType.ProgressBoss3ID,
-                ChannelFeatureType.ProgressBoss4ID,
-                ChannelFeatureType.ProgressBoss5ID,
-            }
+            ChannelFeatureType.ProgressBoss1ID,
+            ChannelFeatureType.ProgressBoss2ID,
+            ChannelFeatureType.ProgressBoss3ID,
+            ChannelFeatureType.ProgressBoss4ID,
+            ChannelFeatureType.ProgressBoss5ID
         )]
         public static async Task UpdateProgressSOS(CommandEventArgs commandEventArgs)
             => await new BattleProgress(commandEventArgs).UpdateStatusData(ProgressStatus.SOS);
@@ -167,98 +146,77 @@ namespace PriconneBotConsoleApp.Script
             new[] { "〆確定", "fin" },
             0,
             0,
-            new[]
-            {
-                ChannelFeatureType.ProgressBoss1ID,
-                ChannelFeatureType.ProgressBoss2ID,
-                ChannelFeatureType.ProgressBoss3ID,
-                ChannelFeatureType.ProgressBoss4ID,
-                ChannelFeatureType.ProgressBoss5ID,
-            }
+            ChannelFeatureType.ProgressBoss1ID,
+            ChannelFeatureType.ProgressBoss2ID,
+            ChannelFeatureType.ProgressBoss3ID,
+            ChannelFeatureType.ProgressBoss4ID,
+            ChannelFeatureType.ProgressBoss5ID
         )]
         public static async Task UpdateProgressFin(CommandEventArgs commandEventArgs)
             => await new BattleProgress(commandEventArgs).UpdateStatusData(ProgressStatus.SubdueBoss);
 
         [Command(
             "!init", 0, 0,
-            new[]
-            {
-                ChannelFeatureType.ProgressBoss1ID,
-                ChannelFeatureType.ProgressBoss2ID,
-                ChannelFeatureType.ProgressBoss3ID,
-                ChannelFeatureType.ProgressBoss4ID,
-                ChannelFeatureType.ProgressBoss5ID,
-            }
+            ChannelFeatureType.ProgressBoss1ID,
+            ChannelFeatureType.ProgressBoss2ID,
+            ChannelFeatureType.ProgressBoss3ID,
+            ChannelFeatureType.ProgressBoss4ID,
+            ChannelFeatureType.ProgressBoss5ID
         )]
         public static async Task InitProgressData(CommandEventArgs commandEventArgs)
             => await new BattleProgress(commandEventArgs).InitCommand();
 
         [Command(
-             "!call", 1, 1,
-             new[]
-             {
-                ChannelFeatureType.ProgressBoss1ID,
-                ChannelFeatureType.ProgressBoss2ID,
-                ChannelFeatureType.ProgressBoss3ID,
-                ChannelFeatureType.ProgressBoss4ID,
-                ChannelFeatureType.ProgressBoss5ID,
-             }
+            "!call", 1, 1,
+            ChannelFeatureType.ProgressBoss1ID,
+            ChannelFeatureType.ProgressBoss2ID,
+            ChannelFeatureType.ProgressBoss3ID,
+            ChannelFeatureType.ProgressBoss4ID,
+            ChannelFeatureType.ProgressBoss5ID
          )]
         public static async Task CallProgress(CommandEventArgs commandEventArgs)
              => await new BattleProgress(commandEventArgs).Start();
 
         [Command(
-             "!list", 0, 0,
-             new[]
-             {
-                ChannelFeatureType.ProgressBoss1ID,
-                ChannelFeatureType.ProgressBoss2ID,
-                ChannelFeatureType.ProgressBoss3ID,
-                ChannelFeatureType.ProgressBoss4ID,
-                ChannelFeatureType.ProgressBoss5ID,
-             }
+            "!list", 0, 0,
+            ChannelFeatureType.ProgressBoss1ID,
+            ChannelFeatureType.ProgressBoss2ID,
+            ChannelFeatureType.ProgressBoss3ID,
+            ChannelFeatureType.ProgressBoss4ID,
+            ChannelFeatureType.ProgressBoss5ID
          )]
         public static async Task DisplayList(CommandEventArgs commandEventArgs)
              => await new BattleProgress(commandEventArgs).SendList();
 
         [Command(
-             "!rm", 1, 1,
-             new[]
-             {
-                ChannelFeatureType.ProgressBoss1ID,
-                ChannelFeatureType.ProgressBoss2ID,
-                ChannelFeatureType.ProgressBoss3ID,
-                ChannelFeatureType.ProgressBoss4ID,
-                ChannelFeatureType.ProgressBoss5ID,
-             }
+            "!rm", 1, 1,
+            ChannelFeatureType.ProgressBoss1ID,
+            ChannelFeatureType.ProgressBoss2ID,
+            ChannelFeatureType.ProgressBoss3ID,
+            ChannelFeatureType.ProgressBoss4ID,
+            ChannelFeatureType.ProgressBoss5ID
          )]
         public static async Task RemoveProgressData(CommandEventArgs commandEventArgs)
              => await new BattleProgress(commandEventArgs).RemoveOrRevertUserData(true);
 
         [Command(
-             "!rv", 1, 1,
-             new[]
-             {
-                ChannelFeatureType.ProgressBoss1ID,
-                ChannelFeatureType.ProgressBoss2ID,
-                ChannelFeatureType.ProgressBoss3ID,
-                ChannelFeatureType.ProgressBoss4ID,
-                ChannelFeatureType.ProgressBoss5ID,
-             }
+            "!rv", 1, 1,
+            ChannelFeatureType.ProgressBoss1ID,
+            ChannelFeatureType.ProgressBoss2ID,
+            ChannelFeatureType.ProgressBoss3ID,
+            ChannelFeatureType.ProgressBoss4ID,
+            ChannelFeatureType.ProgressBoss5ID
          )]
         public static async Task RevertProgressData(CommandEventArgs commandEventArgs)
              => await new BattleProgress(commandEventArgs).RemoveOrRevertUserData();
 
         [Command(
              "!next", 0, 0,
-             new[]
-             {
-                ChannelFeatureType.ProgressBoss1ID,
-                ChannelFeatureType.ProgressBoss2ID,
-                ChannelFeatureType.ProgressBoss3ID,
-                ChannelFeatureType.ProgressBoss4ID,
-                ChannelFeatureType.ProgressBoss5ID,
-             }
+            ChannelFeatureType.ProgressBoss1ID,
+            ChannelFeatureType.ProgressBoss2ID,
+            ChannelFeatureType.ProgressBoss3ID,
+            ChannelFeatureType.ProgressBoss4ID,
+            ChannelFeatureType.ProgressBoss5ID
          )]
         public static async Task NextProgressBoss(CommandEventArgs commandEventArgs)
              => await new BattleProgress(commandEventArgs).NextBoss();
