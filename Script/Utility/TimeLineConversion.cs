@@ -148,8 +148,6 @@ namespace PriconneBotConsoleApp.Script
                     {
                         afterLineMessageContent = afterLineMessageContent.Replace(matchTimeData.Value, $"{afterSeconds:D2}{matchTimeData.Groups[2]}");
                     }
-
-                    
                 }
 
                 sendMessageContent.AppendLine(afterLineMessageContent);

@@ -340,5 +340,9 @@ namespace PriconneBotConsoleApp.Script
         [Command("!tl", 2, 2)]
         public static async Task TimeLineConversion(CommandEventArgs commandEventArgs)
             => await new TimeLineConversion(commandEventArgs).RunByMessage();
+
+        [Command("!today", 0, 0)]
+        public static async Task EventInfomation(CommandEventArgs commandEventArgs)
+            => await new PriconneEventViewer(commandEventArgs).SendEventInfomationByMessage();
     }
 }
