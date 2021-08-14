@@ -104,7 +104,7 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private ReservationData MessageToReservationData()
         {
-            if (!Enum.TryParse<BossNumberType>(m_CommandEventArgs.Arguments[1], out var bossNumber)
+            if (!(byte.TryParse(m_CommandEventArgs.Arguments[1], out var bossNumber) && CommonDefine.MinBossNumber<= bossNumber && bossNumber <= CommonDefine.MaxBossNumber )
                 || !(byte.TryParse(m_CommandEventArgs.Arguments[0], out var battleLap) && battleLap > m_CommandEventArgs.ClanData.GetBossLap(bossNumber)))
             {
                 return null;
