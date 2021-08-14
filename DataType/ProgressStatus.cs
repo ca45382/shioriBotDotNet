@@ -20,6 +20,6 @@ namespace PriconneBotConsoleApp.DataType
         SOS,
 
         [Description("🏃")]
-        Fin,
+        SubdueBoss,
     }
 }

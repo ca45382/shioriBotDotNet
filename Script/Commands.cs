@@ -177,7 +177,7 @@ namespace PriconneBotConsoleApp.Script
             }
         )]
         public static async Task UpdateProgressFin(CommandEventArgs commandEventArgs)
-            => await new BattleProgress(commandEventArgs).UpdateStatusData(ProgressStatus.Fin);
+            => await new BattleProgress(commandEventArgs).UpdateStatusData(ProgressStatus.SubdueBoss);
 
         [Command(
             "!init", 0, 0,

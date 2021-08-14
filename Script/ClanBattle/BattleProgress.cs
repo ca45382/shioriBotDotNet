@@ -416,7 +416,7 @@ namespace PriconneBotConsoleApp.Script
             }
 
             return DatabaseProgressController.GetProgressData(playerData, m_BossNumberType)
-               .Where(x => x.Status != (byte)ProgressStatus.AttackDone || x.Status != (byte)ProgressStatus.Fin)
+               .Where(x => x.Status != (byte)ProgressStatus.AttackDone || x.Status != (byte)ProgressStatus.SubdueBoss)
                .FirstOrDefault();
         }
 

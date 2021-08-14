@@ -119,7 +119,7 @@ namespace PriconneBotConsoleApp.Script
             if (commentData.Length > MaxCommentLength)
             {
                 commentData = commentData.Substring(0, MaxCommentLength);
-                _ = m_CommandEventArgs.Channel.SendTimedMessageAsync(TimeDefine.WarningMessageDisplayTime, WarningType.LongComment.ToLabel());
+                _ = m_CommandEventArgs.Channel.SendTimedMessageAsync(TimeDefine.WarningMessageDisplayTime, WarningType.TooLongComment.ToLabel());
             }
 
             return new ReservationData()
