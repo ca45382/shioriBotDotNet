@@ -332,5 +332,13 @@ namespace PriconneBotConsoleApp.Script
         [Command(compatibleChannels: ChannelFeatureType.TaskKillID)]
         public static async Task StartTaskkill(CommandEventArgs commandEventArgs)
             => await new BattleTaskKill(commandEventArgs.ClanData, commandEventArgs.SocketUserMessage).RunByMessageCommands();
+
+        [Command("!dice", 0, 1)]
+        public static async Task Dice(CommandEventArgs commandEventArgs)
+            => await new Dice(commandEventArgs).Run();
+
+        [Command("!tl", 2, 2)]
+        public static async Task TimeLineConversion(CommandEventArgs commandEventArgs)
+            => await new TimeLineConversion(commandEventArgs).RunByMessage();
     }
 }

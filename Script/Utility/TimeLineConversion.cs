@@ -1,17 +1,17 @@
 ﻿using System;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
+using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.Define;
 
 namespace PriconneBotConsoleApp.Script
 {
     public class TimeLineConversion
     {
-        private IMessage m_userMessage;
+        private CommandEventArgs m_CommandEventArgs;
 
         private class ConvertData
         {
@@ -22,19 +22,12 @@ namespace PriconneBotConsoleApp.Script
             public IMessage Message = null;
         }
 
-        public TimeLineConversion(IMessage message)
-        {
-            m_userMessage = message;
-        }
+        public TimeLineConversion(CommandEventArgs commandEventArgs)
+            => m_CommandEventArgs = commandEventArgs;
 
         public async Task RunByMessage()
         {
-            if (m_userMessage == null || !m_userMessage.Content.StartsWith("!tl"))
-            {
-                return;
-            }
-
-            var messageData = await LoadTimeLineMessage(m_userMessage);
+            var messageData = await LoadTimeLineMessage();
 
             if (messageData == null)
             {
@@ -42,9 +35,7 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var convertMessage = ConversionMessage(messageData.Message.Content, messageData.Time);
-            var userChannelData = m_userMessage.Channel as ISocketMessageChannel;
-            await userChannelData.SendMessageAsync(convertMessage);
-            return;
+            await m_CommandEventArgs.Channel.SendMessageAsync(convertMessage);
         }
 
         /// <summary>
@@ -53,11 +44,12 @@ namespace PriconneBotConsoleApp.Script
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        private async Task<ConvertData> LoadTimeLineMessage(IMessage message)
+        private async Task<ConvertData> LoadTimeLineMessage()
         {
-            var splitMessageContent = message.Content.Split( new[] { " ", "　" }, StringSplitOptions.RemoveEmptyEntries);
 
-            if (splitMessageContent.Length != 3 || !int.TryParse(splitMessageContent[2], out int timeData) || timeData < CommonDefine.MinBattleTime || timeData > CommonDefine.MaxBattleTime )
+            if (!int.TryParse(m_CommandEventArgs.Arguments[1], out int timeData) 
+                || timeData < CommonDefine.MinBattleTime 
+                || CommonDefine.MaxBattleTime < timeData  )
             {
                 return null;
             }
@@ -67,10 +59,10 @@ namespace PriconneBotConsoleApp.Script
                 Time = timeData,
             };
 
-            var uriData = new Uri(splitMessageContent[1]);
+            var uriData = new Uri(m_CommandEventArgs.Arguments[0]);
             var discordID = uriData.Segments;
 
-            if (discordID.Count() != 5)
+            if (discordID.Length != 5)
             {
                 return null;
             }
@@ -79,8 +71,7 @@ namespace PriconneBotConsoleApp.Script
             convertData.MessageChannelID = discordID[3].Replace("/", "");
             convertData.MessageID = discordID[4];
 
-            var userChannelData = message.Channel as SocketGuildChannel;
-            var timeLineChannelData = userChannelData.Guild.GetChannel(ulong.Parse(convertData.MessageChannelID)) as SocketTextChannel;
+            var timeLineChannelData = m_CommandEventArgs.Role.Guild.GetChannel(ulong.Parse(convertData.MessageChannelID)) as SocketTextChannel;
             convertData.Message = await timeLineChannelData.GetMessageAsync(ulong.Parse(convertData.MessageID));
 
             if (convertData.Message == null)
