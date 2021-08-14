@@ -79,7 +79,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var deleteReservationData = MessageToReservationData();
 
-            if (deleteReservationData is null)
+            if (deleteReservationData == null)
             {
                 return;
             }
@@ -122,7 +122,7 @@ namespace PriconneBotConsoleApp.Script
             {
                 PlayerID = m_CommandEventArgs.PlayerData.PlayerID,
                 BattleLap = battleLap,
-                BossNumber = (byte)bossNumber,
+                BossNumber = bossNumber,
                 CommentData = commentData,
             };
         }
@@ -147,7 +147,7 @@ namespace PriconneBotConsoleApp.Script
 
         private bool DeleteUserReservationData(ReservationData reservationData)
         {
-            var userReservationDataList = DatabaseReservationController.LoadReservationData(reservationData.PlayerData);
+            var userReservationDataList = DatabaseReservationController.LoadReservationData(m_CommandEventArgs.PlayerData);
 
             var sqlReservationData = userReservationDataList
                 .Where(x => x.BossNumber == reservationData.BossNumber && x.BattleLap == reservationData.BattleLap)
