@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -70,14 +71,10 @@ namespace PriconneBotConsoleApp.Script
         }
 
         public async Task SendList()
-        {
-            await SendClanProgressList();
-        }
+            => await SendClanProgressList();
 
         public async Task NextBoss()
-        {
-            await ChangeLap();
-        }
+            => await ChangeLap();
 
         /// <summary>
         /// 編成データをアップデートする。
@@ -88,7 +85,7 @@ namespace PriconneBotConsoleApp.Script
         {
             if (!TryGetProgressData(out var userProgressData))
             {
-                userProgressData = new ProgressData()
+                userProgressData = new ProgressData
                 {
                     PlayerID = m_CommandEventArgs.PlayerData.PlayerID,
                     BossNumber = (byte)m_BossNumberType,
@@ -202,6 +199,7 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var playerData = DatabasePlayerDataController.LoadPlayerData(m_CommandEventArgs.Role, userData.Id);
+
             var playerProgressData = DatabaseProgressController.GetProgressData(playerData, m_BossNumberType)
                 .OrderByDescending(x => x.UpdateDateTime).FirstOrDefault();
 
@@ -285,14 +283,10 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private void InitializeProgressData()
         {
-            var deleteData = DatabaseProgressController.GetProgressData(m_CommandEventArgs.ClanData, m_BossNumberType);
-
-            if (deleteData == null)
+            if(DatabaseProgressController.GetProgressData(m_CommandEventArgs.ClanData, m_BossNumberType) is { } deleteData)
             {
-                return;
+                DatabaseProgressController.DeleteProgressData(deleteData);
             }
-
-            DatabaseProgressController.DeleteProgressData(deleteData);
         }
 
         private async Task SendClanProgressList(bool removeLastMessage = true)
@@ -306,55 +300,44 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var channelIDTemp = m_CommandEventArgs.ClanData.GetChannelID(BossNumberToChannelType(m_BossNumberType));
-
-            var progressChannelTEMP = m_CommandEventArgs.Role.Guild.GetChannel(channelIDTemp) as SocketTextChannel;
-            var progressChannel = progressChannelTEMP as SocketTextChannel;
+            var progressChannel = m_CommandEventArgs.Role.Guild.GetChannel(channelIDTemp) as SocketTextChannel;
             var lastMessageID = m_CommandEventArgs.ClanData.GetMessageID(BossNumberToMessageType(m_BossNumberType));
             DatabaseMessageDataController.UpdateMessageID(m_CommandEventArgs.ClanData, sendMessage.Id, BossNumberToMessageType(m_BossNumberType));
-            var lastMessage = progressChannel.GetCachedMessage(lastMessageID);
+            var cachedMessage = progressChannel.GetCachedMessage(lastMessageID);
 
-            if (lastMessage == null)
+            if (cachedMessage == null)
             {
-                IMessage lastIMessage;
-
                 try
                 {
-                    lastIMessage = await progressChannel.GetMessageAsync(lastMessageID);
+                    var message = await progressChannel.GetMessageAsync(lastMessageID);
+
+                    if (removeLastMessage)
+                    {
+                        await message.DeleteAsync();
+                    }
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
-                    return;
                 }
-
-                if (removeLastMessage)
-                {
-                    await lastIMessage.DeleteAsync();
-                }
-
-                return;
             }
-            else
+            else if (removeLastMessage)
             {
-                if (removeLastMessage)
-                {
-                    await lastMessage.DeleteAsync();
-                }
+                await cachedMessage.DeleteAsync();
             }
-
-            return;
         }
 
         private Embed CreateProgressList()
         {
+            var clanPlayerDataList = DatabasePlayerDataController.LoadPlayerData(m_CommandEventArgs.ClanData);
             var clanProgressData = DatabaseProgressController.GetProgressData(m_CommandEventArgs.ClanData, m_BossNumberType)
                 .OrderBy(x => x.Status).ThenByDescending(x => x.Damage).ThenBy(x => x.CreateDateTime)
                 .ToArray();
-            var clanPlayerDataList = DatabasePlayerDataController.LoadPlayerData(m_CommandEventArgs.ClanData);
-            var progressPlayer = clanProgressData.Select(x => new PlayerInfo(
-                clanPlayerDataList.FirstOrDefault(y => y.PlayerID == x.PlayerID),
-                x
-                )).ToArray();
+
+            var progressPlayer = clanProgressData.Select(x => 
+                    new PlayerInfo(clanPlayerDataList.FirstOrDefault(y => y.PlayerID == x.PlayerID),x))
+                .ToArray();
+
             var bossLap = m_CommandEventArgs.ClanData.GetBossLap(m_BossNumberType);
             var bossData = RediveClanBattleData.BossDataList
                 .FirstOrDefault(x => x.BossNumber == (byte)m_BossNumberType && x.LapNumberFrom <= bossLap && (x.LapNumberTo == -1 || x.LapNumberTo >= bossLap));
@@ -372,13 +355,13 @@ namespace PriconneBotConsoleApp.Script
             {
                 remainAttackString.Append((i == 0 ? "完凸:" : i + "凸:") + reportCount[i] + "人 ");
             }
+
             summaryStringBuilder.AppendLine(remainAttackString.ToString());
 
             // ボスのHPをここに入力(万表示)
             var bossHP = bossData?.HP / CommonDefine.DisplayDamageUnit ?? 0;
             var sumAttackDoneHP = progressPlayer.Where(x => x.ProgressData.Status == (byte)ProgressStatus.AttackDone).Select(x => (int)x.ProgressData.Damage).Sum();
             var sumAttackReadyHP = progressPlayer.Where(x => x.ProgressData.Status == (byte)ProgressStatus.AttackReady).Select(x => (int)x.ProgressData.Damage).Sum();
-
             summaryStringBuilder.AppendLine("現在HP " + (bossHP - sumAttackDoneHP) + "万 / " + bossHP + "万");
             summaryStringBuilder.AppendLine("仮確HP " + (bossHP - sumAttackReadyHP - sumAttackDoneHP) + "万 / " + bossHP + "万");
 
@@ -389,6 +372,7 @@ namespace PriconneBotConsoleApp.Script
             };
 
             var reportMessage = string.Join("\n", progressPlayer.Select(x => x.GetNameWithData()).ToArray());
+
             var embedFieldBuilder = new EmbedFieldBuilder()
             {
                 Name = "参加者",
@@ -421,10 +405,7 @@ namespace PriconneBotConsoleApp.Script
         }
 
         private bool TryGetProgressData(out ProgressData progressData)
-        {
-            progressData = GetProgressData();
-            return progressData != null;
-        }
+            => (progressData = GetProgressData()) != null;
 
         private MessageFeatureType BossNumberToMessageType(BossNumberType bossNumberType)
         {

@@ -59,7 +59,7 @@ namespace PriconneBotConsoleApp.Script
                 var bossNumber = int.Parse(Regex.Match(m_CommandEventArgs.Name, @"\d").Value);
 
                 if (!EnumMapper.TryParse<AttackType>(Regex.Match(m_CommandEventArgs.Name, @"\D{1,3}").Value, out var attackType)
-                    || attackType == AttackType.Unknown 
+                    || attackType == AttackType.Unknown
                     || attackType == AttackType.CarryOver)
                 {
                     return;
@@ -184,10 +184,10 @@ namespace PriconneBotConsoleApp.Script
         public void DeleteAllClanReport()
         {
             var clanReportData = DatabaseReportDataController.GetReportData(m_CommandEventArgs.ClanData);
+
             if (DatabaseReportDataController.DeleteReportData(clanReportData))
             {
                 _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(EnumMapper.ToEmoji(ReactionType.Success));
-                
             }
         }
 
