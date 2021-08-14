@@ -104,6 +104,7 @@ namespace PriconneBotConsoleApp.Database
             var transaction = databaseConnector.Database.BeginTransaction();
 
             databaseConnector.ReservationData.Add(reservationData);
+
             try
             {
                 databaseConnector.SaveChanges();
@@ -123,8 +124,7 @@ namespace PriconneBotConsoleApp.Database
         {
             using var databaseConnector = new DatabaseConnector();
             var transaction = databaseConnector.Database.BeginTransaction();
-            var updateData = databaseConnector.ReservationData
-                .FirstOrDefault(x => x.ReserveID == reservationData.ReserveID);
+            var updateData = databaseConnector.ReservationData.FirstOrDefault(x => x.ReserveID == reservationData.ReserveID);
 
             try
             {
@@ -148,7 +148,6 @@ namespace PriconneBotConsoleApp.Database
 
             foreach (var reservationData in reservationDataSet)
             {
-
                 var updateData = databaseConnector.ReservationData.AsQueryable()
                     .FirstOrDefault(d => d.PlayerID == reservationData.PlayerID && d.BossNumber == reservationData.BossNumber
                         && d.BattleLap == reservationData.BattleLap && !d.DeleteFlag);

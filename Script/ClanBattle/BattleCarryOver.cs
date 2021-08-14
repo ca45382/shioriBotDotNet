@@ -78,7 +78,7 @@ namespace PriconneBotConsoleApp.Script
 
             var databaseCarryOverList = DatabaseCarryOverController.GetCarryOverData(playerData).ToArray();
             var databaseCarryOverData = databaseCarryOverList.FirstOrDefault(x => x.BossNumber == carryOverData.BossNumber && x.RemainTime == carryOverData.RemainTime);
-            bool result = false;
+            var result = false;
 
             if (databaseCarryOverData != null)
             {
@@ -92,7 +92,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (result)
             {
-                _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
+                _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(ReactionType.Success.ToEmoji());
             }
         }
 
@@ -128,21 +128,15 @@ namespace PriconneBotConsoleApp.Script
         /// </summary>
         public void DeleteOtherPlayerData()
         {
-            SocketGuildUser targetUser;
-
-            if (MentionUtils.TryParseUser(m_CommandEventArgs.Arguments[0], out var userID) ||
-                ulong.TryParse(m_CommandEventArgs.Arguments[0], out userID))
-            {
-                targetUser = m_CommandEventArgs.Role.Guild.GetUser(userID);
-            }
-            else
-            {
-                throw new ArgumentNullException();
-            }
+            var targetUser = MentionUtils.TryParseUser(m_CommandEventArgs.Arguments[0], out var userID)
+                    || ulong.TryParse(m_CommandEventArgs.Arguments[0], out userID)
+                ? m_CommandEventArgs.Role.Guild.GetUser(userID)
+                : throw new ArgumentNullException();
 
             // コマンドは `!rm @削除対象のユーザー 古い方から何番目か` としている。
             if (!byte.TryParse(m_CommandEventArgs.Arguments[1], out var number)
-                || number > CommonDefine.MaxReportNumber || number <= 0)
+                || number <= 0
+                || CommonDefine.MaxReportNumber < number)
             {
                 throw new ArgumentOutOfRangeException();
             }
@@ -152,7 +146,7 @@ namespace PriconneBotConsoleApp.Script
             try
             {
                 DeletePlayerCarryOverData(playerData, number);
-                _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
+                _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(ReactionType.Success.ToEmoji());
             }
             catch (Exception e)
             {
@@ -173,21 +167,15 @@ namespace PriconneBotConsoleApp.Script
         private void DeletePlayerCarryOverData(PlayerData playerData, byte deleteNumber)
         {
             var carryOverList = DatabaseCarryOverController.GetCarryOverData(playerData)
-                .OrderBy(x => x.DateTime).ToArray();
+                .OrderBy(x => x.DateTime)
+                .ToArray();
 
             if (carryOverList.Length == 0)
             {
                 throw new ArgumentOutOfRangeException();
             }
 
-            if (deleteNumber > 0 && deleteNumber <= carryOverList.Length)
-            {
-                DatabaseCarryOverController.DeleteCarryOverData(carryOverList[deleteNumber - 1]);
-            }
-            else
-            {
-                DatabaseCarryOverController.DeleteCarryOverData(carryOverList.First());
-            }
+            DatabaseCarryOverController.DeleteCarryOverData(carryOverList[(deleteNumber > 0 && deleteNumber <= carryOverList.Length) ? deleteNumber - 1 : 0]);
         }
 
         /// <summary>
@@ -203,9 +191,12 @@ namespace PriconneBotConsoleApp.Script
             }
 
             DatabaseCarryOverController.DeleteCarryOverData(carryOverList);
-            _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
-            _ = m_CommandEventArgs.Channel.SendTimedMessageAsync(TimeDefine.SuccessMessageDisplayTime,
-                string.Format(EnumMapper.ToLabel(InfomationType.DeleteAllCarryOverData), TimeDefine.SuccessMessageDisplayTime));
+            _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(ReactionType.Success.ToEmoji());
+
+            _ = m_CommandEventArgs.Channel.SendTimedMessageAsync(
+                TimeDefine.SuccessMessageDisplayTime,
+                string.Format(EnumMapper.ToLabel(InfomationType.DeleteAllCarryOverData), TimeDefine.SuccessMessageDisplayTime)
+            );
         }
 
         // 持ち越しを表示するUIを考える
@@ -213,6 +204,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var carryOverArray = DatabaseCarryOverController.GetCarryOverData(m_CommandEventArgs.ClanData)
                 .OrderBy(x => x.DateTime);
+
             var playerArray = DatabasePlayerDataController.LoadPlayerData(m_CommandEventArgs.ClanData);
             List<PlayerInfo> carryOverStringList = new();
 

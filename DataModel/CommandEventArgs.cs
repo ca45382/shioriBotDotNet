@@ -24,7 +24,6 @@ namespace PriconneBotConsoleApp.DataModel
             Arguments = splitContents.Length > 1 ? splitContents.Skip(1).ToList() : Array.Empty<string>();
             User = SocketUserMessage.Author as SocketGuildUser;
             Channel = SocketUserMessage.Channel as SocketTextChannel;
-
             PlayerData = DatabasePlayerDataController.LoadPlayerData(Channel.Guild.Id, SocketUserMessage.Author.Id);
             Role = Channel.Guild.GetRole(PlayerData?.ClanData.ClanRoleID ?? 0);
 

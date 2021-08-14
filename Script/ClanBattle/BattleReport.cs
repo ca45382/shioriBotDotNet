@@ -45,9 +45,7 @@ namespace PriconneBotConsoleApp.Script
         }
 
         public BattleReport(CommandEventArgs commandEventArgs)
-        {
-            m_CommandEventArgs = commandEventArgs;
-        }
+            => m_CommandEventArgs = commandEventArgs;
 
         /// <summary>
         /// 個人の凸報告
@@ -61,7 +59,8 @@ namespace PriconneBotConsoleApp.Script
                 var bossNumber = int.Parse(Regex.Match(m_CommandEventArgs.Name, @"\d").Value);
 
                 if (!EnumMapper.TryParse<AttackType>(Regex.Match(m_CommandEventArgs.Name, @"\D{1,3}").Value, out var attackType)
-                    || attackType == AttackType.Unknown || attackType == AttackType.CarryOver)
+                    || attackType == AttackType.Unknown 
+                    || attackType == AttackType.CarryOver)
                 {
                     return;
                 }
@@ -92,7 +91,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (DatabaseReportDataController.CreateReportData(reportData))
             {
-                _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(new Emoji(ReactionType.Success.ToLabel()));
+                _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(ReactionType.Success.ToEmoji());
             }
 
             return;
@@ -104,6 +103,7 @@ namespace PriconneBotConsoleApp.Script
         public void DeleteReportData()
         {
             var playerData = new PlayerData();
+
             if (m_CommandEventArgs.Arguments.Count == 1
                 && ulong.TryParse(Regex.Match(m_CommandEventArgs.Arguments[0], @"\d+").Value, out ulong registerUserID))
             {
@@ -155,7 +155,7 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            var reportData = new ReportData()
+            var reportData = new ReportData
             {
                 AttackType = (byte)attackType,
                 BossNumber = bossNumber,
