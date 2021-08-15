@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
 using PriconneBotConsoleApp.Database;
 using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.DataType;
@@ -36,8 +32,10 @@ namespace PriconneBotConsoleApp.Script
                     TimeDefine.ErrorMessageDisplayTime,
                     string.Format(ErrorType.OutOfReservationTime.ToLabel(),
                         $"{m_CommandEventArgs.ClanData.ReservationStartTime.Hours}",
-                        $"{m_CommandEventArgs.ClanData.ReservationEndTime.Hours}")
-                    );
+                        $"{m_CommandEventArgs.ClanData.ReservationEndTime.Hours}"
+                    )
+                );
+
                 return;
             }
 
