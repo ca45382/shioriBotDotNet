@@ -111,6 +111,7 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         public async Task UpdateDamageData()
         {
+            // TODO : progressDataFlagでやりくりしているのが非常に見にくいので修正したい
             var progressDataFlag = false;
             int damageNumber = 0;
             byte remainTimeNumber = 0;

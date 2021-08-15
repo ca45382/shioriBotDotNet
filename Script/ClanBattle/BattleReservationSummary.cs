@@ -105,6 +105,7 @@ namespace PriconneBotConsoleApp.Script
             var reservationDataSet = DatabaseReservationController.LoadReservationData(m_ClanData);
             List<List<ReservationData>> reservationDataList = new();
 
+            // TODO : Linqで行けそうな気がする
             for (var i = 0; i < CommonDefine.MaxBossNumber; i++)
             {
                 reservationDataList.Add(new List<ReservationData>());
