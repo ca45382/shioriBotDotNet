@@ -37,7 +37,7 @@ namespace PriconneBotConsoleApp.Script
 
                 return string.Join(
                     halfSizeWhitespace,
-                    ((ProgressStatus) ProgressData.Status).ToLabel(),
+                    ((ProgressStatus)ProgressData.Status).ToLabel(),
                     ProgressData.CarryOverFlag ? "持" : fullSizeWhitespace,
                     $"{ProgressData.Damage,6}@{ProgressData.RemainTime:D2}",
                     ((AttackType)ProgressData.AttackType).ToShortLabel(),
@@ -285,7 +285,7 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private void InitializeProgressData()
         {
-            if(DatabaseProgressController.GetProgressData(m_CommandEventArgs.ClanData, m_BossNumberType) is { } deleteData)
+            if (DatabaseProgressController.GetProgressData(m_CommandEventArgs.ClanData, m_BossNumberType) is { } deleteData)
             {
                 DatabaseProgressController.DeleteProgressData(deleteData);
             }
@@ -332,15 +332,18 @@ namespace PriconneBotConsoleApp.Script
         private Embed CreateProgressList()
         {
             var clanPlayerDataList = DatabasePlayerDataController.LoadPlayerData(m_CommandEventArgs.ClanData);
+
             var clanProgressData = DatabaseProgressController.GetProgressData(m_CommandEventArgs.ClanData, m_BossNumberType)
-                .OrderBy(x => x.Status).ThenByDescending(x => x.Damage).ThenBy(x => x.CreateDateTime)
+                .OrderBy(x => x.Status)
+                .ThenByDescending(x => x.Damage)
+                .ThenBy(x => x.CreateDateTime)
                 .ToArray();
 
-            var progressPlayer = clanProgressData.Select(x => 
-                    new PlayerInfo(clanPlayerDataList.FirstOrDefault(y => y.PlayerID == x.PlayerID),x))
+            var progressPlayer = clanProgressData.Select(x => new PlayerInfo(clanPlayerDataList.FirstOrDefault(y => y.PlayerID == x.PlayerID), x))
                 .ToArray();
 
             var bossLap = m_CommandEventArgs.ClanData.GetBossLap(m_BossNumberType);
+
             var bossData = RediveClanBattleData.BossDataList
                 .FirstOrDefault(x => x.BossNumber == (byte)m_BossNumberType && x.LapNumberFrom <= bossLap && (x.LapNumberTo == -1 || x.LapNumberTo >= bossLap));
 
