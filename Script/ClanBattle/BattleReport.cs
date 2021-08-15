@@ -121,7 +121,7 @@ namespace PriconneBotConsoleApp.Script
             }
 
             var removeData = DatabaseReportDataController.GetReportData(playerData)
-                .OrderBy(x => x.DateTime).Last();
+                .MaxBy(x => x.DateTime);
 
             if (DatabaseReportDataController.DeleteReportData(removeData))
             {

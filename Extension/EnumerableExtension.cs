@@ -13,5 +13,27 @@ namespace PriconneBotConsoleApp.Extension
                 action(element);
             }
         }
+
+        public static TSource MaxBy<TSource, TValue>([NotNull] this IEnumerable<TSource> source, [NotNull] Func<TSource, TValue> func)
+            where TValue : IComparable<TValue>
+        {
+            var firstFlag = true;
+            TValue maxValue = default;
+            TSource maxSource = default;
+
+            foreach (var element in source)
+            {
+                var value = func(element);
+
+                if (firstFlag || value.CompareTo(maxValue) > 0)
+                {
+                    maxValue = value;
+                    maxSource = element;
+                    firstFlag = false;
+                }
+            }
+
+            return maxSource;
+        }
     }
 }
