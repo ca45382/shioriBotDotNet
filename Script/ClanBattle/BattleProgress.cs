@@ -62,7 +62,7 @@ namespace PriconneBotConsoleApp.Script
         public async Task Start()
         {
             if (!ushort.TryParse(m_CommandEventArgs.Arguments[0], out var lap)
-                || lap > ClanBattleDefine.MaxLapNumber || lap <= 0)
+                || !ClanBattleDefine.IsValidLapNumber(lap))
             {
                 return;
             }
