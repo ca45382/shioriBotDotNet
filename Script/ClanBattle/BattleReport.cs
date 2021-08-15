@@ -69,7 +69,7 @@ namespace PriconneBotConsoleApp.Script
                 reportData.BossNumber = (byte)bossNumber;
             }
 
-            if (reportData.BossNumber < CommonDefine.MinBossNumber || reportData.BossNumber > CommonDefine.MaxBossNumber)
+            if (!CommonDefine.IsValidBossNumber(reportData.BossNumber))
             {
                 return;
             }
@@ -140,9 +140,9 @@ namespace PriconneBotConsoleApp.Script
         public void RegisterOtherUserReportData()
         {
             if ((!ulong.TryParse(m_CommandEventArgs.Arguments[0], out var registerUserID)
-                && !MentionUtils.TryParseUser(m_CommandEventArgs.Arguments[0], out registerUserID))
+                    && !MentionUtils.TryParseUser(m_CommandEventArgs.Arguments[0], out registerUserID))
                 || !byte.TryParse(m_CommandEventArgs.Arguments[1], out var bossNumber)
-                || bossNumber > CommonDefine.MaxBossNumber || bossNumber < CommonDefine.MinBossNumber
+                || !CommonDefine.IsValidBossNumber(bossNumber)
                 || !EnumMapper.TryParse<AttackType>(m_CommandEventArgs.Arguments[2], out var attackType))
             {
                 return;

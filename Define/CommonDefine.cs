@@ -19,5 +19,11 @@
         public const int MaxDamageValue = 999999;
 
         public const int DisplayDamageUnit = 10000;
+
+        public static bool IsValidBossNumber(int value)
+            => MinBossNumber <= value && value <= MaxBossNumber;
+
+        public static bool IsValidBattleTime(int value)
+            => MinBattleTime <= value && value <= MaxBattleTime;
     }
 }

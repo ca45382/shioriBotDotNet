@@ -134,7 +134,8 @@ namespace PriconneBotConsoleApp.Script
 
                 if (!uint.TryParse(Regex.Match(damageText, @"\d+").ToString(), out damageNumber)
                     || !byte.TryParse(Regex.Match(remainTimeText, @"\d+").ToString(), out remainTimeNumber)
-                    || damageNumber > CommonDefine.MaxDamageValue || remainTimeNumber > CommonDefine.MaxBattleTime)
+                    || damageNumber > CommonDefine.MaxDamageValue
+                    || remainTimeNumber > CommonDefine.MaxBattleTime)
                 {
                     return;
                 }

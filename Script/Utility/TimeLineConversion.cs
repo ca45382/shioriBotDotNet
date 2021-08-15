@@ -46,10 +46,8 @@ namespace PriconneBotConsoleApp.Script
         /// <returns></returns>
         private async Task<ConvertData> LoadTimeLineMessage()
         {
-
-            if (!int.TryParse(m_CommandEventArgs.Arguments[1], out int timeData) 
-                || timeData < CommonDefine.MinBattleTime 
-                || CommonDefine.MaxBattleTime < timeData  )
+            if (!int.TryParse(m_CommandEventArgs.Arguments[1], out int timeData)
+                || !CommonDefine.IsValidBattleTime(timeData))
             {
                 return null;
             }

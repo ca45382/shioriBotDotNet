@@ -60,8 +60,8 @@ namespace PriconneBotConsoleApp.Script
 
             if (!byte.TryParse(m_CommandEventArgs.Arguments[0], out var bossNumber)
                 || !byte.TryParse(m_CommandEventArgs.Arguments[1], out var remainTime)
-                || bossNumber < CommonDefine.MinBossNumber || bossNumber > CommonDefine.MaxBossNumber
-                || remainTime < CommonDefine.MinBattleTime || remainTime > CommonDefine.MaxBattleTime
+                || !CommonDefine.IsValidBossNumber(bossNumber)
+                || !CommonDefine.IsValidBattleTime(remainTime)
                 || playerData == null)
             {
                 return;
