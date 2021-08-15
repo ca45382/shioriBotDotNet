@@ -41,9 +41,10 @@ namespace PriconneBotConsoleApp.Script
                 .FirstOrDefault(x => x.ChannelID == m_TextChannel.Id)
                 ?.FeatureID ?? 0;
 
-            if (channelFeatureID == (int)ChannelFeatureType.ReserveResultID)
+            if (channelFeatureID == (int)ChannelFeatureType.ReserveResultID
+                && m_Interaction is SocketMessageComponent socketMessageComponent)
             {
-                await new BattleReservationSummary(m_Role, m_ClanData).RunInteraction(m_Interaction as SocketMessageComponent);
+                await new BattleReservationSummary(m_Role, m_ClanData).RunInteraction(socketMessageComponent);
             }
 
             BattleDeclaration battleDeclaration = channelFeatureID switch
