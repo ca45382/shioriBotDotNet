@@ -119,7 +119,7 @@ namespace PriconneBotConsoleApp.Script
 
                 if (!reservationDataList[i].Any())
                 {
-                    // 何かの空白代入して空行を生成している。
+                    // 空行を保つためのゼロ幅空白(\u200b)を挿入している。
                     fieldBuilder.Value = "\n\u200b";
                 }
                 else
