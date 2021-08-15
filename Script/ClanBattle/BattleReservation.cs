@@ -47,6 +47,7 @@ namespace PriconneBotConsoleApp.Script
                     TimeDefine.ErrorMessageDisplayTime,
                     ErrorType.FailedReservation.ToLabel()
                     );
+
                 return;
             }
 
@@ -60,6 +61,7 @@ namespace PriconneBotConsoleApp.Script
                     TimeDefine.ErrorMessageDisplayTime,
                     string.Format(ErrorType.OutOfReservationBossLaps.ToLabel(), allowReservationLap.ToString())
                     );
+
                 return;
             }
 
