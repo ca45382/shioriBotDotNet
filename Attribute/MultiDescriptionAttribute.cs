@@ -1,20 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PriconneBotConsoleApp.Attribute
 {
     public struct MultiDescriptionData
     {
-        public string LongDescription;
-        public string ShortDescription;
-        public string[] Aliases;
+        public string LongDescription { get; init; }
+        public string ShortDescription { get; init; }
+        public IReadOnlyList<string> Aliases { get; init; }
+
+        private string[] m_Names;
+
+        public string[] Names
+            => m_Names ??= Aliases.Append(LongDescription).Append(ShortDescription).ToArray();
     }
 
     [AttributeUsage(AttributeTargets.Field)]
     public class MultiDescriptionAttribute : System.Attribute
     {
         public MultiDescriptionAttribute(
-            string longDescription, 
-            string shortDescription = null, 
+            string longDescription,
+            string shortDescription = null,
             params string[] aliases)
         {
             Data = new MultiDescriptionData
@@ -26,5 +33,5 @@ namespace PriconneBotConsoleApp.Attribute
         }
 
         public MultiDescriptionData Data { get; }
-    } 
+    }
 }

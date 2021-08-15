@@ -35,10 +35,10 @@ namespace PriconneBotConsoleApp.Script
             };
 
         private static MultiDescriptionData GetMultiDescriptionData<T>(T data) where T : Enum
-            => m_MultiDescriptionDictionary.GetValueOrInitialize((typeof(T), data), data.GetMultiDescripion);
+            => m_MultiDescriptionDictionary.GetValueOrInitialize((typeof(T), data), () =>  data.GetMultiDescription());
 
         private static string ToSingleLabel<T>(this T data) where T : Enum
-            => m_SingleDescriptionDictionary.GetValueOrInitialize((typeof(T), data), data.GetDescription);
+            => m_SingleDescriptionDictionary.GetValueOrInitialize((typeof(T), data), () => data.GetDescription());
 
         public static string ToLongLabel<T>(this T data) where T : Enum
             => GetMultiDescriptionData(data).LongDescription;
@@ -46,13 +46,13 @@ namespace PriconneBotConsoleApp.Script
         public static string ToShortLabel<T>(this T data) where T : Enum
             => GetMultiDescriptionData(data).ShortDescription;
 
-        private static string[] GetAliases<T>(this T data) where T : Enum
+        private static IReadOnlyList<string> GetAliases<T>(this T data) where T : Enum
             => GetMultiDescriptionData(data).Aliases;
 
         public static Emoji ToEmoji(this ButtonType buttonType)
             => new(buttonType.ToShortLabel());
 
-        public static Emoji emoji(this ReactionType reactionType)
+        public static Emoji ToEmoji(this ReactionType reactionType)
             => new(reactionType.ToLabel());
 
         private static DescriptionType GetDescriptionType<T>() where T : Enum

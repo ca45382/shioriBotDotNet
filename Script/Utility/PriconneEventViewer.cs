@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using PriconneBotConsoleApp.Database;
+using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Extension;
 
@@ -11,21 +12,14 @@ namespace PriconneBotConsoleApp.Script
 {
     public class PriconneEventViewer
     {
-        private IMessage m_UserMessage;
-        public PriconneEventViewer(IMessage message)
-        {
-            m_UserMessage = message;
-        }
+        private CommandEventArgs m_CommandEventArgs;
+        public PriconneEventViewer(CommandEventArgs commandEventArgs)
+            => m_CommandEventArgs = commandEventArgs;
 
         public async Task SendEventInfomationByMessage()
         {
-            if (m_UserMessage.Content != "!today")
-            {
-                return;
-            }
-
             var eventString = EventString();
-            await m_UserMessage.Channel.SendMessageAsync(text: eventString) ;
+            await m_CommandEventArgs.Channel.SendMessageAsync(text: eventString) ;
         }
 
         public string EventString()

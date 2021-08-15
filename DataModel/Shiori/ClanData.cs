@@ -1,4 +1,5 @@
 ﻿using PriconneBotConsoleApp.DataType;
+using PriconneBotConsoleApp.Extension;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -82,68 +83,33 @@ namespace PriconneBotConsoleApp.DataModel
             };
         }
 
+        public int GetBossLap(BossNumberType bossNumberType)
+            => GetBossLap((int)bossNumberType);
+
+        public void SetBossLap(BossNumberType bossNumberType, int bossLap)
+            => SetBossLap((int)bossNumberType, bossLap);
+
         /// <summary>
-        /// 最も周回数を返す
+        /// クラン内のチャンネルIDを返す。
+        /// </summary>
+        /// <param name="channelFeatureType"></param>
+        /// <returns></returns>
+        public ulong GetChannelID(ChannelFeatureType channelFeatureType)
+            => ChannelData?.GetChannelID(ClanID, channelFeatureType) ?? 0;
+
+        /// <summary>
+        /// クラン内のメッセージIDを返す。
+        /// </summary>
+        /// <param name="messageFeatureType"></param>
+        /// <returns></returns>
+        public ulong GetMessageID(MessageFeatureType messageFeatureType)
+            => MessageData?.GetMessageID(ClanID, messageFeatureType) ?? 0;
+
+        /// <summary>
+        /// 最も小さい周回数を返す
         /// </summary>
         /// <returns></returns>
         public int GetMinBossLap()
             => Enumerable.Min(new int[] { Boss1Lap, Boss2Lap, Boss3Lap, Boss4Lap, Boss5Lap });
-
-        /// <summary>
-        /// 5つのボスデータから今のボスに変換。来月削除。
-        /// </summary>
-        /// <param name="clanData"></param>
-        /// <returns></returns>
-        [Obsolete]
-        public byte GetNowBoss()
-        {
-            if (Boss1Lap == Boss2Lap
-                && Boss2Lap == Boss3Lap
-                && Boss3Lap == Boss4Lap
-                && Boss4Lap == Boss5Lap)
-            {
-                return (byte)BossNumberType.Boss5Number;
-            }
-            if (Boss1Lap  == Boss2Lap + 1 )
-            {
-                return (byte)BossNumberType.Boss1Number;
-            }
-            else if (Boss2Lap == Boss3Lap + 1)
-            {
-                return (byte)BossNumberType.Boss2Number;
-            }
-            else if (Boss3Lap == Boss4Lap + 1)
-            {
-                return (byte)BossNumberType.Boss3Number;
-            }
-            else if (Boss4Lap == Boss5Lap + 1)
-            {
-                return (byte)BossNumberType.Boss4Number;
-            }
-
-            return 0;
-        }
-
-        /// <summary>
-        /// 5つのボスデータから今のLapに変換。来月削除。
-        /// </summary>
-        /// <param name="clanData"></param>
-        /// <returns></returns>
-        [Obsolete]
-        public ushort GetNowLap()
-        {
-            if (Boss1Lap == Boss2Lap
-                && Boss2Lap == Boss3Lap
-                && Boss3Lap == Boss4Lap
-                && Boss4Lap == Boss5Lap)
-            {
-                return Boss5Lap;
-            }
-            else
-            {
-                return Boss1Lap;
-            }
-        }
     }
-
 }

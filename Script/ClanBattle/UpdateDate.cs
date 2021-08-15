@@ -55,7 +55,7 @@ namespace PriconneBotConsoleApp.Script
                 }
 
                 taskList.Add(new BattleTaskKill(clanRole).SyncTaskKillData());
-                taskList.Add(new BattleReservation(clanRole).UpdateSystemMessage());
+                taskList.Add(new BattleReservationSummary(clanRole).UpdateMessage());
 
                 for (int i = 0; i < CommonDefine.MaxBossNumber; i++)
                 {

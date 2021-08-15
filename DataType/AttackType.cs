@@ -13,7 +13,7 @@ namespace PriconneBotConsoleApp.DataType
         Magic,
 
         [MultiDescription("ニャル", "ニ", "n", "N")]
-        NewYearKyaru,
+        NewYearKaryl,
 
         [MultiDescription("持ち越し", "持", "-", "持越し", "持越")]
         CarryOver,
