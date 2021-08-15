@@ -131,14 +131,14 @@ namespace PriconneBotConsoleApp.Script
             var targetUser = MentionUtils.TryParseUser(m_CommandEventArgs.Arguments[0], out var userID)
                     || ulong.TryParse(m_CommandEventArgs.Arguments[0], out userID)
                 ? m_CommandEventArgs.Role.Guild.GetUser(userID)
-                : throw new ArgumentNullException();
+                : throw new ArgumentNullException("ユーザー情報がありません。");
 
             // コマンドは `!rm @削除対象のユーザー 古い方から何番目か` としている。
             if (!byte.TryParse(m_CommandEventArgs.Arguments[1], out var number)
                 || number <= 0
                 || CommonDefine.MaxReportNumber < number)
             {
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException("持ち越しがありません。");
             }
 
             var playerData = DatabasePlayerDataController.LoadPlayerData(m_CommandEventArgs.Role, targetUser.Id);
@@ -172,7 +172,7 @@ namespace PriconneBotConsoleApp.Script
 
             if (carryOverList.Length == 0)
             {
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException("持ち越しがありません。");
             }
 
             DatabaseCarryOverController.DeleteCarryOverData(carryOverList[(deleteNumber > 0 && deleteNumber <= carryOverList.Length) ? deleteNumber - 1 : 0]);
