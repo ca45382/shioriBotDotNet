@@ -195,7 +195,7 @@ namespace PriconneBotConsoleApp.Script
 
             _ = m_CommandEventArgs.Channel.SendTimedMessageAsync(
                 TimeDefine.SuccessMessageDisplayTime,
-                string.Format(EnumMapper.ToLabel(InfomationType.DeleteAllCarryOverData), TimeDefine.SuccessMessageDisplayTime)
+                string.Format(EnumMapper.ToLabel(InformationType.DeleteAllCarryOverData), TimeDefine.SuccessMessageDisplayTime)
             );
         }
 

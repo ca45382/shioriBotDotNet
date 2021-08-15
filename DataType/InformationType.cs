@@ -7,7 +7,7 @@ using System.ComponentModel;
 
 namespace PriconneBotConsoleApp.DataType
 {
-    public enum InfomationType
+    public enum InformationType
     {
         Unknown,
 

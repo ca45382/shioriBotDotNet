@@ -130,7 +130,7 @@ namespace PriconneBotConsoleApp.Script
                 if (playerData.UserID != m_CommandEventArgs.User.Id)
                 {
                     _ = m_CommandEventArgs.SocketUserMessage.Channel.SendTimedMessageAsync(TimeDefine.SuccessMessageDisplayTime,
-                        string.Format(InfomationType.DeleteInstead.ToLabel(), playerData.UserID, TimeDefine.SuccessMessageDisplayTime));
+                        string.Format(InformationType.DeleteInstead.ToLabel(), playerData.UserID, TimeDefine.SuccessMessageDisplayTime));
                 }
             }
         }
