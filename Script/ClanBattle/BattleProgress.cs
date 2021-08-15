@@ -112,14 +112,14 @@ namespace PriconneBotConsoleApp.Script
         public async Task UpdateDamageData()
         {
             var progressDataFlag = false;
-            uint damageNumber = 0;
+            int damageNumber = 0;
             byte remainTimeNumber = 0;
 
             // TODO : 冗長なRegexの高速化 #131
             if (Regex.IsMatch(m_CommandEventArgs.Name, @"\d+万$"))
             {
-                if (!uint.TryParse(Regex.Match(m_CommandEventArgs.Name, @"\d+").ToString(), out damageNumber)
-                   || damageNumber > CommonDefine.MaxDamageValue)
+                if (!int.TryParse(Regex.Match(m_CommandEventArgs.Name, @"\d+").ToString(), out damageNumber)
+                   || CommonDefine.IsValidDamageValue(damageNumber))
                 {
                     return;
                 }
@@ -133,9 +133,9 @@ namespace PriconneBotConsoleApp.Script
                 var damageText = Regex.Match(m_CommandEventArgs.Name, @"\d+@").ToString();
                 var remainTimeText = Regex.Match(m_CommandEventArgs.Name, @"@\d+").ToString();
 
-                if (!uint.TryParse(Regex.Match(damageText, @"\d+").ToString(), out damageNumber)
+                if (!int.TryParse(Regex.Match(damageText, @"\d+").ToString(), out damageNumber)
                     || !byte.TryParse(Regex.Match(remainTimeText, @"\d+").ToString(), out remainTimeNumber)
-                    || damageNumber > CommonDefine.MaxDamageValue
+                    || CommonDefine.IsValidDamageValue(damageNumber)
                     || remainTimeNumber > CommonDefine.MaxBattleTime)
                 {
                     return;
@@ -164,7 +164,7 @@ namespace PriconneBotConsoleApp.Script
                 userProgressData.Status = (byte)ProgressStatus.SOS;
             }
 
-            userProgressData.Damage = damageNumber;
+            userProgressData.Damage = (uint)damageNumber;
             userProgressData.RemainTime = remainTimeNumber;
             userProgressData.CommentData = string.Join(" ", m_CommandEventArgs.Arguments);
             await UpdateProgressData(userProgressData, m_CommandEventArgs.PlayerData);
@@ -333,13 +333,11 @@ namespace PriconneBotConsoleApp.Script
         {
             var clanPlayerDataList = DatabasePlayerDataController.LoadPlayerData(m_CommandEventArgs.ClanData);
 
-            var clanProgressData = DatabaseProgressController.GetProgressData(m_CommandEventArgs.ClanData, m_BossNumberType)
+            var progressPlayer = DatabaseProgressController.GetProgressData(m_CommandEventArgs.ClanData, m_BossNumberType)
                 .OrderBy(x => x.Status)
                 .ThenByDescending(x => x.Damage)
                 .ThenBy(x => x.CreateDateTime)
-                .ToArray();
-
-            var progressPlayer = clanProgressData.Select(x => new PlayerInfo(clanPlayerDataList.FirstOrDefault(y => y.PlayerID == x.PlayerID), x))
+                .Select(x => new PlayerInfo(clanPlayerDataList.FirstOrDefault(y => y.PlayerID == x.PlayerID), x))
                 .ToArray();
 
             var bossLap = m_CommandEventArgs.ClanData.GetBossLap(m_BossNumberType);

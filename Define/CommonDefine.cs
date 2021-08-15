@@ -25,5 +25,8 @@
 
         public static bool IsValidBattleTime(int value)
             => MinBattleTime <= value && value <= MaxBattleTime;
+
+        public static bool IsValidDamageValue(int value)
+            => 0 <= value && value <= MaxDamageValue;
     }
 }
