@@ -54,6 +54,7 @@ namespace PriconneBotConsoleApp.Script
         {
             var reportData = new ReportData();
 
+            // TODO : 冗長なRegexの高速化 #131
             if (Regex.IsMatch(m_CommandEventArgs.Name, @"\d\D{1,3}"))
             {
                 var bossNumber = int.Parse(Regex.Match(m_CommandEventArgs.Name, @"\d").Value);

@@ -115,6 +115,7 @@ namespace PriconneBotConsoleApp.Script
             uint damageNumber = 0;
             byte remainTimeNumber = 0;
 
+            // TODO : 冗長なRegexの高速化 #131
             if (Regex.IsMatch(m_CommandEventArgs.Name, @"\d+万$"))
             {
                 if (!uint.TryParse(Regex.Match(m_CommandEventArgs.Name, @"\d+").ToString(), out damageNumber)
@@ -126,6 +127,7 @@ namespace PriconneBotConsoleApp.Script
                 progressDataFlag = true;
             }
 
+            // TODO : 冗長なRegexの高速化 #131
             if (Regex.IsMatch(m_CommandEventArgs.Name, @"\d+@\d+"))
             {
                 var damageText = Regex.Match(m_CommandEventArgs.Name, @"\d+@").ToString();
