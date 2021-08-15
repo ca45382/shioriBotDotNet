@@ -41,7 +41,7 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            if(buttonType == ButtonType.Reload)
+            if (buttonType == ButtonType.Reload)
             {
                 await UpdateMessage();
             }
