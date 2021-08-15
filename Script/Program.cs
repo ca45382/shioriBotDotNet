@@ -80,7 +80,7 @@ namespace PriconneBotConsoleApp.Script
             {
                 await CommandMapper.Invoke(new CommandEventArgs(socketUserMessage));
             }
-            catch 
+            catch
             {
             }
         }
