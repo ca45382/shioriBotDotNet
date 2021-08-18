@@ -121,7 +121,7 @@ namespace PriconneBotConsoleApp.Script
             if (Regex.IsMatch(m_CommandEventArgs.Name, @"\d+万$"))
             {
                 if (!int.TryParse(Regex.Match(m_CommandEventArgs.Name, @"\d+").ToString(), out damageNumber)
-                   || CommonDefine.IsValidDamageValue(damageNumber))
+                   || !CommonDefine.IsValidDamageValue(damageNumber))
                 {
                     return;
                 }
@@ -137,7 +137,7 @@ namespace PriconneBotConsoleApp.Script
 
                 if (!int.TryParse(Regex.Match(damageText, @"\d+").ToString(), out damageNumber)
                     || !byte.TryParse(Regex.Match(remainTimeText, @"\d+").ToString(), out remainTimeNumber)
-                    || CommonDefine.IsValidDamageValue(damageNumber)
+                    || !CommonDefine.IsValidDamageValue(damageNumber)
                     || remainTimeNumber > CommonDefine.MaxBattleTime)
                 {
                     return;
@@ -198,7 +198,7 @@ namespace PriconneBotConsoleApp.Script
                     .Select(x => (int)x.Damage).Sum();
                 var bossHP = RediveClanBattleData.BossDataList
                     .FirstOrDefault(x => x.BossNumber == (byte)m_BossNumberType && x.LapNumberFrom <= nowLap && (x.LapNumberTo == -1 || x.LapNumberTo >= nowLap))
-                    ?.HP ?? 0;
+                    ?.HP / CommonDefine.DisplayDamageUnit ?? 0;
 
                 userProgressData.Damage = (uint)(bossHP - damageSum > 0 ? bossHP - damageSum : 0);
 

@@ -104,6 +104,7 @@ namespace PriconneBotConsoleApp.Database
 
             using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
+
             try
             {
                 databaseConnector.Add(reportData);
@@ -111,8 +112,9 @@ namespace PriconneBotConsoleApp.Database
                 transaction.Commit();
 
                 return databaseConnector.ReportData.AsQueryable()
-                    .OrderByDescending(x => x.DateTime)
-                    .First();
+                    .Where(x => x.PlayerID == reportData.PlayerID && !x.DeleteFlag
+                        && x.DateTime == databaseConnector.ReportData.AsQueryable().Max(x => x.DateTime))
+                    .FirstOrDefault();
             }
             catch
             {
