@@ -196,9 +196,8 @@ namespace ShioriBot.Net.Script
                 var damageSum = DatabaseProgressController.GetProgressData(m_CommandEventArgs.ClanData, m_BossNumberType)
                     .Where(x => x.Status == (byte)ProgressStatus.AttackDone)
                     .Select(x => (int)x.Damage).Sum();
-                var bossHP = RediveClanBattleData.BossDataList
-                    .FirstOrDefault(x => x.BossNumber == (byte)m_BossNumberType && x.LapNumberFrom <= nowLap && (x.LapNumberTo == -1 || x.LapNumberTo >= nowLap))
-                    ?.HP / CommonDefine.DisplayDamageUnit ?? 0;
+                var bossHP = RediveClanBattleData.GetBossData(m_BossNumberType, nowLap)
+                    ?.DisplayHP ?? 0;
 
                 userProgressData.Damage = (uint)(bossHP - damageSum > 0 ? bossHP - damageSum : 0);
 
@@ -377,8 +376,7 @@ namespace ShioriBot.Net.Script
 
             var bossLap = m_CommandEventArgs.ClanData.GetBossLap(m_BossNumberType);
 
-            var bossData = RediveClanBattleData.BossDataList
-                .FirstOrDefault(x => x.BossNumber == (byte)m_BossNumberType && x.LapNumberFrom <= bossLap && (x.LapNumberTo == -1 || x.LapNumberTo >= bossLap));
+            var bossData = RediveClanBattleData.GetBossData(m_BossNumberType, bossLap);
 
             var summaryStringBuilder = new StringBuilder();
             // 持ち越しデータ出力
@@ -396,8 +394,7 @@ namespace ShioriBot.Net.Script
 
             summaryStringBuilder.AppendLine(remainAttackString.ToString());
 
-            // ボスのHPをここに入力(万表示)
-            var bossHP = bossData?.HP / CommonDefine.DisplayDamageUnit ?? 0;
+            var bossHP = bossData?.DisplayHP;
             var sumAttackDoneHP = progressPlayer.Where(x => x.ProgressData.Status == (byte)ProgressStatus.AttackDone).Select(x => (int)x.ProgressData.Damage).Sum();
             var sumAttackReadyHP = progressPlayer.Where(x => x.ProgressData.Status == (byte)ProgressStatus.AttackReady).Select(x => (int)x.ProgressData.Damage).Sum();
             summaryStringBuilder.AppendLine("現在HP " + (bossHP - sumAttackDoneHP) + "万 / " + bossHP + "万");
