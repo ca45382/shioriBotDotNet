@@ -394,7 +394,7 @@ namespace ShioriBot.Net.Script
 
             summaryStringBuilder.AppendLine(remainAttackString.ToString());
 
-            var bossHP = bossData?.DisplayHP;
+            var bossHP = bossData?.DisplayHP ?? 0;
             var sumAttackDoneHP = progressPlayer.Where(x => x.ProgressData.Status == (byte)ProgressStatus.AttackDone).Select(x => (int)x.ProgressData.Damage).Sum();
             var sumAttackReadyHP = progressPlayer.Where(x => x.ProgressData.Status == (byte)ProgressStatus.AttackReady).Select(x => (int)x.ProgressData.Damage).Sum();
             summaryStringBuilder.AppendLine("現在HP " + (bossHP - sumAttackDoneHP) + "万 / " + bossHP + "万");
