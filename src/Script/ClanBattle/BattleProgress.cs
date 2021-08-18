@@ -486,8 +486,7 @@ namespace ShioriBot.Net.Script
             }
 
             reportData.PlayerID = playerData.PlayerID;
-            var reportedData = DatabaseReportDataController.CreateReportData(reportData);
-            progressData.ReportID = reportedData.ReportID;
+            progressData.ReportID = DatabaseReportDataController.CreateReportData(reportData).ReportID;
         }
 
         /// <summary>
