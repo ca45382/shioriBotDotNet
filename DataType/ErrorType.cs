@@ -19,7 +19,7 @@ namespace PriconneBotConsoleApp.DataType
         [Description("予約ができません。予約は{0}周目から可能です。")]
         OutOfMinReservationBossLaps,
 
-        [Description("予約できません。予約は{0}周目まで可能です。")]
+        [Description("予約ができません。予約は{0}周目まで可能です。")]
         OutOfMaxReservationBossLaps,
 
         //凸宣言関連
