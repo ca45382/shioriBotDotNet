@@ -107,7 +107,7 @@ namespace PriconneBotConsoleApp.Script
             if (!byte.TryParse(m_CommandEventArgs.Arguments[1], out var bossNumber)
                 || !byte.TryParse(m_CommandEventArgs.Arguments[0], out var battleLap)
                 || !CommonDefine.IsValidBossNumber(bossNumber)
-                || !CommonDefine.IsValidBattleTime(battleLap))
+                || !CommonDefine.IsValidBattleLap(battleLap))
             {
                 return null;
             }

@@ -28,5 +28,8 @@
 
         public static bool IsValidDamageValue(int value)
             => 0 <= value && value <= MaxDamageValue;
+
+        public static bool IsValidBattleLap(int value)
+            => 0 < value;
     }
 }
