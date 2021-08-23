@@ -51,15 +51,30 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            var allowReservationLap = m_CommandEventArgs.ClanData.ReservationLap == 0
-                ? ClanBattleDefine.MaxLapNumber
-                : (m_CommandEventArgs.ClanData.ReservationLap + m_CommandEventArgs.ClanData.GetMinBossLap());
+            var allowMinReservationLap = Math.Min(
+                    m_CommandEventArgs.ClanData.GetBossLap(reservationData.BossNumber) + 1,
+                    m_CommandEventArgs.ClanData.GetMinBossLap() + CommonDefine.BattleLapRange + 1
+                );
 
-            if (reservationData.BattleLap > allowReservationLap)
+            if (reservationData.BattleLap < allowMinReservationLap)
             {
                 _ = m_CommandEventArgs.Channel.SendTimedMessageAsync(
                     TimeDefine.ErrorMessageDisplayTime,
-                    string.Format(ErrorType.OutOfReservationBossLaps.ToLabel(), allowReservationLap.ToString())
+                    string.Format(ErrorType.OutOfMinReservationBossLaps.ToLabel(), allowMinReservationLap.ToString())
+                    );
+
+                return;
+            }
+
+            var allowMaxReservationLap = m_CommandEventArgs.ClanData.ReservationLap == 0
+                ? ClanBattleDefine.MaxLapNumber
+                : (m_CommandEventArgs.ClanData.ReservationLap + m_CommandEventArgs.ClanData.GetMinBossLap());
+
+            if (reservationData.BattleLap > allowMaxReservationLap)
+            {
+                _ = m_CommandEventArgs.Channel.SendTimedMessageAsync(
+                    TimeDefine.ErrorMessageDisplayTime,
+                    string.Format(ErrorType.OutOfMaxReservationBossLaps.ToLabel(), allowMaxReservationLap.ToString())
                     );
 
                 return;
@@ -107,7 +122,7 @@ namespace PriconneBotConsoleApp.Script
             if (!byte.TryParse(m_CommandEventArgs.Arguments[1], out var bossNumber)
                 || !byte.TryParse(m_CommandEventArgs.Arguments[0], out var battleLap)
                 || !CommonDefine.IsValidBossNumber(bossNumber)
-                || !CommonDefine.IsValidBattleTime(battleLap))
+                || !CommonDefine.IsValidBattleLap(battleLap))
             {
                 return null;
             }
