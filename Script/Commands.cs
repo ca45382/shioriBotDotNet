@@ -37,7 +37,7 @@ namespace PriconneBotConsoleApp.Script
             return Task.CompletedTask;
         }
 
-        [Command("!list", 0, 0, compatibleChannels: ChannelFeatureType.CarryOverID)]
+        [Command(new[] { "!list", "リスト" }, 0, 0, compatibleChannels: ChannelFeatureType.CarryOverID)]
         public static async Task DisplayCarryOverList(CommandEventArgs commandEventArgs)
         {
             await new BattleCarryOver(commandEventArgs).SendClanCarryOverList();
@@ -234,7 +234,7 @@ namespace PriconneBotConsoleApp.Script
         public static async Task UpdateProgressDamage(CommandEventArgs commandEventArgs)
              => await new BattleProgress(commandEventArgs).UpdateDamageData();
 
-        [Command("!list", 0, 0, ChannelFeatureType.ReportID)]
+        [Command(new[] { "!list" , "リスト"}, 0, 0, ChannelFeatureType.ReportID)]
         public static async Task ListReport(CommandEventArgs commandEventArgs)
             => await new BattleReport(commandEventArgs).SendClanAttackList();
 
