@@ -160,7 +160,7 @@ namespace PriconneBotConsoleApp.Script
             {
                 AttackType = (byte)attackType,
                 BossNumber = bossNumber,
-                PlayerID = registerUserID,
+                PlayerID = registerPlayerData.PlayerID,
             };
 
             var userReportedData = DatabaseReportDataController.GetReportData(registerPlayerData);
