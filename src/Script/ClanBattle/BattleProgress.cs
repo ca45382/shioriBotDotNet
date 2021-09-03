@@ -195,7 +195,8 @@ namespace ShioriBot.Net.Script
                 var nowLap = m_CommandEventArgs.ClanData.GetBossLap(m_BossNumberType);
                 var damageSum = DatabaseProgressController.GetProgressData(m_CommandEventArgs.ClanData, m_BossNumberType)
                     .Where(x => x.Status == (byte)ProgressStatus.AttackDone)
-                    .Select(x => (int)x.Damage).Sum();
+                    .Select(x => (int)x.Damage)
+                    .Sum();
                 var bossHP = RediveClanBattleData.GetBossData(m_BossNumberType, nowLap)
                     ?.DisplayHP ?? 0;
 
