@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace PriconneBotConsoleApp.DataModel
+namespace PriconneBotConsoleApp.Model
 {
     public class BotConfigData
     {

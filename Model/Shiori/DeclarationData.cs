@@ -2,22 +2,18 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PriconneBotConsoleApp.DataModel
+namespace PriconneBotConsoleApp.Model
 {
-    [Table("reserve_data")]
-    public class ReservationData
+    [Table("declare_data")]
+    public class DeclarationData
     {
-        [Column("reserve_id", TypeName = "BIGINT UNSIGNED"), Key]
+        [Column("declare_id", TypeName = "BIGINT UNSIGNED"), Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public ulong ReserveID { get; set; }
+        public ulong DeclareID { get; set; }
 
-        [Column("create_date_time"), Required]
+        [Column("date_time"), Required]
         [Timestamp]
-        public DateTime CreateDateTime { get; set; }
-
-        [Column("update_date_time"), Required]
-        [Timestamp]
-        public DateTime UpdateDateTime { get; set; }
+        public DateTime DateTime { get; set; }
 
         [Column("boss_num", TypeName = "TINYINT UNSIGNED")]
         public byte BossNumber { get; set; }
@@ -28,14 +24,8 @@ namespace PriconneBotConsoleApp.DataModel
         [Column("attack_type", TypeName = "TINYINT UNSIGNED")]
         public byte AttackType { get; set; }
 
-        [Column("carry_over_flag", TypeName = "TINYINT UNSIGNED")]
-        public bool CarryOverFlag { get; set; }
-
-        [Column("reply", TypeName = "TINYINT UNSIGNED")]
-        public bool Reply { get; set; }
-
-        [Column("comment_data", TypeName = "varchar(100)")]
-        public string CommentData { get; set; }
+        [Column("finish_flag", TypeName = "TINYINT UNSIGNED")]
+        public bool FinishFlag { get; set; }
 
         [Column("delete_flag", TypeName = "TINYINT UNSIGNED")]
         public bool DeleteFlag { get; set; }

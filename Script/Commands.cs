@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using PriconneBotConsoleApp.Attribute;
-using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.Model;
 using PriconneBotConsoleApp.DataType;
 
 namespace PriconneBotConsoleApp.Script

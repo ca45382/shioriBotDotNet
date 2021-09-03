@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Text.Json;
-using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.Model;
 
 namespace PriconneBotConsoleApp.Script
 {

@@ -2,7 +2,7 @@
 using System.Linq;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
-using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.Model;
 
 namespace PriconneBotConsoleApp.Database
 {

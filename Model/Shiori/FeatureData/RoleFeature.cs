@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 using PriconneBotConsoleApp.Interface;
 
-namespace PriconneBotConsoleApp.DataModel
+namespace PriconneBotConsoleApp.Model
 {
     [Table("role_feature")]
     public class RoleFeature : IBotFeature 

@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
 using PriconneBotConsoleApp.Database;
-using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.Model;
 using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Define;
 using PriconneBotConsoleApp.Extension;
