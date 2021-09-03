@@ -57,9 +57,13 @@ namespace ShioriBot.Net.Database
             => GetReportDataByID(progressData.ReportID);
 
         private static ReportData GetReportDataByID(ulong reportID)
-            => new DatabaseConnector().ReportData.AsQueryable()
+        {
+            using var databaseConnector = new ShioriDBContext();
+
+            return databaseConnector.ReportData.AsQueryable()
             .Include(x => x.PlayerData)
             .FirstOrDefault(x => x.ReportID == reportID);
+        }
 
         /// <summary>
         /// 配列の前から0凸完了～3凸完了
@@ -130,7 +134,7 @@ namespace ShioriBot.Net.Database
                 return;
             }
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             var serverData = databaseConnector.ReportData.AsQueryable()
