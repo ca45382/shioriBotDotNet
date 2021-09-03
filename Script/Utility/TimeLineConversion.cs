@@ -69,6 +69,7 @@ namespace PriconneBotConsoleApp.Script
             convertData.MessageChannelID = discordID[3].Replace("/", "");
             convertData.MessageID = discordID[4];
 
+            // TODO: User.Guildは直感的に読み取りにくいのでCommandArgsにGuildを追加したい。
             var timeLineChannelData = m_CommandEventArgs.User.Guild.GetChannel(ulong.Parse(convertData.MessageChannelID)) as SocketTextChannel;
             convertData.Message = await timeLineChannelData.GetMessageAsync(ulong.Parse(convertData.MessageID));
 
