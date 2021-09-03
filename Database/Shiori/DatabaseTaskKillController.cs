@@ -1,10 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PriconneBotConsoleApp.DataModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using PriconneBotConsoleApp.Model;
 
 namespace PriconneBotConsoleApp.Database
 {
@@ -13,7 +11,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static IEnumerable<TaskKillData> LoadTaskKillData()
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.TaskKillData.AsQueryable()
                 .Where(x => !x.DeleteFlag)
@@ -27,7 +25,7 @@ namespace PriconneBotConsoleApp.Database
         /// <returns></returns>
         public static IEnumerable<TaskKillData> LoadTaskKillData(ClanData clanData)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.TaskKillData
                 .Include(x => x.PlayerData)
@@ -42,7 +40,7 @@ namespace PriconneBotConsoleApp.Database
         /// <returns></returns>
         public static TaskKillData LoadTaskKillData(PlayerData playerData)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             if (playerData.PlayerID == 0)
             {
@@ -66,7 +64,7 @@ namespace PriconneBotConsoleApp.Database
         /// <returns>書き込み成功True</returns>
         public static bool CreateTaskKillData(PlayerData playerData)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             if (playerData == null)
             {
@@ -107,7 +105,7 @@ namespace PriconneBotConsoleApp.Database
         /// <returns>付与成功True</returns>
         public static bool DeleteTaskKillData(TaskKillData taskKillData)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             if (taskKillData == null)
             {
@@ -146,7 +144,7 @@ namespace PriconneBotConsoleApp.Database
                 return;
             }
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             var deleteDataList = databaseConnector.TaskKillData.AsQueryable()
@@ -176,7 +174,7 @@ namespace PriconneBotConsoleApp.Database
                 return false;
             }
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             var deleteDataList = databaseConnector.TaskKillData
                 .Include(x => x.PlayerData)

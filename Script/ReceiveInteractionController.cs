@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using PriconneBotConsoleApp.DataType;
-using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.Model;
 using PriconneBotConsoleApp.Database;
 
 namespace PriconneBotConsoleApp.Script

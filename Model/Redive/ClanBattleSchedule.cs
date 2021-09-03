@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PriconneBotConsoleApp.DataModel
+namespace PriconneBotConsoleApp.Model
 {
     [Table("clan_battle_schedule")]
     public class ClanBattleSchedule

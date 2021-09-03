@@ -2,7 +2,7 @@
 using System.Linq;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
-using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.Model;
 
 namespace PriconneBotConsoleApp.Database
 {
@@ -10,7 +10,7 @@ namespace PriconneBotConsoleApp.Database
     {
         public static List<PlayerData> LoadPlayerData(ulong serverID)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.PlayerData
                 .Include(b => b.ClanData)
@@ -20,7 +20,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static IEnumerable<PlayerData> LoadPlayerData(SocketRole roleData)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var clanData = databaseConnector.ClanData.AsQueryable()
                 .Where(x => x.ClanRoleID == roleData.Id && x.ServerID == roleData.Guild.Id)
                 .FirstOrDefault();
@@ -35,7 +35,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static IEnumerable<PlayerData> LoadPlayerData(ClanData clanData)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.PlayerData.AsQueryable()
                 .Where(x => x.ClanID == clanData.ClanID)
@@ -44,7 +44,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static PlayerData LoadPlayerData(ulong serverID, ulong userID)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.PlayerData
                 .Include(b => b.ClanData)
@@ -53,7 +53,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static PlayerData LoadPlayerData(SocketRole roleData, ulong userID)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.PlayerData
                 .Include(x => x.ClanData)
@@ -63,7 +63,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static void CreatePlayerData(IEnumerable<PlayerData> playersData)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
             
             foreach (PlayerData playerData in playersData)
@@ -94,7 +94,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static void UpdatePlayerData(IEnumerable<PlayerData> playersData)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
             
             foreach (PlayerData playerData in playersData)
@@ -116,7 +116,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static void DeletePlayerData(IEnumerable<PlayerData> playersData)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
             
             foreach (PlayerData playerData in playersData)

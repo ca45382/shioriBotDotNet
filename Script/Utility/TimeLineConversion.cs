@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.Model;
 using PriconneBotConsoleApp.Define;
 
 namespace PriconneBotConsoleApp.Script

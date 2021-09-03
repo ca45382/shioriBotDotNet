@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using Discord.WebSocket;
-using PriconneBotConsoleApp.DataModel;
+using Microsoft.EntityFrameworkCore;
 using PriconneBotConsoleApp.Define;
+using PriconneBotConsoleApp.Model;
 
 namespace PriconneBotConsoleApp.Database
 {
@@ -11,13 +11,13 @@ namespace PriconneBotConsoleApp.Database
     {
         public static List<ClanData> LoadClanData()
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             return databaseConnector.ClanData.ToList();
         }
 
         public static ClanData LoadClanData(SocketRole role)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.ClanData
                 .Include(b => b.ServerData)
@@ -29,7 +29,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static bool UpdateClanData(ClanData clanData)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             var databaseClanData = databaseConnector.ClanData.AsQueryable()

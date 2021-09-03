@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using PriconneBotConsoleApp.DataModel;
+﻿using System.Linq;
 using PriconneBotConsoleApp.DataType;
+using PriconneBotConsoleApp.Model;
 
 namespace PriconneBotConsoleApp.Database
 {
@@ -10,7 +8,7 @@ namespace PriconneBotConsoleApp.Database
     {
         public static bool UpdateMessageID(ClanData clanData, ulong messageID, MessageFeatureType featureType)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             var clanID = databaseConnector.ClanData

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PriconneBotConsoleApp.Database;
 using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Define;
 using PriconneBotConsoleApp.Extension;
 
-namespace PriconneBotConsoleApp.DataModel
+namespace PriconneBotConsoleApp.Model
 {
     public static class RediveClanBattleData
     {
@@ -34,7 +33,7 @@ namespace PriconneBotConsoleApp.DataModel
         {
             // TODO : 日本時間に対応
             var nowTime = DateTime.Now;
-            using var rediveConnector = new RediveConnector();
+            using var rediveConnector = new RediveDBContext();
 
             var clanBattleSchedule = rediveConnector.ClanBattleSchedule.AsEnumerable()
                 .Where(x => nowTime >= x.StartTime && nowTime <= x.EndTime)

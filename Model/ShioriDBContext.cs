@@ -1,11 +1,10 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using PriconneBotConsoleApp.DataModel;
 using PriconneBotConsoleApp.Script;
 
-namespace PriconneBotConsoleApp.Database
+namespace PriconneBotConsoleApp.Model
 {
-    public class DatabaseConnector : DbContext
+    public class ShioriDBContext : DbContext
     {
         public DbSet<ServerData> ServerData { get; set; }
         public DbSet<ClanData> ClanData { get; set; }
@@ -34,7 +33,7 @@ namespace PriconneBotConsoleApp.Database
         // TODO: 動的に取得する
         public static readonly MariaDbServerVersion ServerVersion = new MariaDbServerVersion(new Version(10, 3, 27));
 
-        public DatabaseConnector()
+        public ShioriDBContext()
         {
         }
 

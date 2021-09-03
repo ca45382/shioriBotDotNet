@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
-namespace PriconneBotConsoleApp.DataModel
+namespace PriconneBotConsoleApp.Model
 {
     [Table("clan_info")]
     public class ClanData

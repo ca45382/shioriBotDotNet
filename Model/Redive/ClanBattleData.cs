@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using PriconneBotConsoleApp.DataType;
 
-namespace PriconneBotConsoleApp.DataModel
+namespace PriconneBotConsoleApp.Model
 {
     [Table("clan_battle_2_map_data")]
     public class ClanBattleData

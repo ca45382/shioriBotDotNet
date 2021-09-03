@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using PriconneBotConsoleApp.DataModel;
-using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Define;
-using PriconneBotConsoleApp.Extension;
+using PriconneBotConsoleApp.Model;
 
 namespace PriconneBotConsoleApp.Database
 {
@@ -14,7 +12,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static IEnumerable<ReservationData> LoadReservationData()
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.ReservationData.AsQueryable()
                 .Where(x => !x.DeleteFlag)
@@ -23,7 +21,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static List<ReservationData> LoadReservationData(ClanData clanData)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.ReservationData
                 .Include(b => b.PlayerData)
@@ -41,7 +39,7 @@ namespace PriconneBotConsoleApp.Database
                 return null;
             }
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.ReservationData.AsQueryable()
                 .Where(b => b.PlayerID == playerData.PlayerID && !b.DeleteFlag)
@@ -56,7 +54,7 @@ namespace PriconneBotConsoleApp.Database
                 return null;
             }
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.ReservationData.AsQueryable()
                 .Include(x => x.PlayerData)
@@ -71,7 +69,7 @@ namespace PriconneBotConsoleApp.Database
                 return null;
             }
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             var databaseClanData = databaseConnector.ClanData
                 .FirstOrDefault(d => d.ServerID == clanData.ServerID && d.ClanRoleID == clanData.ClanRoleID);
@@ -100,7 +98,7 @@ namespace PriconneBotConsoleApp.Database
                 return;
             }
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             databaseConnector.ReservationData.Add(reservationData);
@@ -122,7 +120,7 @@ namespace PriconneBotConsoleApp.Database
         /// <param name="reservationData"></param>
         public static void UpdateReservationData(ReservationData reservationData)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
             var updateData = databaseConnector.ReservationData.FirstOrDefault(x => x.ReserveID == reservationData.ReserveID);
 
@@ -143,7 +141,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static void DeleteReservationData(IEnumerable<ReservationData> reservationDataSet)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             foreach (var reservationData in reservationDataSet)

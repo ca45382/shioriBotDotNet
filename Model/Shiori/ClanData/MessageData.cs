@@ -1,16 +1,21 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PriconneBotConsoleApp.DataModel
+namespace PriconneBotConsoleApp.Model
 {
-    [Table("channel_data")]
-    public class ChannelData
+    [Table("message_data")]
+    public class MessageData
     {
         [Column("id", TypeName = "BIGINT UNSIGNED AUTO_INCREMENT"), Key, Required]
         public ulong DataID { get; set; }
 
-        [Column("channel_id", TypeName = "BIGINT UNSIGNED"), Required]
-        public ulong ChannelID { get; set; }
+        [Column("message_id", TypeName = "BIGINT UNSIGNED"), Required]
+        public ulong MessageID { get; set; }
+
+        [Column("update_time", TypeName = "TIMESTAMP on update CURRENT_TIMESTAMP")]
+        [Timestamp]
+        public DateTime UpdateTime { get; set; }
 
         //以下外部キー
         [Column("clan_id", TypeName = "BIGINT UNSIGNED"), Required]
@@ -20,6 +25,6 @@ namespace PriconneBotConsoleApp.DataModel
         public uint FeatureID { get; set; }
 
         public ClanData ClanData { get; set; }
-        public ChannelFeature ChannelFeature { get; set; }
+        public MessageFeature MessageFeature { get; set; }
     }
 }

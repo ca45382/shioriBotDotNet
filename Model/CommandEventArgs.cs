@@ -6,7 +6,7 @@ using PriconneBotConsoleApp.Database;
 using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Extension;
 
-namespace PriconneBotConsoleApp.DataModel
+namespace PriconneBotConsoleApp.Model
 {
     public class CommandEventArgs : EventArgs
     {

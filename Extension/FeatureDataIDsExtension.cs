@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.Model;
 using PriconneBotConsoleApp.DataType;
 
 namespace PriconneBotConsoleApp.Extension

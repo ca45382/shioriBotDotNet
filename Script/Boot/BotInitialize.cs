@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using System;
 
-using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.Model;
 using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Database;
 
