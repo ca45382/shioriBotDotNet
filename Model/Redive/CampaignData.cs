@@ -7,7 +7,7 @@ namespace PriconneBotConsoleApp.Model
     [Table("campaign_schedule")]
     public class CampaignData
     {
-        [Column("id", TypeName = "INTEGER"),Key]
+        [Column("id", TypeName = "INTEGER"), Key]
         public int CampaignID { get; set; }
 
         [Column("campaign_category", TypeName = "INTEGER")]

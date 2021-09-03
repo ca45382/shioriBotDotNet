@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using PriconneBotConsoleApp.Model;
-using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Define;
-using PriconneBotConsoleApp.Extension;
+using PriconneBotConsoleApp.Model;
 
 namespace PriconneBotConsoleApp.Database
 {

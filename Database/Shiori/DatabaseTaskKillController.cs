@@ -1,10 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PriconneBotConsoleApp.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using PriconneBotConsoleApp.Model;
 
 namespace PriconneBotConsoleApp.Database
 {

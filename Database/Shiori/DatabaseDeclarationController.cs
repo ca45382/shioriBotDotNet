@@ -2,7 +2,6 @@
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using PriconneBotConsoleApp.Model;
-using PriconneBotConsoleApp.Extension;
 
 namespace PriconneBotConsoleApp.Database
 {

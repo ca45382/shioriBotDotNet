@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-
-using PriconneBotConsoleApp.Model;
 using PriconneBotConsoleApp.Interface;
+using PriconneBotConsoleApp.Model;
 
 namespace PriconneBotConsoleApp.Database
 {

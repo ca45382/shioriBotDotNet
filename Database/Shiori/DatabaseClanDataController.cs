@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using Discord.WebSocket;
-using PriconneBotConsoleApp.Model;
+using Microsoft.EntityFrameworkCore;
 using PriconneBotConsoleApp.Define;
+using PriconneBotConsoleApp.Model;
 
 namespace PriconneBotConsoleApp.Database
 {

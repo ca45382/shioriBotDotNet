@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PriconneBotConsoleApp.Database;
 using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Define;
 using PriconneBotConsoleApp.Extension;
