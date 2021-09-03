@@ -11,6 +11,8 @@ namespace PriconneBotConsoleApp.Model
         public DbSet<ClanBattleData> ClanBattleData { get; set; }
         public DbSet<WaveGroupData> WaveGroupData { get; set; }
         public DbSet<EnemyParameter> EnemyParameter { get; set; }
+        public DbSet<ClanBattlePeriod> ClanBattlePeriod { get; set; }
+        public DbSet<ClanBattleTrainingSchedule> ClanBattleTrainingSchedule { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
         {
@@ -21,7 +23,6 @@ namespace PriconneBotConsoleApp.Model
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
         }
     }
 }

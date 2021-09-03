@@ -35,19 +35,26 @@ namespace PriconneBotConsoleApp.Model
             var nowTime = DateTime.Now;
             using var rediveConnector = new RediveDBContext();
 
-            var clanBattleSchedule = rediveConnector.ClanBattleSchedule.AsEnumerable()
-                .Where(x => nowTime >= x.StartTime && nowTime <= x.EndTime)
+            var clanBattleTrainingSchedule = rediveConnector.ClanBattleTrainingSchedule.AsEnumerable()
+                .Where(x => x.BattleStartTime <= nowTime && nowTime <= x.IntervalEndTime)
+                .OrderByDescending(x => x.ClanBattleID)
                 .FirstOrDefault();
 
-            if (clanBattleSchedule == null)
+            if (clanBattleTrainingSchedule == null)
             {
                 return false;
             }
 
+            var clanBattleSchedule = rediveConnector.ClanBattleSchedule.AsQueryable()
+                .First(x => x.ClanBattleID == clanBattleTrainingSchedule.ClanBattleID);
+
+            var clanBattlePeriod = rediveConnector.ClanBattlePeriod.AsQueryable()
+                .First(x => x.ClanBattleID == clanBattleTrainingSchedule.ClanBattleID);
+
             ClanBattleID = clanBattleSchedule.ClanBattleID;
             ReleaseMonth = clanBattleSchedule.ReleaseMonth;
             ClanBattleStartTime = clanBattleSchedule.StartTime;
-            ClanBattleEndTime = clanBattleSchedule.EndTime;
+            ClanBattleEndTime = clanBattlePeriod.BattleEndTime;
 
             var clanBattleDataArray = rediveConnector.ClanBattleData.AsQueryable()
                 .Where(x => x.ClanBattleID == ClanBattleID).OrderBy(x => x.ID)

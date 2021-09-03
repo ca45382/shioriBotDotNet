@@ -1,21 +1,20 @@
-﻿using Discord.WebSocket;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Discord.WebSocket;
 using PriconneBotConsoleApp.Database;
 using PriconneBotConsoleApp.Model;
 using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Define;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PriconneBotConsoleApp.Script
 {
     public class UpdateDate
     {
-        private DateTime m_BoundaryTime;
-        private IEnumerable<ClanData> m_ClanList;
-        private DiscordSocketClient m_Client;
+        private readonly DateTime m_BoundaryTime;
+        private readonly IEnumerable<ClanData> m_ClanList;
+        private readonly DiscordSocketClient m_Client;
 
         public UpdateDate(DiscordSocketClient client)
         {
@@ -28,6 +27,8 @@ namespace PriconneBotConsoleApp.Script
         {
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
+
+            var nowTime = DateTime.Now;
 
             var reservarionDataList = DatabaseReservationController.LoadReservationData()
                 .Where(x => x.CreateDateTime < m_BoundaryTime);
@@ -55,12 +56,16 @@ namespace PriconneBotConsoleApp.Script
                 }
 
                 taskList.Add(new BattleTaskKill(clanRole).SyncTaskKillData());
-                taskList.Add(new BattleReservationSummary(clanRole).UpdateMessage());
 
-                for (int i = 0; i < CommonDefine.MaxBossNumber; i++)
+                if (RediveClanBattleData.ClanBattleStartTime <= nowTime && nowTime <= RediveClanBattleData.ClanBattleEndTime)
                 {
-                    taskList.Add(new BattleDeclaration(clanRole, (BossNumberType)(i + 1)).UpdateDeclarationBotMessage());
-                    // TODO:ここに進行の方も追加
+                    taskList.Add(new BattleReservationSummary(clanRole).UpdateMessage());
+
+                    for (int i = 0; i < CommonDefine.MaxBossNumber; i++)
+                    {
+                        taskList.Add(new BattleDeclaration(clanRole, (BossNumberType)(i + 1)).UpdateDeclarationBotMessage());
+                        // TODO:ここに進行の方も追加
+                    }
                 }
 
                 await Task.WhenAll(taskList);
