@@ -465,7 +465,7 @@ namespace ShioriBot.Net.Script
             reportData.BossNumber = (byte)m_BossNumberType;
             reportData.FinalDamage = progressData.Damage;
 
-            if (progressData.Status == (byte)ProgressStatus.SubdueBoss)
+            if (progressData.Status == (byte)ProgressStatus.SubdueBoss && !progressData.CarryOverFlag)
             {
                 reportData.SubdueFlag = true;
                 UpdateCarryOverData(progressData, playerData);
