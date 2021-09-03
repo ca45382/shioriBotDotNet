@@ -10,16 +10,13 @@ namespace PriconneBotConsoleApp.Model
         [Column("clan_battle_id", TypeName = "INTEGER"), Key]
         public int ClanBattleID { get; set; }
 
-        [Column("battle_start_time", TypeName = "TEXT")]
-        [Timestamp]
+        [Column("battle_start_time", TypeName = "TEXT"), Timestamp]
         public DateTime BattleStartTime { get; set; }
 
-        [Column("battle_end_time", TypeName = "TEXT")]
-        [Timestamp]
+        [Column("battle_end_time", TypeName = "TEXT"), Timestamp]
         public DateTime BattleEndTime { get; set; }
 
-        [Column("interval_end_time", TypeName = "TEXT")]
-        [Timestamp]
+        [Column("interval_end_time", TypeName = "TEXT"), Timestamp]
         public DateTime IntervalEndTime { get; set; }
     }
 }

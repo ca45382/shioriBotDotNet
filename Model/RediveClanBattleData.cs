@@ -12,10 +12,7 @@ namespace PriconneBotConsoleApp.Model
         public static int ClanBattleID { get; private set; } = 0;
         public static int ReleaseMonth { get; private set; } = 0;
         public static DateTime ClanBattleStartTime { get; private set; }
-        public static DateTime ClanBattleTraningStartTime { get; private set; }
         public static DateTime ClanBattleEndTime { get; private set; }
-        public static DateTime ClanBattleIntervalEndTime { get; private set; }
-        public static DateTime ClanBattleTraningIntervalEndTime { get; private set; }
         public static IEnumerable<BossData> BossDataList { get; private set; }
 
         public class BossData
@@ -39,7 +36,7 @@ namespace PriconneBotConsoleApp.Model
             using var rediveConnector = new RediveDBContext();
 
             var clanBattleTrainingSchedule = rediveConnector.ClanBattleTrainingSchedule.AsEnumerable()
-                .Where(x => nowTime >= x.BattleStartTime && nowTime <= x.IntervalEndTime)
+                .Where(x => x.BattleStartTime <= nowTime && nowTime <= x.IntervalEndTime)
                 .OrderByDescending(x => x.ClanBattleID)
                 .FirstOrDefault();
 
@@ -50,16 +47,14 @@ namespace PriconneBotConsoleApp.Model
 
             var clanBattleSchedule = rediveConnector.ClanBattleSchedule.AsQueryable()
                 .First(x => x.ClanBattleID == clanBattleTrainingSchedule.ClanBattleID);
+
             var clanBattlePeriod = rediveConnector.ClanBattlePeriod.AsQueryable()
                 .First(x => x.ClanBattleID == clanBattleTrainingSchedule.ClanBattleID);
 
             ClanBattleID = clanBattleSchedule.ClanBattleID;
             ReleaseMonth = clanBattleSchedule.ReleaseMonth;
             ClanBattleStartTime = clanBattleSchedule.StartTime;
-            ClanBattleTraningStartTime = clanBattleTrainingSchedule.BattleStartTime;
             ClanBattleEndTime = clanBattlePeriod.BattleEndTime;
-            ClanBattleIntervalEndTime = clanBattleSchedule.EndTime;
-            ClanBattleTraningIntervalEndTime = clanBattleTrainingSchedule.IntervalEndTime;
 
             var clanBattleDataArray = rediveConnector.ClanBattleData.AsQueryable()
                 .Where(x => x.ClanBattleID == ClanBattleID).OrderBy(x => x.ID)

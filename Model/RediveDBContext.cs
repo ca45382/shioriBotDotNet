@@ -23,7 +23,6 @@ namespace PriconneBotConsoleApp.Model
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
         }
     }
 }

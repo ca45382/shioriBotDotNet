@@ -57,7 +57,7 @@ namespace PriconneBotConsoleApp.Script
 
                 taskList.Add(new BattleTaskKill(clanRole).SyncTaskKillData());
 
-                if (nowTime >= RediveClanBattleData.ClanBattleStartTime && nowTime <= RediveClanBattleData.ClanBattleEndTime)
+                if (RediveClanBattleData.ClanBattleStartTime <= nowTime && nowTime <= RediveClanBattleData.ClanBattleEndTime)
                 {
                     taskList.Add(new BattleReservationSummary(clanRole).UpdateMessage());
 
