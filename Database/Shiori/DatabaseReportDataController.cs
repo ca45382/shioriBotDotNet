@@ -16,7 +16,7 @@ namespace PriconneBotConsoleApp.Database
         /// <returns></returns>
         public static IEnumerable<ReportData> GetReportData()
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.ReportData.AsQueryable()
                 .Where(x => !x.DeleteFlag)
@@ -30,7 +30,7 @@ namespace PriconneBotConsoleApp.Database
         /// <returns></returns>
         public static IEnumerable<ReportData> GetReportData(PlayerData playerData)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.ReportData.AsQueryable()
                 .Where(x => x.PlayerID == playerData.PlayerID && !x.SubdueFlag && !x.DeleteFlag)
@@ -44,7 +44,7 @@ namespace PriconneBotConsoleApp.Database
         /// <returns></returns>
         public static IEnumerable<ReportData> GetReportData(ClanData clanData)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.ReportData.AsQueryable()
                 .Include(x => x.PlayerData)
@@ -59,7 +59,7 @@ namespace PriconneBotConsoleApp.Database
         /// <returns></returns>
         public static int[] GetRemainPlayerCount(ClanData clanData)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             var reportCount = new int[CommonDefine.MaxReportNumber + 1];
 
@@ -73,7 +73,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static int GetReportCount(PlayerData playerData)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.ReportData.AsQueryable()
                 .Count(x => x.PlayerID == playerData.PlayerID && !x.SubdueFlag && !x.DeleteFlag);
@@ -93,7 +93,7 @@ namespace PriconneBotConsoleApp.Database
 
             reportData.PlayerData = null;
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
             try
             {
@@ -131,7 +131,7 @@ namespace PriconneBotConsoleApp.Database
         /// <returns></returns>
         public static bool DeleteReportData(IEnumerable<ReportData> reportDataList, bool isValid = false)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             var deleteDataList = databaseConnector.ReportData.AsQueryable()

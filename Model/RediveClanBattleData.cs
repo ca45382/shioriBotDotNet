@@ -34,7 +34,7 @@ namespace PriconneBotConsoleApp.Model
         {
             // TODO : 日本時間に対応
             var nowTime = DateTime.Now;
-            using var rediveConnector = new RediveConnector();
+            using var rediveConnector = new RediveDBContext();
 
             var clanBattleSchedule = rediveConnector.ClanBattleSchedule.AsEnumerable()
                 .Where(x => nowTime >= x.StartTime && nowTime <= x.EndTime)

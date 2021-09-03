@@ -10,21 +10,21 @@ namespace PriconneBotConsoleApp.Database
     {
         public static IEnumerable<ChannelFeature> LoadChannelFeature()
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.ChannelFeatures.ToList();
         }
 
         public static IEnumerable<MessageFeature> LoadMessageFeature()
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.MessageFeatures.ToList();
         }
 
         public static IEnumerable<RoleFeature> LoadRoleFeature()
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.RoleFeatures.ToList();
         }
@@ -35,7 +35,7 @@ namespace PriconneBotConsoleApp.Database
             var createFeatures = GetCreateData(features, databaseFeatures);
             var removeFeatures = GetRemoveData(features, databaseFeatures);
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             foreach (var createFeature in createFeatures)
@@ -58,7 +58,7 @@ namespace PriconneBotConsoleApp.Database
             var createFeatures = GetCreateData(features, databaseFeatures);
             var removeFeatures = GetRemoveData(features, databaseFeatures);
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             foreach (var createFeature in createFeatures)
@@ -81,7 +81,7 @@ namespace PriconneBotConsoleApp.Database
             var createFeatures = GetCreateData(features, databaseFeatures);
             var removeFeatures = GetRemoveData(features, databaseFeatures);
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             foreach (var createFeature in createFeatures)

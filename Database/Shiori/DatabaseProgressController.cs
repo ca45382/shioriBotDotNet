@@ -13,7 +13,7 @@ namespace PriconneBotConsoleApp.Database
     {
         public static IEnumerable<ProgressData> GetProgressData(ClanData clanData, BossNumberType bossNumber)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.ProgressData.AsQueryable()
                 .Include(x => x.PlayerData)
@@ -24,7 +24,7 @@ namespace PriconneBotConsoleApp.Database
         public static IEnumerable<ProgressData> GetProgressData(PlayerData playerData, BossNumberType bossNumber)
         {
             var playerID = playerData?.PlayerID ?? 0;
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.ProgressData.AsQueryable()
                 .Where(x => x.PlayerID == playerID && x.BossNumber == (byte)bossNumber && !x.DeleteFlag)
@@ -40,7 +40,7 @@ namespace PriconneBotConsoleApp.Database
 
             progressData.PlayerData = null;
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             try
@@ -64,7 +64,7 @@ namespace PriconneBotConsoleApp.Database
                 return false;
             }
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             var updateData = databaseConnector.ProgressData.AsQueryable()
@@ -103,7 +103,7 @@ namespace PriconneBotConsoleApp.Database
                 return false;
             }
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             var deleteDataList = databaseConnector.ProgressData.AsQueryable()

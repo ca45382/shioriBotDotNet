@@ -9,14 +9,14 @@ namespace PriconneBotConsoleApp.Database
     {
         public static IEnumerable<CampaignData> LoadCampaignData()
         {
-            using var rediveConnector = new RediveConnector();
+            using var rediveConnector = new RediveDBContext();
 
             return rediveConnector.CampaignData.ToList();
         }
 
         public static IEnumerable<CampaignData> LoadCampaignData(DateTime dateTime)
         {
-            using var rediveConnector = new RediveConnector();
+            using var rediveConnector = new RediveDBContext();
 
             return rediveConnector.CampaignData.AsEnumerable()
                 .Where(b => b.CampaignStartTime <= dateTime && dateTime <= b.CampaignEndTime)

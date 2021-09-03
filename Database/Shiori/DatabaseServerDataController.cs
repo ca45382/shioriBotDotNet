@@ -9,14 +9,14 @@ namespace PriconneBotConsoleApp.Database
     {
         public static IEnumerable<ServerData> LoadServerData()
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.ServerData.ToArray();
         }
 
         public static ServerData LoadServerData(IGuild guild)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.ServerData
                 .FirstOrDefault(b => b.ServerID == guild.Id);
@@ -24,7 +24,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static void CreateServerData(IGuild guild)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             var databaseServerData = databaseConnector.ServerData
@@ -50,7 +50,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static void UpdateServerData(IGuild guild)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             var databaseServerData = databaseConnector.ServerData

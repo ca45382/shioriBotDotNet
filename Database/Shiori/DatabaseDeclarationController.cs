@@ -10,7 +10,7 @@ namespace PriconneBotConsoleApp.Database
     {
         public static IEnumerable<DeclarationData> LoadDeclarationData(ClanData clanData, byte bossNumber)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             var databaseClanData = databaseConnector.ClanData.AsQueryable()
                 .Where(d => d.ServerID == clanData.ServerID && d.ClanRoleID == clanData.ClanRoleID)
@@ -30,7 +30,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static IEnumerable<DeclarationData> LoadDeclarationData(PlayerData playerData, byte bossNumber)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             playerData = databaseConnector.PlayerData.AsQueryable()
                 .FirstOrDefault(d => d.PlayerID == playerData.PlayerID);
@@ -63,7 +63,7 @@ namespace PriconneBotConsoleApp.Database
                 return false;
             }
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             if (declarationData.PlayerID == 0)
@@ -99,7 +99,7 @@ namespace PriconneBotConsoleApp.Database
                 return false;
             }
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             if (declarationData.PlayerID == 0)
@@ -141,7 +141,7 @@ namespace PriconneBotConsoleApp.Database
         /// <returns></returns>
         public static bool DeleteDeclarationData(IEnumerable<DeclarationData> declarationDataSet)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             foreach (var declarationData in declarationDataSet)
@@ -189,7 +189,7 @@ namespace PriconneBotConsoleApp.Database
             }
 
             var clanData = playerData.ClanData;
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.PlayerData
                 .Include(d => d.ClanData)

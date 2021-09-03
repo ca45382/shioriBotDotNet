@@ -1,11 +1,10 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using PriconneBotConsoleApp.Model;
 
 
-namespace PriconneBotConsoleApp.Database
+namespace PriconneBotConsoleApp.Model
 {
-    public class RediveConnector : DbContext
+    public class RediveDBContext : DbContext
     {
         public DbSet<CampaignData> CampaignData { get; set; }
         public DbSet<ClanBattleSchedule> ClanBattleSchedule { get; set; }

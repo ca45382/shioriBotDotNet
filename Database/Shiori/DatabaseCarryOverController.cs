@@ -13,7 +13,7 @@ namespace PriconneBotConsoleApp.Database
     {
         public static IEnumerable<CarryOverData> GetCarryOverData()
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.CarryOverData.AsQueryable()
                 .Where(x => !x.DeleteFlag)
@@ -27,7 +27,7 @@ namespace PriconneBotConsoleApp.Database
                 return null;
             }
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.CarryOverData.AsQueryable()
                 .Where(x => x.PlayerID == playerData.PlayerID && !x.DeleteFlag)
@@ -41,7 +41,7 @@ namespace PriconneBotConsoleApp.Database
                 return null;
             }
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.CarryOverData.AsQueryable().Include(x => x.PlayerData)
                 .Where(x => x.PlayerData.ClanID == clanData.ClanID && !x.DeleteFlag)
@@ -57,7 +57,7 @@ namespace PriconneBotConsoleApp.Database
 
             carryOverData.PlayerData = null;
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
             try
             {
@@ -83,7 +83,7 @@ namespace PriconneBotConsoleApp.Database
 
             carryOverData.PlayerData = null;
 
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             var updateData = databaseConnector.CarryOverData.AsQueryable()
@@ -115,7 +115,7 @@ namespace PriconneBotConsoleApp.Database
 
         public static bool DeleteCarryOverData(IEnumerable<CarryOverData> carryOverDataList)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             var deleteDataList = databaseConnector.CarryOverData.AsQueryable()

@@ -10,7 +10,7 @@ namespace PriconneBotConsoleApp.Database
     {
         public static bool UpdateMessageID(ClanData clanData, ulong messageID, MessageFeatureType featureType)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
 
             var clanID = databaseConnector.ClanData
