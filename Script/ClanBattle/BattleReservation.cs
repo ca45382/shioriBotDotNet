@@ -51,10 +51,7 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            var allowMinReservationLap = Math.Min(
-                    m_CommandEventArgs.ClanData.GetBossLap(reservationData.BossNumber) + 1,
-                    m_CommandEventArgs.ClanData.GetMinBossLap() + CommonDefine.BattleLapRange + 1
-                );
+            var allowMinReservationLap = m_CommandEventArgs.ClanData.GetBossLap(reservationData.BossNumber);
 
             if (reservationData.BattleLap < allowMinReservationLap)
             {
