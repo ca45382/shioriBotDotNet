@@ -4,7 +4,7 @@ using PriconneBotConsoleApp.Database;
 using PriconneBotConsoleApp.DataType;
 using PriconneBotConsoleApp.Interface;
 
-namespace PriconneBotConsoleApp.DataModel
+namespace PriconneBotConsoleApp.Model
 {
     public class ButtonEvent : IPlayerEvent
     {

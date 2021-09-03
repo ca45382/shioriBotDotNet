@@ -1,5 +1,5 @@
 ﻿using Discord.WebSocket;
-using PriconneBotConsoleApp.DataModel;
+using PriconneBotConsoleApp.Model;
 using PriconneBotConsoleApp.DataType;
 
 namespace PriconneBotConsoleApp.Interface
