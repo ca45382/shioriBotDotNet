@@ -17,7 +17,7 @@ namespace ShioriBot.Net.Database
 
         public static IEnumerable<ClanData> LoadClanData(SocketGuild guild)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.ClanData
                 .Include(x => x.MessageData).Include(x => x.MessageData).Include(x => x.RoleData)

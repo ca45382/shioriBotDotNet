@@ -31,7 +31,7 @@ namespace ShioriBot.Net.Database
 
         public static ChannelData GetChannelData(ulong channelID)
         {
-            using var databaseConnector = new DatabaseConnector();
+            using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.ChannelData.AsQueryable()
                 .Include(x => x.ClanData)
