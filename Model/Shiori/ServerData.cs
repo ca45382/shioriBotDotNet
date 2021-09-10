@@ -13,6 +13,9 @@ namespace PriconneBotConsoleApp.Model
         [Column("server_name", TypeName = "VARCHAR(100)")]
         public string ServerName { get; set; }
 
+        [Column("server_icon_hash", TypeName = "VARCHAR(100)")]
+        public string ServerIconHash { get; set; }
+
         [Column("server_owner_id", TypeName = "BIGINT UNSIGNED")]
         public ulong ServerOwnerID { get; set; }
 
