@@ -193,10 +193,12 @@ namespace ShioriBot.Net.Script
             if (progressStatus == ProgressStatus.SubdueBoss)
             {
                 var nowLap = m_CommandEventArgs.ClanData.GetBossLap(m_BossNumberType);
+
                 var damageSum = DatabaseProgressController.GetProgressData(m_CommandEventArgs.ClanData, m_BossNumberType)
                     .Where(x => x.Status == (byte)ProgressStatus.AttackDone)
                     .Select(x => (int)x.Damage)
                     .Sum();
+
                 var bossHP = RediveClanBattleData.GetBossData(m_BossNumberType, nowLap)
                     ?.DisplayHP ?? 0;
 
@@ -503,6 +505,11 @@ namespace ShioriBot.Net.Script
             DatabaseReportDataController.DeleteReportData(reportedData);
         }
 
+        /// <summary>
+        /// 持ち越しデータを登録
+        /// </summary>
+        /// <param name="progressData"></param>
+        /// <param name="playerData"></param>
         private void UpdateCarryOverData(ProgressData progressData, PlayerData playerData)
         {
             if (progressData.CarryOverFlag)
