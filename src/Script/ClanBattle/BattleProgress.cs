@@ -529,7 +529,7 @@ namespace ShioriBot.Net.Script
                 BattleLap = (ushort)m_CommandEventArgs.ClanData.GetBossLap(m_BossNumberType),
                 BossNumber = (byte)m_BossNumberType,
                 PlayerID = progressData.PlayerID,
-                RemainTime = (byte)(progressData.RemainTime),
+                RemainTime = progressData.RemainTime,
             };
 
             DatabaseCarryOverController.CreateCarryOverData(carryOverData);
