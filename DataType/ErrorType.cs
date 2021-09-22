@@ -6,7 +6,7 @@ namespace PriconneBotConsoleApp.DataType
     {
         Unknown,
 
-        //予約関連
+        // 予約関連
         [Description("予約に失敗しました。")]
         FailedReservation,
 
@@ -22,12 +22,19 @@ namespace PriconneBotConsoleApp.DataType
         [Description("予約ができません。予約は{0}周目まで可能です。")]
         OutOfMaxReservationBossLaps,
 
-        //凸宣言関連
+        // 凸宣言関連
         [Description("!call [周回数] で宣言を開始してください。")]
         FailedDeclaration,
 
-        //凸報告関連
+        // 凸報告関連
         [Description("報告件数が規定数を超えています。")]
         UpperLimitReport,
+
+        // 持ち越し時間計算機関連
+        [Description("ダメージの値は整数値で入力してください。")]
+        InvalidDamage,
+
+        [Description("ボスを倒し切れていないです。")]
+        NotSubdueBoss,
     }
 }

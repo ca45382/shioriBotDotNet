@@ -7,7 +7,7 @@ namespace PriconneBotConsoleApp.Script
 {
     public static class Commands
     {
-        // 持ち越し関連
+        #region 持ち越し関連
         [Command(AttackType.CarryOver, 2, compatibleChannels: ChannelFeatureType.CarryOverID)]
         public static Task UpdateCarryOverData(CommandEventArgs commandEventArgs)
         {
@@ -49,8 +49,9 @@ namespace PriconneBotConsoleApp.Script
             new BattleCarryOver(commandEventArgs).InitAllData();
             return Task.CompletedTask;
         }
+        #endregion
 
-        // 進行関連
+        #region 進行関連
         [Command(
             AttackType.Physics,
             0,
@@ -233,7 +234,9 @@ namespace PriconneBotConsoleApp.Script
          )]
         public static async Task UpdateProgressDamage(CommandEventArgs commandEventArgs)
              => await new BattleProgress(commandEventArgs).UpdateDamageData();
+        #endregion
 
+        #region 凸報告関連
         [Command(new[] { "!list" , "リスト"}, 0, 0, ChannelFeatureType.ReportID)]
         public static async Task ListReport(CommandEventArgs commandEventArgs)
             => await new BattleReport(commandEventArgs).SendClanAttackList();
@@ -265,7 +268,9 @@ namespace PriconneBotConsoleApp.Script
             new BattleReport(commandEventArgs).RegisterReportData();
             return Task.CompletedTask;
         }
+        #endregion
 
+        #region 凸予約関連
         [Command("予約", 0, compatibleChannels: ChannelFeatureType.ReserveID)]
         public static Task ReservationCommand(CommandEventArgs commandEventArgs)
         {
@@ -300,7 +305,9 @@ namespace PriconneBotConsoleApp.Script
         [Command("!start", 0, 0, ChannelFeatureType.ReserveResultID)]
         public static async Task SendReserveSummary(CommandEventArgs commandEventArgs)
             => await new BattleReservationSummary(commandEventArgs.Role, commandEventArgs.ClanData).SendMessage();
+        #endregion
 
+        #region 凸宣言関連
         [Command(compatibleChannels: new[]
              {
                 ChannelFeatureType.DeclareBoss1ID,
@@ -328,11 +335,15 @@ namespace PriconneBotConsoleApp.Script
 
             await new BattleDeclaration(commandEventArgs.ClanData, commandEventArgs.SocketUserMessage, BossNumber).RunDeclarationCommandByMessage();
         }
+        #endregion
 
+        #region タスキル関連
         [Command(compatibleChannels: ChannelFeatureType.TaskKillID)]
         public static async Task StartTaskkill(CommandEventArgs commandEventArgs)
             => await new BattleTaskKill(commandEventArgs.ClanData, commandEventArgs.SocketUserMessage).RunByMessageCommands();
+        #endregion
 
+        #region その他
         [Command("!dice", 0, 1)]
         public static async Task Dice(CommandEventArgs commandEventArgs)
             => await new Dice(commandEventArgs).Run();
@@ -344,5 +355,11 @@ namespace PriconneBotConsoleApp.Script
         [Command("!today", 0, 0)]
         public static async Task EventInformation(CommandEventArgs commandEventArgs)
             => await new PriconneEventViewer(commandEventArgs).SendEventInfomationByMessage();
+
+        [Command("!time", 2, 10)]
+        public static async Task TimeCalculate(CommandEventArgs commandEventArgs)
+            => await Task.Run(() => new CarryOverTimeCalculator(commandEventArgs).Run());
+
+        #endregion
     }
 }
