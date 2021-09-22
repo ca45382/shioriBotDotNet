@@ -27,7 +27,11 @@ namespace PriconneBotConsoleApp.Model
             public int Level;
             public int HP;
             public float ScoreCoefficient;
+            public int DisplayHP { get { return HP / CommonDefine.DisplayDamageUnit; } }
         }
+
+        public static BossData GetBossData(BossNumberType bossNumberType, int lap)
+            => BossDataList.FirstOrDefault(x => x.BossNumber == (byte)bossNumberType && x.LapNumberFrom <= lap && (x.LapNumberTo == -1 || x.LapNumberTo >= lap));
 
         public static bool ReloadData()
         {
