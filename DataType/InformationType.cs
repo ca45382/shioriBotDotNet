@@ -18,5 +18,9 @@ namespace PriconneBotConsoleApp.DataType
         //持ち越し関連
         [Description("持ち越しをすべて削除しました。\nこのメッセージは{0}秒後削除されます。")]
         DeleteAllCarryOverData,
+
+        // 持ち越し秒数計算機関連
+        [Description("{0}人目が{1}秒の持ち越しを持ちます。")]
+        CarryOverTimeResult,
     }
 }
