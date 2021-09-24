@@ -19,8 +19,8 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            uint[] hpArgumentList = new uint[m_CommandEventArgs.Arguments.Count];
-            bool isValidArgument = true;
+            var hpArgumentList = new uint[m_CommandEventArgs.Arguments.Count];
+            var isValidArgument = true;
 
             for (var i = 0; i < m_CommandEventArgs.Arguments.Count; i++)
             {
@@ -44,12 +44,12 @@ namespace PriconneBotConsoleApp.Script
             // のちに拡張する予定
 
             var bossHP = hpArgumentList[0];
-            uint remainTime = 0;
-            int personNumber = 0;
+            var remainTime = 0u;
+            var personNumber = 0;
 
             for (var i = 1; i < m_CommandEventArgs.Arguments.Count; i++)
             {
-                if(bossHP <= hpArgumentList[i])
+                if (bossHP <= hpArgumentList[i])
                 {
                     remainTime = Calculate(bossHP, hpArgumentList[i]);
                     personNumber = i;
@@ -60,7 +60,7 @@ namespace PriconneBotConsoleApp.Script
                 bossHP -= hpArgumentList[i];
             }
 
-            if(remainTime == 0)
+            if (remainTime == 0)
             {
                 m_CommandEventArgs.Channel.SendMessageAsync(EnumMapper.ToLabel(ErrorType.NotSubdueBoss));
                 return;

@@ -34,7 +34,7 @@ namespace PriconneBotConsoleApp.DataType
         [Description("ダメージの値は整数値で入力してください。")]
         InvalidDamage,
 
-        [Description("ボスを倒し切れていないです。")]
+        [Description("ボスを倒し切れていません。")]
         NotSubdueBoss,
     }
 }
