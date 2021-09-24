@@ -357,7 +357,7 @@ namespace PriconneBotConsoleApp.Script
             => await new PriconneEventViewer(commandEventArgs).SendEventInfomationByMessage();
 
         [Command("!time", 2, 10)]
-        public static async Task TimeCalculate(CommandEventArgs commandEventArgs)
+        public static async Task CalculateCarryOverTime(CommandEventArgs commandEventArgs)
             => await Task.Run(() => new CarryOverTimeCalculator(commandEventArgs).Run());
 
         #endregion

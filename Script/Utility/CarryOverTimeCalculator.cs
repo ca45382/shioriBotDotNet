@@ -66,11 +66,8 @@ namespace PriconneBotConsoleApp.Script
                 return;
             }
 
-            m_CommandEventArgs.Channel.SendMessageAsync(string.Format(
-                EnumMapper.ToLabel(InformationType.CarryOverTimeResult),
-                personNumber,
-                remainTime                
-                ));
+            var infomationComment = string.Format(EnumMapper.ToLabel(InformationType.CarryOverTimeResult), personNumber, remainTime);
+            m_CommandEventArgs.Channel.SendMessageAsync(infomationComment);
         }
 
         private static uint Calculate(uint remainBossHP, uint attackDamage, uint remainTime = 0)
