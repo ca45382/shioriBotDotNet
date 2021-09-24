@@ -237,7 +237,7 @@ namespace PriconneBotConsoleApp.Script
         #endregion
 
         #region 凸報告関連
-        [Command(new[] { "!list" , "リスト"}, 0, 0, ChannelFeatureType.ReportID)]
+        [Command(new[] { "!list", "リスト" }, 0, 0, ChannelFeatureType.ReportID)]
         public static async Task ListReport(CommandEventArgs commandEventArgs)
             => await new BattleReport(commandEventArgs).SendClanAttackList();
 
