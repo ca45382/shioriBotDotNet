@@ -39,6 +39,7 @@ namespace PriconneBotConsoleApp.Database
             {
                 ServerID = guild.Id,
                 ServerName = guild.Name,
+                ServerIconHash = guild.IconId,
                 ServerOwnerID = guild.OwnerId,
             };
 
@@ -62,6 +63,7 @@ namespace PriconneBotConsoleApp.Database
             }
 
             databaseServerData.ServerName = guild.Name;
+            databaseServerData.ServerIconHash = guild.IconId;
             databaseServerData.ServerOwnerID = guild.OwnerId;
 
             databaseConnector.SaveChanges();
