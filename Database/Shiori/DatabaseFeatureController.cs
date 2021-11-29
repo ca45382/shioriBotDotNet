@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using PriconneBotConsoleApp.Interface;
 using PriconneBotConsoleApp.Model;
 
@@ -26,6 +27,15 @@ namespace PriconneBotConsoleApp.Database
             using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.RoleFeatures.ToList();
+        }
+
+        public static ChannelData GetChannelData(ulong channelID)
+        {
+            using var databaseConnector = new ShioriDBContext();
+
+            return databaseConnector.ChannelData.AsQueryable()
+                .Include(x => x.ClanData)
+                .FirstOrDefault(x => x.ChannelID == channelID);
         }
 
         public static void UpdateChannelFeature(IEnumerable<ChannelFeature> features)
