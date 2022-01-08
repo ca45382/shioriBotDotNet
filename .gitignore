@@ -17,7 +17,7 @@
 mono_crash.*
 
 # Bot config files
-[Dd]ata/*.json
+src/[Dd]ata/*.json
 
 # Build results
 [Dd]ebug/
