@@ -61,8 +61,8 @@ namespace ShioriBot.Net.Database
             using var databaseConnector = new ShioriDBContext();
 
             return databaseConnector.ReportData.AsQueryable()
-            .Include(x => x.PlayerData)
-            .FirstOrDefault(x => x.ReportID == reportID);
+                .Include(x => x.PlayerData)
+                .FirstOrDefault(x => x.ReportID == reportID);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace ShioriBot.Net.Database
 
         public static void UpdateReportData(ReportData reportData)
         {
-            if(reportData.ReportID == 0)
+            if (reportData.ReportID == 0)
             {
                 return;
             }
