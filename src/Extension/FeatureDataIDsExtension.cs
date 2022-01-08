@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using PriconneBotConsoleApp.Model;
-using PriconneBotConsoleApp.DataType;
+using ShioriBot.Net.Model;
+using ShioriBot.Net.DataType;
 
-namespace PriconneBotConsoleApp.Extension
+namespace ShioriBot.Net.Extension
 {
 
     public static class FeatureDataIDsExtension

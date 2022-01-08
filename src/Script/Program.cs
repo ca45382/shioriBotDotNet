@@ -7,10 +7,10 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using PriconneBotConsoleApp.Model;
-using PriconneBotConsoleApp.Define;
+using ShioriBot.Net.Model;
+using ShioriBot.Net.Define;
 
-namespace PriconneBotConsoleApp.Script
+namespace ShioriBot.Net.Script
 {
     public class Program
     {

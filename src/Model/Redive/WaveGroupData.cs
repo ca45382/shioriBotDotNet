@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PriconneBotConsoleApp.Model
+namespace ShioriBot.Net.Model
 {
     [Table("wave_group_data")]
     public class WaveGroupData

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using PriconneBotConsoleApp.Model;
-using PriconneBotConsoleApp.Define;
+using ShioriBot.Net.Model;
+using ShioriBot.Net.Define;
 
-namespace PriconneBotConsoleApp.Script
+namespace ShioriBot.Net.Script
 {
     public class Dice
     {

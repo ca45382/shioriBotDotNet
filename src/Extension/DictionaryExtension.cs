@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace PriconneBotConsoleApp.Extension
+namespace ShioriBot.Net.Extension
 {
     public static class DictionaryExtension
     {

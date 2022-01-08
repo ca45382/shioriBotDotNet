@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using PriconneBotConsoleApp.DataType;
-using PriconneBotConsoleApp.Extension;
+using ShioriBot.Net.DataType;
+using ShioriBot.Net.Extension;
 
-namespace PriconneBotConsoleApp.Attribute
+namespace ShioriBot.Net.Attribute
 {
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public class CommandAttribute : System.Attribute

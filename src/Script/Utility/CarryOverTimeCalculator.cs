@@ -1,9 +1,9 @@
 ﻿using System;
-using PriconneBotConsoleApp.DataType;
-using PriconneBotConsoleApp.Define;
-using PriconneBotConsoleApp.Model;
+using ShioriBot.Net.DataType;
+using ShioriBot.Net.Define;
+using ShioriBot.Net.Model;
 
-namespace PriconneBotConsoleApp.Script
+namespace ShioriBot.Net.Script
 {
     public class CarryOverTimeCalculator
     {

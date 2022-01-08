@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
-using PriconneBotConsoleApp.Attribute;
-using PriconneBotConsoleApp.Model;
-using PriconneBotConsoleApp.DataType;
+using ShioriBot.Net.Attribute;
+using ShioriBot.Net.Model;
+using ShioriBot.Net.DataType;
 
-namespace PriconneBotConsoleApp.Script
+namespace ShioriBot.Net.Script
 {
     public static class Commands
     {

@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace PriconneBotConsoleApp.Extension
+namespace ShioriBot.Net.Extension
 {
     public static class StringExtension
     {

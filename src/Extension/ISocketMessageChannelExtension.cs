@@ -4,7 +4,7 @@ using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
 
-namespace PriconneBotConsoleApp.Extension
+namespace ShioriBot.Net.Extension
 {
     public static class ISocketMessageChannelExtension
     {

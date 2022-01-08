@@ -1,6 +1,6 @@
-﻿using PriconneBotConsoleApp.Attribute;
+﻿using ShioriBot.Net.Attribute;
 
-namespace PriconneBotConsoleApp.DataType
+namespace ShioriBot.Net.DataType
 {
     public enum AttackType
     {

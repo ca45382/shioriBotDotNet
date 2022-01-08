@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using System;
 
-using PriconneBotConsoleApp.Model;
-using PriconneBotConsoleApp.DataType;
-using PriconneBotConsoleApp.Database;
+using ShioriBot.Net.Model;
+using ShioriBot.Net.DataType;
+using ShioriBot.Net.Database;
 
-namespace PriconneBotConsoleApp.Script
+namespace ShioriBot.Net.Script
 {
     public class BotInitialize
     {

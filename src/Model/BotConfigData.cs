@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace PriconneBotConsoleApp.Model
+namespace ShioriBot.Net.Model
 {
     public class BotConfigData
     {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace PriconneBotConsoleApp.DataType
+namespace ShioriBot.Net.DataType
 {
     public enum CampaignSystemType
     {

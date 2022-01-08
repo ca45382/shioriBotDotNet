@@ -1,4 +1,4 @@
-﻿namespace PriconneBotConsoleApp.DataType
+﻿namespace ShioriBot.Net.DataType
 {
     //メッセージ 2xxx
     public enum MessageFeatureType : uint

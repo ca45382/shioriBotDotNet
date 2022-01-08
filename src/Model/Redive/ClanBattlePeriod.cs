@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PriconneBotConsoleApp.Model
+namespace ShioriBot.Net.Model
 {
     [Table("clan_battle_period")]
     public class ClanBattlePeriod

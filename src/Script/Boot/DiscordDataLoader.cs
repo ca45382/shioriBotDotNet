@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Discord.WebSocket;
-using PriconneBotConsoleApp.Model;
-using PriconneBotConsoleApp.Database;
+using ShioriBot.Net.Model;
+using ShioriBot.Net.Database;
 
-namespace PriconneBotConsoleApp.Script
+namespace ShioriBot.Net.Script
 {
     public class DiscordDataLoader
     {

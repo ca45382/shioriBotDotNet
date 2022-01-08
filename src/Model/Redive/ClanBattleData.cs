@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using PriconneBotConsoleApp.DataType;
+using ShioriBot.Net.DataType;
 
-namespace PriconneBotConsoleApp.Model
+namespace ShioriBot.Net.Model
 {
     [Table("clan_battle_2_map_data")]
     public class ClanBattleData

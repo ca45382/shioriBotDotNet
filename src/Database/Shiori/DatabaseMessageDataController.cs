@@ -1,8 +1,8 @@
 ﻿using System.Linq;
-using PriconneBotConsoleApp.DataType;
-using PriconneBotConsoleApp.Model;
+using ShioriBot.Net.DataType;
+using ShioriBot.Net.Model;
 
-namespace PriconneBotConsoleApp.Database
+namespace ShioriBot.Net.Database
 {
     public static class DatabaseMessageDataController
     {

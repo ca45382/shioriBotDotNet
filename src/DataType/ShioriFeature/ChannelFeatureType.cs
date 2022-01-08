@@ -1,4 +1,4 @@
-﻿namespace PriconneBotConsoleApp.DataType
+﻿namespace ShioriBot.Net.DataType
 {
     //チャンネル系 1xxx
     public enum ChannelFeatureType : uint

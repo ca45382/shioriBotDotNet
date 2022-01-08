@@ -1,11 +1,11 @@
 ﻿using Discord.WebSocket;
 using System.Linq;
 using System.Threading.Tasks;
-using PriconneBotConsoleApp.DataType;
-using PriconneBotConsoleApp.Model;
-using PriconneBotConsoleApp.Database;
+using ShioriBot.Net.DataType;
+using ShioriBot.Net.Model;
+using ShioriBot.Net.Database;
 
-namespace PriconneBotConsoleApp.Script
+namespace ShioriBot.Net.Script
 {
     public class ReceiveInteractionController
     {

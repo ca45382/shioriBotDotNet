@@ -4,13 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using PriconneBotConsoleApp.Database;
-using PriconneBotConsoleApp.Model;
-using PriconneBotConsoleApp.DataType;
-using PriconneBotConsoleApp.Define;
-using PriconneBotConsoleApp.Extension;
+using ShioriBot.Net.Database;
+using ShioriBot.Net.Model;
+using ShioriBot.Net.DataType;
+using ShioriBot.Net.Define;
+using ShioriBot.Net.Extension;
 
-namespace PriconneBotConsoleApp.Script
+namespace ShioriBot.Net.Script
 {
     public class BattleCarryOver
     {

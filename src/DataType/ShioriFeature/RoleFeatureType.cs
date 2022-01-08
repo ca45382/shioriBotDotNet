@@ -1,4 +1,4 @@
-﻿namespace PriconneBotConsoleApp.DataType
+﻿namespace ShioriBot.Net.DataType
 {
     //ロール系 3xxx
     public enum RoleFeatureType : uint

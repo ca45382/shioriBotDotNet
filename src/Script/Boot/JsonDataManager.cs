@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.Text.Json;
-using PriconneBotConsoleApp.Model;
+using ShioriBot.Net.Model;
 
-namespace PriconneBotConsoleApp.Script
+namespace ShioriBot.Net.Script
 {
     public static class BotConfigManager
     {

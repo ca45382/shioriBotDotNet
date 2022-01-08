@@ -2,9 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-using PriconneBotConsoleApp.Interface;
+using ShioriBot.Net.Interface;
 
-namespace PriconneBotConsoleApp.Model
+namespace ShioriBot.Net.Model
 {
     [Table("role_feature")]
     public class RoleFeature : IBotFeature 

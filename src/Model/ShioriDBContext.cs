@@ -1,8 +1,8 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using PriconneBotConsoleApp.Script;
+using ShioriBot.Net.Script;
 
-namespace PriconneBotConsoleApp.Model
+namespace ShioriBot.Net.Model
 {
     public class ShioriDBContext : DbContext
     {

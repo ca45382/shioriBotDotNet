@@ -4,13 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using PriconneBotConsoleApp.Model;
-using PriconneBotConsoleApp.Database;
-using PriconneBotConsoleApp.DataType;
-using PriconneBotConsoleApp.Extension;
-using PriconneBotConsoleApp.Define;
+using ShioriBot.Net.Model;
+using ShioriBot.Net.Database;
+using ShioriBot.Net.DataType;
+using ShioriBot.Net.Extension;
+using ShioriBot.Net.Define;
 
-namespace PriconneBotConsoleApp.Script
+namespace ShioriBot.Net.Script
 {
     public class BattleDeclaration
     {

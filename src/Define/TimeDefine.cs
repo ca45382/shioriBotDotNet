@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PriconneBotConsoleApp.Define
+namespace ShioriBot.Net.Define
 {
     public static class TimeDefine
     {

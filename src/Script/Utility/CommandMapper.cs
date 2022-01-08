@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using PriconneBotConsoleApp.Attribute;
-using PriconneBotConsoleApp.Model;
-using PriconneBotConsoleApp.DataType;
-using PriconneBotConsoleApp.Extension;
+using ShioriBot.Net.Attribute;
+using ShioriBot.Net.Model;
+using ShioriBot.Net.DataType;
+using ShioriBot.Net.Extension;
 
-namespace PriconneBotConsoleApp.Script
+namespace ShioriBot.Net.Script
 {
     public static class CommandMapper
     {

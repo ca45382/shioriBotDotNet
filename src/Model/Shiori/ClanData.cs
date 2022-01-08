@@ -1,12 +1,12 @@
-﻿using PriconneBotConsoleApp.DataType;
-using PriconneBotConsoleApp.Extension;
+﻿using ShioriBot.Net.DataType;
+using ShioriBot.Net.Extension;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
-namespace PriconneBotConsoleApp.Model
+namespace ShioriBot.Net.Model
 {
     [Table("clan_info")]
     public class ClanData

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Reflection;
-using PriconneBotConsoleApp.Attribute;
-using PriconneBotConsoleApp.DataType;
+using ShioriBot.Net.Attribute;
+using ShioriBot.Net.DataType;
 
-namespace PriconneBotConsoleApp.Extension
+namespace ShioriBot.Net.Extension
 {
     public static class EnumExtension
     {

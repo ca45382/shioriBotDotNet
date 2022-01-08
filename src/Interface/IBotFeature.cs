@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PriconneBotConsoleApp.Interface
+namespace ShioriBot.Net.Interface
 {
     public interface IBotFeature
     {

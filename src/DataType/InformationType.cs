@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 
-namespace PriconneBotConsoleApp.DataType
+namespace ShioriBot.Net.DataType
 {
     public enum InformationType
     {

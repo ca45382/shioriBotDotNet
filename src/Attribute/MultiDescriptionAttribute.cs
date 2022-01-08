@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PriconneBotConsoleApp.Attribute
+namespace ShioriBot.Net.Attribute
 {
     public struct MultiDescriptionData
     {

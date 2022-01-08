@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using PriconneBotConsoleApp.Define;
-using PriconneBotConsoleApp.Extension;
-using PriconneBotConsoleApp.Model;
+using ShioriBot.Net.Define;
+using ShioriBot.Net.Extension;
+using ShioriBot.Net.Model;
 
-namespace PriconneBotConsoleApp.Database
+namespace ShioriBot.Net.Database
 {
     public static class DatabaseReportDataController
     {

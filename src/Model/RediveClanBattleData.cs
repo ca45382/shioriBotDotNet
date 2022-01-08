@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PriconneBotConsoleApp.DataType;
-using PriconneBotConsoleApp.Define;
-using PriconneBotConsoleApp.Extension;
+using ShioriBot.Net.DataType;
+using ShioriBot.Net.Define;
+using ShioriBot.Net.Extension;
 
-namespace PriconneBotConsoleApp.Model
+namespace ShioriBot.Net.Model
 {
     public static class RediveClanBattleData
     {

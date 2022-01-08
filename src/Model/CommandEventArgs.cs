@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Discord.WebSocket;
-using PriconneBotConsoleApp.Database;
-using PriconneBotConsoleApp.DataType;
-using PriconneBotConsoleApp.Extension;
+using ShioriBot.Net.Database;
+using ShioriBot.Net.DataType;
+using ShioriBot.Net.Extension;
 
-namespace PriconneBotConsoleApp.Model
+namespace ShioriBot.Net.Model
 {
     public class CommandEventArgs : EventArgs
     {

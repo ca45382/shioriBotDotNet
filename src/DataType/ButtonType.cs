@@ -1,6 +1,6 @@
-﻿using PriconneBotConsoleApp.Attribute;
+﻿using ShioriBot.Net.Attribute;
 
-namespace PriconneBotConsoleApp.DataType
+namespace ShioriBot.Net.DataType
 {
     /// <summary> Long : 文字列, Short : 絵文字 </summary>
     public enum ButtonType

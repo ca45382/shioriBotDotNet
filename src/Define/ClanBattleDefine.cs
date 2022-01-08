@@ -1,4 +1,4 @@
-﻿namespace PriconneBotConsoleApp.Define
+﻿namespace ShioriBot.Net.Define
 {
     public static class ClanBattleDefine
     {

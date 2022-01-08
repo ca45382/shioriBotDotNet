@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using PriconneBotConsoleApp.Model;
+using ShioriBot.Net.Model;
 
-namespace PriconneBotConsoleApp.Database
+namespace ShioriBot.Net.Database
 {
     public static class DatabaseTaskKillController
     {
