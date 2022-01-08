@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ShioriBot.Net.Model
+namespace ShioriBot.Model
 {
     [Table("clan_battle_schedule")]
     public class ClanBattleSchedule

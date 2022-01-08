@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using ShioriBot.Net.DataType;
-using ShioriBot.Net.Model;
+using ShioriBot.DataType;
+using ShioriBot.Model;
 
-namespace ShioriBot.Net.Database
+namespace ShioriBot.Database
 {
     public static class DatabaseProgressController
     {

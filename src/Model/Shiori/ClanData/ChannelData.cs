@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ShioriBot.Net.Model
+namespace ShioriBot.Model
 {
     [Table("channel_data")]
     public class ChannelData

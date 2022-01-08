@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using ShioriBot.Net.DataType;
-using ShioriBot.Net.Extension;
+using ShioriBot.DataType;
+using ShioriBot.Extension;
 
-namespace ShioriBot.Net.Attribute
+namespace ShioriBot.Attribute
 {
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public class CommandAttribute : System.Attribute

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ShioriBot.Net.Define
+namespace ShioriBot.Define
 {
     public static class TimeDefine
     {

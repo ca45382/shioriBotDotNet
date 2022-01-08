@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Reflection;
-using ShioriBot.Net.Attribute;
-using ShioriBot.Net.DataType;
+using ShioriBot.Attribute;
+using ShioriBot.DataType;
 
-namespace ShioriBot.Net.Extension
+namespace ShioriBot.Extension
 {
     public static class EnumExtension
     {

@@ -4,7 +4,7 @@ using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
 
-namespace ShioriBot.Net.Extension
+namespace ShioriBot.Extension
 {
     public static class ISocketMessageChannelExtension
     {

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ShioriBot.Net.Model
+namespace ShioriBot.Model
 {
     [Table("task_kill_data")]
     public class TaskKillData

@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
-using ShioriBot.Net.Attribute;
-using ShioriBot.Net.Model;
-using ShioriBot.Net.DataType;
+using ShioriBot.Attribute;
+using ShioriBot.Model;
+using ShioriBot.DataType;
 
-namespace ShioriBot.Net.Script
+namespace ShioriBot.Script
 {
     public static class Commands
     {

@@ -1,4 +1,4 @@
-﻿namespace ShioriBot.Net.Define
+﻿namespace ShioriBot.Define
 {
     public class UtilityDefine
     {

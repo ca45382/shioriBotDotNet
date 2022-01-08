@@ -2,10 +2,10 @@
 using System.Linq;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
-using ShioriBot.Net.Define;
-using ShioriBot.Net.Model;
+using ShioriBot.Define;
+using ShioriBot.Model;
 
-namespace ShioriBot.Net.Database
+namespace ShioriBot.Database
 {
     public static class DatabaseClanDataController
     {

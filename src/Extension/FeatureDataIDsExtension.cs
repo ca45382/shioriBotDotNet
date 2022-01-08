@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using ShioriBot.Net.Model;
-using ShioriBot.Net.DataType;
+using ShioriBot.Model;
+using ShioriBot.DataType;
 
-namespace ShioriBot.Net.Extension
+namespace ShioriBot.Extension
 {
 
     public static class FeatureDataIDsExtension

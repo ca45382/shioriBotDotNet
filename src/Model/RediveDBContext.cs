@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 
 
-namespace ShioriBot.Net.Model
+namespace ShioriBot.Model
 {
     public class RediveDBContext : DbContext
     {

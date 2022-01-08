@@ -1,4 +1,4 @@
-﻿namespace ShioriBot.Net.DataType
+﻿namespace ShioriBot.DataType
 {
     //メッセージ 2xxx
     public enum MessageFeatureType : uint

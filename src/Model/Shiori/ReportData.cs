@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ShioriBot.Net.Model
+namespace ShioriBot.Model
 {
     [Table("report_data")]
     public class ReportData

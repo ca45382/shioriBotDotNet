@@ -1,4 +1,4 @@
-﻿namespace ShioriBot.Net.Model
+﻿namespace ShioriBot.Model
 {
     public class RediveVersionData
     {

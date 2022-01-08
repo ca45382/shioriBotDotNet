@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using ShioriBot.Net.DataType;
+using ShioriBot.DataType;
 
-namespace ShioriBot.Net.Model
+namespace ShioriBot.Model
 {
     [Table("clan_battle_2_map_data")]
     public class ClanBattleData

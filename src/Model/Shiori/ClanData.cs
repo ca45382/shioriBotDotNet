@@ -1,12 +1,12 @@
-﻿using ShioriBot.Net.DataType;
-using ShioriBot.Net.Extension;
+﻿using ShioriBot.DataType;
+using ShioriBot.Extension;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
-namespace ShioriBot.Net.Model
+namespace ShioriBot.Model
 {
     [Table("clan_info")]
     public class ClanData

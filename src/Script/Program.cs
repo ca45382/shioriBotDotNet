@@ -7,10 +7,10 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using ShioriBot.Net.Model;
-using ShioriBot.Net.Define;
+using ShioriBot.Model;
+using ShioriBot.Define;
 
-namespace ShioriBot.Net.Script
+namespace ShioriBot.Script
 {
     public class Program
     {

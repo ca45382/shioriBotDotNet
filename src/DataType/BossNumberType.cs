@@ -1,4 +1,4 @@
-﻿namespace ShioriBot.Net.DataType
+﻿namespace ShioriBot.DataType
 {
     public enum BossNumberType
     {

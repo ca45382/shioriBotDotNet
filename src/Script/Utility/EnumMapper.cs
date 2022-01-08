@@ -5,11 +5,11 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Discord;
-using ShioriBot.Net.Attribute;
-using ShioriBot.Net.DataType;
-using ShioriBot.Net.Extension;
+using ShioriBot.Attribute;
+using ShioriBot.DataType;
+using ShioriBot.Extension;
 
-namespace ShioriBot.Net.Script
+namespace ShioriBot.Script
 {
     public static class EnumMapper
     {

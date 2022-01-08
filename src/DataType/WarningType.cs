@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ShioriBot.Net.DataType
+namespace ShioriBot.DataType
 {
     public enum WarningType
     {
