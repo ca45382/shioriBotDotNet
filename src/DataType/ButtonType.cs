@@ -1,6 +1,6 @@
-﻿using ShioriBot.Net.Attribute;
+﻿using ShioriBot.Attribute;
 
-namespace ShioriBot.Net.DataType
+namespace ShioriBot.DataType
 {
     /// <summary> Long : 文字列, Short : 絵文字 </summary>
     public enum ButtonType

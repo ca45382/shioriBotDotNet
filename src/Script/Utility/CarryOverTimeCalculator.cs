@@ -1,9 +1,9 @@
 ﻿using System;
-using ShioriBot.Net.DataType;
-using ShioriBot.Net.Define;
-using ShioriBot.Net.Model;
+using ShioriBot.DataType;
+using ShioriBot.Define;
+using ShioriBot.Model;
 
-namespace ShioriBot.Net.Script
+namespace ShioriBot.Script
 {
     public class CarryOverTimeCalculator
     {

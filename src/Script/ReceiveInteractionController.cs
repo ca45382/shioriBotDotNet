@@ -1,11 +1,11 @@
 ﻿using Discord.WebSocket;
 using System.Linq;
 using System.Threading.Tasks;
-using ShioriBot.Net.DataType;
-using ShioriBot.Net.Model;
-using ShioriBot.Net.Database;
+using ShioriBot.DataType;
+using ShioriBot.Model;
+using ShioriBot.Database;
 
-namespace ShioriBot.Net.Script
+namespace ShioriBot.Script
 {
     public class ReceiveInteractionController
     {

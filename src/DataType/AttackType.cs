@@ -1,6 +1,6 @@
-﻿using ShioriBot.Net.Attribute;
+﻿using ShioriBot.Attribute;
 
-namespace ShioriBot.Net.DataType
+namespace ShioriBot.DataType
 {
     public enum AttackType
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ShioriBot.Net.Attribute
+namespace ShioriBot.Attribute
 {
     public struct MultiDescriptionData
     {

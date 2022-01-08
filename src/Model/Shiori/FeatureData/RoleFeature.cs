@@ -2,9 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-using ShioriBot.Net.Interface;
+using ShioriBot.Interface;
 
-namespace ShioriBot.Net.Model
+namespace ShioriBot.Model
 {
     [Table("role_feature")]
     public class RoleFeature : IBotFeature 

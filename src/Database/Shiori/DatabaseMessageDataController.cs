@@ -1,8 +1,8 @@
 ﻿using System.Linq;
-using ShioriBot.Net.DataType;
-using ShioriBot.Net.Model;
+using ShioriBot.DataType;
+using ShioriBot.Model;
 
-namespace ShioriBot.Net.Database
+namespace ShioriBot.Database
 {
     public static class DatabaseMessageDataController
     {

@@ -4,13 +4,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
-using ShioriBot.Net.Database;
-using ShioriBot.Net.Model;
-using ShioriBot.Net.DataType;
-using ShioriBot.Net.Define;
-using ShioriBot.Net.Extension;
+using ShioriBot.Database;
+using ShioriBot.Model;
+using ShioriBot.DataType;
+using ShioriBot.Define;
+using ShioriBot.Extension;
 
-namespace ShioriBot.Net.Script
+namespace ShioriBot.Script
 {
     public class BattleReport
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace ShioriBot.Net.Extension
+namespace ShioriBot.Extension
 {
     public static class DictionaryExtension
     {

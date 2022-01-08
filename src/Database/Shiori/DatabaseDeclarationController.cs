@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using ShioriBot.Net.Model;
+using ShioriBot.Model;
 
-namespace ShioriBot.Net.Database
+namespace ShioriBot.Database
 {
     public static class DatabaseDeclarationController
     {

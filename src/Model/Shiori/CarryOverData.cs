@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ShioriBot.Net.Model
+namespace ShioriBot.Model
 {
     [Table("carry_over_data")]
     public class CarryOverData

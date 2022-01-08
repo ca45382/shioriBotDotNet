@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ShioriBot.Net.DataType;
-using ShioriBot.Net.Define;
-using ShioriBot.Net.Extension;
+using ShioriBot.DataType;
+using ShioriBot.Define;
+using ShioriBot.Extension;
 
-namespace ShioriBot.Net.Model
+namespace ShioriBot.Model
 {
     public static class RediveClanBattleData
     {

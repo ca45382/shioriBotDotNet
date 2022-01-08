@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 
-namespace ShioriBot.Net.DataType
+namespace ShioriBot.DataType
 {
     public enum InformationType
     {

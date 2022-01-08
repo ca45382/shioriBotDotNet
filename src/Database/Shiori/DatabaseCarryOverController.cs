@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using ShioriBot.Net.Extension;
-using ShioriBot.Net.Model;
+using ShioriBot.Extension;
+using ShioriBot.Model;
 
-namespace ShioriBot.Net.Database
+namespace ShioriBot.Database
 {
     public static class DatabaseCarryOverController
     {

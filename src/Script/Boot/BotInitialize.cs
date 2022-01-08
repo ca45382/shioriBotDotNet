@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using System;
 
-using ShioriBot.Net.Model;
-using ShioriBot.Net.DataType;
-using ShioriBot.Net.Database;
+using ShioriBot.Model;
+using ShioriBot.DataType;
+using ShioriBot.Database;
 
-namespace ShioriBot.Net.Script
+namespace ShioriBot.Script
 {
     public class BotInitialize
     {

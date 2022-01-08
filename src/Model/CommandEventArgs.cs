@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Discord.WebSocket;
-using ShioriBot.Net.Database;
-using ShioriBot.Net.DataType;
-using ShioriBot.Net.Extension;
+using ShioriBot.Database;
+using ShioriBot.DataType;
+using ShioriBot.Extension;
 
-namespace ShioriBot.Net.Model
+namespace ShioriBot.Model
 {
     public class CommandEventArgs : EventArgs
     {

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.WebSocket;
-using ShioriBot.Net.Database;
-using ShioriBot.Net.Model;
-using ShioriBot.Net.DataType;
-using ShioriBot.Net.Define;
+using ShioriBot.Database;
+using ShioriBot.Model;
+using ShioriBot.DataType;
+using ShioriBot.Define;
 
-namespace ShioriBot.Net.Script
+namespace ShioriBot.Script
 {
     public class UpdateDate
     {

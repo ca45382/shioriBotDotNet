@@ -1,8 +1,8 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using ShioriBot.Net.Script;
+using ShioriBot.Script;
 
-namespace ShioriBot.Net.Model
+namespace ShioriBot.Model
 {
     public class ShioriDBContext : DbContext
     {

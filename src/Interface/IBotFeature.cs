@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ShioriBot.Net.Interface
+namespace ShioriBot.Interface
 {
     public interface IBotFeature
     {

@@ -4,10 +4,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using ShioriBot.Net.Model;
-using ShioriBot.Net.Define;
+using ShioriBot.Model;
+using ShioriBot.Define;
 
-namespace ShioriBot.Net.Script
+namespace ShioriBot.Script
 {
     public class TimeLineConversion
     {

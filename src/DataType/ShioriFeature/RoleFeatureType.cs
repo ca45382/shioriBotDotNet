@@ -1,4 +1,4 @@
-﻿namespace ShioriBot.Net.DataType
+﻿namespace ShioriBot.DataType
 {
     //ロール系 3xxx
     public enum RoleFeatureType : uint

@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.Text.Json;
-using ShioriBot.Net.Model;
+using ShioriBot.Model;
 
-namespace ShioriBot.Net.Script
+namespace ShioriBot.Script
 {
     public static class BotConfigManager
     {

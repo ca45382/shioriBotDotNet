@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ShioriBot.Net.Model
+namespace ShioriBot.Model
 {
     public class BotConfigData
     {

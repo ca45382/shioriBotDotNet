@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using ShioriBot.Net.Attribute;
-using ShioriBot.Net.Model;
-using ShioriBot.Net.DataType;
-using ShioriBot.Net.Extension;
+using ShioriBot.Attribute;
+using ShioriBot.Model;
+using ShioriBot.DataType;
+using ShioriBot.Extension;
 
-namespace ShioriBot.Net.Script
+namespace ShioriBot.Script
 {
     public static class CommandMapper
     {
