@@ -231,6 +231,17 @@ namespace ShioriBot.Script
 
             var declarationData = UserToDeclareData(playerData);
             DatabaseDeclarationController.CreateDeclarationData(declarationData);
+
+            _ = Logger.SendLogMessage(
+                m_UserRole,
+                m_UserClanData,
+                string.Format(
+                    InformationType.Declaration.ToLabel(),
+                    playerData.GuildUserName,
+                    declarationData.BattleLap,
+                    declarationData.BossNumber
+                )
+            );
         }
 
         /// <summary>
@@ -250,6 +261,17 @@ namespace ShioriBot.Script
 
             userDeclareData.FinishFlag = true;
             var result = DatabaseDeclarationController.UpdateDeclarationData(userDeclareData);
+
+            _ = Logger.SendLogMessage(
+                m_UserRole,
+                m_UserClanData,
+                string.Format(
+                    InformationType.CompleteAttack.ToLabel(),
+                    playerData.GuildUserName,
+                    userDeclareData.BattleLap,
+                    userDeclareData.BossNumber
+                )
+            );
 
             // 予約の削除
             var reservationData = DatabaseReservationController.LoadReservationData(playerData);
@@ -280,6 +302,17 @@ namespace ShioriBot.Script
             }
 
             DatabaseDeclarationController.DeleteDeclarationData(sqlData);
+
+            _ = Logger.SendLogMessage(
+                m_UserRole,
+                m_UserClanData,
+                string.Format(
+                    InformationType.CancelAttack.ToLabel(),
+                    playerData.GuildUserName,
+                    sqlData.BattleLap,
+                    sqlData.BossNumber
+                )
+            );
         }
 
         /// <summary>
@@ -306,10 +339,22 @@ namespace ShioriBot.Script
 
             m_UserClanData.SetBossLap(m_BossNumber, nextBattleLap);
             DatabaseClanDataController.UpdateClanData(m_UserClanData);
+            var playerData = DatabasePlayerDataController.LoadPlayerData(m_UserRole, m_User.Id);
 
             var battleReservationSummary = new BattleReservationSummary(m_UserRole);
             battleReservationSummary.DeleteUnusedData(m_BossNumber);
             await Task.WhenAll(SendDeclarationBotMessage(), battleReservationSummary.UpdateMessage());
+
+            _ = Logger.SendLogMessage(
+                m_UserRole,
+                m_UserClanData,
+                string.Format(
+                    InformationType.SubDueBoss.ToLabel(),
+                    playerData.GuildUserName,
+                    m_BossNumber,
+                    nextBattleLap
+                )
+            );
         }
 
         /// <summary>

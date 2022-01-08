@@ -16,6 +16,7 @@
         CarryOverID = 1006,
         TaskKillID = 1007,
         TimeLineDisplayID = 1008,
+        LogID = 1009,
 
         //凸宣言チャンネル 110x
         DeclareBoss1ID = 1101,

@@ -1,15 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace ShioriBot.DataType
 {
     public enum InformationType
     {
         Unknown,
+
+        // 凸宣言関連
+        [Description("{0}さんが{1}周目、{2}ボスに凸宣言を行いました。")]
+        Declaration,
+
+        [Description("{0}さんが{1}周目、{2}ボスへの本戦を終了しました。")]
+        CompleteAttack,
+
+        [Description("{0}さんが{1}周目、{2}ボスへの本戦を取り消しました。")]
+        CancelAttack,
+
+        [Description("{0}さんが{1}ボスを{2}周目に進めました。")]
+        SubDueBoss,
 
         // 凸報告関連
         [Description("<@{0}>の凸報告を代理削除しました。\nこのメッセージは{1}秒後削除されます。")]
