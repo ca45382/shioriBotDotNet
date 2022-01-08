@@ -90,7 +90,7 @@ namespace ShioriBot.Net.Script
                 return;
             }
 
-            if (DatabaseReportDataController.CreateReportData(reportData))
+            if (DatabaseReportDataController.CreateReportData(reportData) != null)
             {
                 _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(ReactionType.Success.ToEmoji());
             }
@@ -171,7 +171,7 @@ namespace ShioriBot.Net.Script
                 return;
             }
 
-            if (DatabaseReportDataController.CreateReportData(reportData))
+            if (DatabaseReportDataController.CreateReportData(reportData) != null)
             {
                 _ = m_CommandEventArgs.SocketUserMessage.AddReactionAsync(EnumMapper.ToEmoji(ReactionType.Success));
             }

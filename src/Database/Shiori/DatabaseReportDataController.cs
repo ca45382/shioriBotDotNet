@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using ShioriBot.Net.Define;
@@ -52,6 +53,18 @@ namespace ShioriBot.Net.Database
                 .ToList();
         }
 
+        public static ReportData GetReportData(ProgressData progressData)
+            => GetReportDataByID(progressData.ReportID);
+
+        private static ReportData GetReportDataByID(ulong reportID)
+        {
+            using var databaseConnector = new ShioriDBContext();
+
+            return databaseConnector.ReportData.AsQueryable()
+                .Include(x => x.PlayerData)
+                .FirstOrDefault(x => x.ReportID == reportID);
+        }
+
         /// <summary>
         /// 配列の前から0凸完了～3凸完了
         /// </summary>
@@ -84,28 +97,69 @@ namespace ShioriBot.Net.Database
         /// </summary>
         /// <param name="reportData"></param>
         /// <returns></returns>
-        public static bool CreateReportData(ReportData reportData)
+        public static ReportData CreateReportData(ReportData reportData)
         {
             if (reportData.PlayerID == 0)
             {
-                return false;
+                return null;
             }
 
             reportData.PlayerData = null;
 
             using var databaseConnector = new ShioriDBContext();
             var transaction = databaseConnector.Database.BeginTransaction();
+
             try
             {
                 databaseConnector.Add(reportData);
                 databaseConnector.SaveChanges();
                 transaction.Commit();
-                return true;
+
+                return databaseConnector.ReportData.AsQueryable()
+                    .Where(x => x.PlayerID == reportData.PlayerID && !x.DeleteFlag
+                        && x.DateTime == databaseConnector.ReportData.AsQueryable().Max(x => x.DateTime))
+                    .FirstOrDefault();
             }
             catch
             {
                 transaction.Rollback();
-                return false;
+                return null;
+            }
+        }
+
+        public static void UpdateReportData(ReportData reportData)
+        {
+            if (reportData.ReportID == 0)
+            {
+                return;
+            }
+
+            using var databaseConnector = new ShioriDBContext();
+            var transaction = databaseConnector.Database.BeginTransaction();
+
+            var serverData = databaseConnector.ReportData.AsQueryable()
+                .FirstOrDefault(x => x.ReportID == reportData.ReportID);
+
+            if (serverData == null)
+            {
+                transaction.Rollback();
+                return;
+            }
+
+            serverData.AttackType = reportData.AttackType;
+            serverData.BattleLap = reportData.BattleLap;
+            serverData.BossNumber = reportData.BossNumber;
+            serverData.FinalDamage = reportData.FinalDamage;
+            serverData.SubdueFlag = reportData.SubdueFlag;
+
+            try
+            {
+                databaseConnector.SaveChanges();
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
             }
         }
 
