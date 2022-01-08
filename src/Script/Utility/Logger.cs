@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Discord.WebSocket;
-using ShioriBot.Net.DataType;
-using ShioriBot.Net.Model;
+using ShioriBot.DataType;
+using ShioriBot.Model;
 
-namespace ShioriBot.Net.Script
+namespace ShioriBot.Script
 {
     public static class Logger
     {
