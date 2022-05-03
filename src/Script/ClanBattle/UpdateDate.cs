@@ -29,6 +29,7 @@ namespace ShioriBot.Script
             sw.Start();
 
             var nowTime = DateTime.Now;
+            //var nowTime = new DateTime(2022, 3, 28, 6,0,0);
 
             var reservarionDataList = DatabaseReservationController.LoadReservationData()
                 .Where(x => x.CreateDateTime < m_BoundaryTime);
@@ -55,20 +56,29 @@ namespace ShioriBot.Script
                     continue;
                 }
 
-                taskList.Add(new BattleTaskKill(clanRole).SyncTaskKillData());
-
-                if (RediveClanBattleData.ClanBattleStartTime <= nowTime && nowTime <= RediveClanBattleData.ClanBattleEndTime)
+                try
                 {
-                    taskList.Add(new BattleReservationSummary(clanRole).UpdateMessage());
+                    taskList.Add(new BattleTaskKill(clanRole).SyncTaskKillData());
 
-                    for (int i = 0; i < CommonDefine.MaxBossNumber; i++)
+                    if (RediveClanBattleData.ClanBattleStartTime <= nowTime && nowTime <= RediveClanBattleData.ClanBattleEndTime)
                     {
-                        taskList.Add(new BattleDeclaration(clanRole, (BossNumberType)(i + 1)).UpdateDeclarationBotMessage());
-                        // TODO:ここに進行の方も追加
+                        taskList.Add(new BattleReservationSummary(clanRole).UpdateMessage());
+
+                        for (int i = 0; i < CommonDefine.MaxBossNumber; i++)
+                        {
+                            taskList.Add(new BattleDeclaration(clanRole, (BossNumberType)(i + 1)).UpdateDeclarationBotMessage());
+                            // TODO:ここに進行の方も追加
+                        }
                     }
+
+                    await Task.WhenAll(taskList);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
                 }
 
-                await Task.WhenAll(taskList);
+                await Task.Delay(1000);
             }
 
             sw.Stop();

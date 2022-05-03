@@ -67,6 +67,12 @@ namespace ShioriBot.Script
             }
 
             var reservationMessageID = m_ClanData.GetMessageID(MessageFeatureType.ReserveResultID);
+
+            if (reservationMessageID == 0)
+            {
+                return;
+            }
+
             var cachedMessage = m_SocketTextChannel.GetCachedMessage(reservationMessageID);
             var embedData = CreateEmbed();
             var componentData = CreateComponent();
