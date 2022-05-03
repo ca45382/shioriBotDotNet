@@ -41,8 +41,9 @@ namespace ShioriBot.Script
 
             m_client = new DiscordSocketClient(m_config);
             m_client.MessageReceived += CommandRecieved;
-            m_client.GuildMembersDownloaded += GuildMembersDownloaded;
-            m_client.UserLeft += UserLeft;
+            m_client.Ready += Client_Ready;
+            //m_client.GuildMembersDownloaded += GuildMembersDownloaded;
+            //m_client.UserLeft += UserLeft;
             m_client.GuildMemberUpdated += GuildMemberUpdated;
             m_client.InteractionCreated += InteractionCreated;
             m_client.Log += Log;
@@ -69,7 +70,7 @@ namespace ShioriBot.Script
                 return;
             }
 
-            Console.WriteLine($"{socketUserMessage.Channel.Name} {socketUserMessage.Author.Username}:{socketUserMessage}");
+            //Console.WriteLine($"{socketUserMessage.Channel.Name} {socketUserMessage.Author.Username}:{socketUserMessage}");
 
             if (socketUserMessage.Author.IsBot)
             {
@@ -91,23 +92,39 @@ namespace ShioriBot.Script
         /// </summary>
         /// <param name="guild"></param>
         /// <returns></returns>
-        private Task GuildMembersDownloaded(SocketGuild guild)
+        private async Task Client_Ready()
         {
-            var discordDataLoader = new DiscordDataLoader();
-            discordDataLoader.UpdateServerData(guild);
-            discordDataLoader.UpdateClanData(guild);
-            discordDataLoader.UpdatePlayerData(guild);
-            return Task.CompletedTask;
+            var guildList = m_client.Guilds;
+
+            await Task.Run(() =>
+            {
+                foreach (var guild in guildList)
+                {
+                    var discordDataLoader = new DiscordDataLoader();
+                    discordDataLoader.UpdateServerData(guild);
+                    discordDataLoader.UpdateClanData(guild);
+                    discordDataLoader.UpdatePlayerData(guild);
+                }
+            });
         }
 
-        private Task UserLeft(SocketGuildUser userInfo)
-        {
-            var discordDataLoader = new DiscordDataLoader();
-            discordDataLoader.UpdateServerData(userInfo.Guild);
-            discordDataLoader.UpdateClanData(userInfo.Guild);
-            discordDataLoader.UpdatePlayerData(userInfo.Guild);
-            return Task.CompletedTask;
-        }
+        //private Task GuildMembersDownloaded(SocketGuild guild)
+        //{
+        //    var discordDataLoader = new DiscordDataLoader();
+        //    discordDataLoader.UpdateServerData(guild);
+        //    discordDataLoader.UpdateClanData(guild);
+        //    discordDataLoader.UpdatePlayerData(guild);
+        //    return Task.CompletedTask;
+        //}
+
+        //private Task UserLeft(SocketGuildUser userInfo)
+        //{
+        //    var discordDataLoader = new DiscordDataLoader();
+        //    discordDataLoader.UpdateServerData(userInfo.Guild);
+        //    discordDataLoader.UpdateClanData(userInfo.Guild);
+        //    discordDataLoader.UpdatePlayerData(userInfo.Guild);
+        //    return Task.CompletedTask;
+        //}
 
         private Task GuildMemberUpdated(Cacheable<SocketGuildUser, ulong> cachedGuildUser, SocketGuildUser newUserInfo)
         {
@@ -126,6 +143,7 @@ namespace ShioriBot.Script
             }
 
             await new ReceiveInteractionController(socketInteraction).Run();
+            await socketInteraction.DeferAsync();
         }
 
         private async Task RefreshInUpdateDate()
