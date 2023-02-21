@@ -41,8 +41,7 @@ namespace ShioriBot.Script
 
             m_client = new DiscordSocketClient(m_config);
             m_client.MessageReceived += CommandRecieved;
-            m_client.GuildMembersDownloaded += GuildMembersDownloaded;
-            m_client.UserLeft += UserLeft;
+            m_client.Ready += Client_Ready;
             m_client.GuildMemberUpdated += GuildMemberUpdated;
             m_client.InteractionCreated += InteractionCreated;
             m_client.Log += Log;
@@ -91,22 +90,20 @@ namespace ShioriBot.Script
         /// </summary>
         /// <param name="guild"></param>
         /// <returns></returns>
-        private Task GuildMembersDownloaded(SocketGuild guild)
+        private async Task Client_Ready()
         {
-            var discordDataLoader = new DiscordDataLoader();
-            discordDataLoader.UpdateServerData(guild);
-            discordDataLoader.UpdateClanData(guild);
-            discordDataLoader.UpdatePlayerData(guild);
-            return Task.CompletedTask;
-        }
+            var guildList = m_client.Guilds;
 
-        private Task UserLeft(SocketGuildUser userInfo)
-        {
-            var discordDataLoader = new DiscordDataLoader();
-            discordDataLoader.UpdateServerData(userInfo.Guild);
-            discordDataLoader.UpdateClanData(userInfo.Guild);
-            discordDataLoader.UpdatePlayerData(userInfo.Guild);
-            return Task.CompletedTask;
+            await Task.Run(() =>
+            {
+                foreach (var guild in guildList)
+                {
+                    var discordDataLoader = new DiscordDataLoader();
+                    discordDataLoader.UpdateServerData(guild);
+                    discordDataLoader.UpdateClanData(guild);
+                    discordDataLoader.UpdatePlayerData(guild);
+                }
+            });
         }
 
         private Task GuildMemberUpdated(Cacheable<SocketGuildUser, ulong> cachedGuildUser, SocketGuildUser newUserInfo)
@@ -126,6 +123,7 @@ namespace ShioriBot.Script
             }
 
             await new ReceiveInteractionController(socketInteraction).Run();
+            await socketInteraction.DeferAsync();
         }
 
         private async Task RefreshInUpdateDate()

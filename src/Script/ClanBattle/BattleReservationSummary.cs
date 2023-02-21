@@ -55,7 +55,7 @@ namespace ShioriBot.Script
         {
             var embedData = CreateEmbed();
             var componentData = CreateComponent();
-            var sendedMessageData = await m_SocketTextChannel.SendMessageAsync(embed: embedData, component: componentData);
+            var sendedMessageData = await m_SocketTextChannel.SendMessageAsync(embed: embedData, components: componentData);
             DatabaseMessageDataController.UpdateMessageID(m_ClanData, sendedMessageData.Id, MessageFeatureType.ReserveResultID);
         }
 
@@ -67,6 +67,12 @@ namespace ShioriBot.Script
             }
 
             var reservationMessageID = m_ClanData.GetMessageID(MessageFeatureType.ReserveResultID);
+
+            if (reservationMessageID == 0)
+            {
+                return;
+            }
+
             var cachedMessage = m_SocketTextChannel.GetCachedMessage(reservationMessageID);
             var embedData = CreateEmbed();
             var componentData = CreateComponent();

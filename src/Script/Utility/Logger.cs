@@ -10,7 +10,11 @@ namespace ShioriBot.Script
         public static async Task SendLogMessage(SocketRole role, ClanData clanData, string logMessage)
         {
             var logChannel = role.Guild.GetTextChannel(clanData.GetChannelID(ChannelFeatureType.LogID));
-            await logChannel.SendMessageAsync(logMessage);
+
+            if (logChannel != null)
+            {
+                await logChannel.SendMessageAsync(logMessage);
+            }
         }
     }
 }

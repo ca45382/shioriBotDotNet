@@ -205,7 +205,7 @@ namespace ShioriBot.Script
             var embed = CreateDeclarationDataEmbed();
             var content = CreateDeclarationDataMessage();
             var component = CreateDeclareComponent();
-            var sentMessage = await m_DeclarationChannel.SendMessageAsync(text: content, embed: embed, component: component);
+            var sentMessage = await m_DeclarationChannel.SendMessageAsync(text: content, embed: embed, components: component);
 
             if (sentMessage == null)
             {
