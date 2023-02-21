@@ -70,7 +70,7 @@ namespace ShioriBot.Script
                 return;
             }
 
-            //Console.WriteLine($"{socketUserMessage.Channel.Name} {socketUserMessage.Author.Username}:{socketUserMessage}");
+            Console.WriteLine($"{socketUserMessage.Channel.Name} {socketUserMessage.Author.Username}:{socketUserMessage}");
 
             if (socketUserMessage.Author.IsBot)
             {
