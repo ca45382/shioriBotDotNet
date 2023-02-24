@@ -3,8 +3,11 @@ C#製のプリコネR クラバト支援Discord bot
 
 # Requirement
 
-* Microsoft.EntityFrameworkCore.Sqlite 5.0.7
-* Discord.Net.Lab v2.4.9
-* Newtonsoft.Json v13.0.1
-* Pomelo.EntityFrameworkCore.MySql v5.0.1
+* Microsoft .NET 6
 * MariaDB v10.3
+
+## Nuget
+
+* Microsoft.EntityFrameworkCore.Sqlite 6.0.14
+* Discord.Net.Lab 3.9.0
+* Pomelo.EntityFrameworkCore.MySql 6.0.2
