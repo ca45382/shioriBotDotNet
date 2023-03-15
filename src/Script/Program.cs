@@ -6,124 +6,73 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ShioriBot.Model;
 using ShioriBot.Define;
+using ShioriBot.Model;
 
 namespace ShioriBot.Script
 {
     public class Program
     {
-        private DiscordSocketClient m_client;
-        private DiscordSocketConfig m_config;
-
+        //old code
         private readonly static string ConfigPath = Path.Combine("data", "botConfig.json");
-        static void Main() => new Program().MainAsync().GetAwaiter().GetResult();
+
+        private readonly IConfiguration m_Configuration;
+        private readonly IServiceProvider m_Service;
+
+        private static void Main(string[] args) 
+            => new Program().MainAsync(args)
+            .GetAwaiter()
+            .GetResult();
+
+        private Program()
+        {
+            // 設定ファイルを開く
+            m_Configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory() + @"\data")
+                .AddJsonFile("botConfig.json")
+                .Build();
+
+            var socketConfig = new DiscordSocketConfig()
+            {
+                MessageCacheSize = 0xFF,
+                GatewayIntents = (GatewayIntents)0b0_1000_0011_0000_0011,
+                //GatewayIntents = GatewayIntents.All,
+            };
+
+            // サービス
+            m_Service = new ServiceCollection()
+                .AddSingleton(m_Configuration)
+                .AddSingleton(socketConfig)
+                .AddSingleton<DiscordSocketClient>()
+                .AddSingleton<CommandService>()
+                .AddSingleton<Handler>()
+                .BuildServiceProvider();
+        }
 
         /// <summary>
         /// ボットの起動処理
         /// </summary>
         /// <returns></returns>
-        public async Task MainAsync()
+        public async Task MainAsync(string[] args)
         {
             BotConfigManager.SetJsonConfig(ConfigPath);
             CommandMapper.InitCommandCache();
-
-            m_config = new DiscordSocketConfig
-            {
-                MessageCacheSize = 10,
-                GatewayIntents = GatewayIntents.All,
-            };
 
             var initialize = new BotInitialize();
             RediveClanBattleData.ReloadData();
             initialize.UpdateRediveDatabase();
 
-            m_client = new DiscordSocketClient(m_config);
-            m_client.MessageReceived += CommandRecieved;
-            m_client.Ready += Client_Ready;
-            m_client.GuildMemberUpdated += GuildMemberUpdated;
-            m_client.InteractionCreated += InteractionCreated;
-            m_client.Log += Log;
+            var client = m_Service.GetRequiredService<DiscordSocketClient>();
 
-            var commands = new CommandService();
-            var services = new ServiceCollection().BuildServiceProvider();
-
-            await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
-            await m_client.LoginAsync(TokenType.Bot, BotConfigManager.Token);
-            await m_client.StartAsync();
+            await m_Service.GetRequiredService<Handler>()
+                .InitializeAsync();
+            
+            await client.LoginAsync(TokenType.Bot, m_Configuration["discord:token"]);
+            await client.StartAsync();
             await RefreshInUpdateDate();
             await Task.Delay(-1);
-        }
-
-        /// <summary>
-        /// メッセージの受信処理
-        /// </summary>
-        /// <param name="socketMessage"></param>
-        /// <returns></returns>
-        private async Task CommandRecieved(SocketMessage socketMessage)
-        {
-            if (socketMessage is not SocketUserMessage socketUserMessage)
-            {
-                return;
-            }
-
-            Console.WriteLine($"{socketUserMessage.Channel.Name} {socketUserMessage.Author.Username}:{socketUserMessage}");
-
-            if (socketUserMessage.Author.IsBot)
-            {
-                return;
-            }
-
-            try
-            {
-                await CommandMapper.Invoke(new CommandEventArgs(socketUserMessage));
-            }
-            catch
-            {
-            }
-        }
-
-        /// <summary>
-        /// 起動時にサーバー情報がbotにダウンロードされた際に
-        /// 動作する。
-        /// </summary>
-        /// <param name="guild"></param>
-        /// <returns></returns>
-        private async Task Client_Ready()
-        {
-            var guildList = m_client.Guilds;
-
-            await Task.Run(() =>
-            {
-                foreach (var guild in guildList)
-                {
-                    var discordDataLoader = new DiscordDataLoader();
-                    discordDataLoader.UpdateServerData(guild);
-                    discordDataLoader.UpdateClanData(guild);
-                    discordDataLoader.UpdatePlayerData(guild);
-                }
-            });
-        }
-
-        private Task GuildMemberUpdated(Cacheable<SocketGuildUser, ulong> cachedGuildUser, SocketGuildUser newUserInfo)
-        {
-            var discordDataLoader = new DiscordDataLoader();
-            discordDataLoader.UpdateServerData(newUserInfo.Guild);
-            discordDataLoader.UpdateClanData(newUserInfo.Guild);
-            discordDataLoader.UpdatePlayerData(newUserInfo.Guild);
-            return Task.CompletedTask;
-        }
-
-        private async Task InteractionCreated(SocketInteraction socketInteraction)
-        {
-            if (socketInteraction.Type != InteractionType.MessageComponent)
-            {
-                return;
-            }
-
-            await new ReceiveInteractionController(socketInteraction).Run();
-            await socketInteraction.DeferAsync();
         }
 
         private async Task RefreshInUpdateDate()
@@ -132,6 +81,7 @@ namespace ShioriBot.Script
             TimeSpan nowTime;
             TimeSpan updateTimeSpan;
 
+            var client = m_Service.GetRequiredService<DiscordSocketClient>();
             var initialize = new BotInitialize();
             var updateTime = TimeDefine.DailyRefreshTime;
 
@@ -152,19 +102,8 @@ namespace ShioriBot.Script
                 await Task.Run(() => Thread.Sleep(updateTimeSpan));
                 initialize.UpdateRediveDatabase();
                 RediveClanBattleData.ReloadData();
-                await new UpdateDate(m_client).DeleteYesterdayData();
+                await new UpdateDate(client).DeleteYesterdayData();
             }
-        }
-
-        /// <summary>
-        /// コンソール表示処理
-        /// </summary>
-        /// <param name="msg"></param>
-        /// <returns></returns>
-        private Task Log(LogMessage msg)
-        {
-            Console.WriteLine(msg.ToString());
-            return Task.CompletedTask;
         }
     }
 }
