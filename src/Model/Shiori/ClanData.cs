@@ -15,7 +15,7 @@ namespace ShioriBot.Model
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public ulong ClanID { get; set; }
 
-        [Column("clan_role_id", TypeName = "BIGINT UNSIGNED")]
+        [Column("clan_role_id", TypeName = "BIGINT UNSIGNED"), Required]
         public ulong ClanRoleID { get; set; }
 
         [Column("clan_name", TypeName = "VARCHAR(30)")]
