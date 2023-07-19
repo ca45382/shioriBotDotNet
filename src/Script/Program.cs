@@ -37,7 +37,7 @@ namespace ShioriBot.Script
 
             var initialize = new BotInitialize();
             RediveClanBattleData.ReloadData();
-            initialize.UpdateRediveDatabase();
+            await BotInitialize.UpdateRediveDatabase();
 
             m_client = new DiscordSocketClient(m_config);
             m_client.MessageReceived += CommandRecieved;
@@ -150,7 +150,7 @@ namespace ShioriBot.Script
                 }
 
                 await Task.Run(() => Thread.Sleep(updateTimeSpan));
-                initialize.UpdateRediveDatabase();
+                await BotInitialize.UpdateRediveDatabase();
                 RediveClanBattleData.ReloadData();
                 await new UpdateDate(m_client).DeleteYesterdayData();
             }
