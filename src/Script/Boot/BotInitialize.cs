@@ -9,40 +9,41 @@ using System;
 using ShioriBot.Model;
 using ShioriBot.DataType;
 using ShioriBot.Database;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace ShioriBot.Script
 {
     public class BotInitialize
     {
         private const string rediveURL = "https://redive.estertion.win/";
-        private readonly string DataFolderPath = Path.Combine("data");
-        private readonly string TempFolderPath = Path.Combine("temp");
-        private readonly string RediveJsonName = "last_version_jp.json";
-        private readonly string RediveDatabaseName = "redive_jp.db";
+        private static readonly string DataFolderPath = Path.Combine("data");
+        private static readonly string TempFolderPath = Path.Combine("temp");
+        private static readonly string RediveJsonName = "last_version_jp.json";
+        private static readonly string RediveDatabaseName = "redive_jp.db";
 
         public BotInitialize()
         {
-            if (!Directory.Exists(DataFolderPath))
-            {
-                Directory.CreateDirectory(DataFolderPath);
-            }
-
-            if (!Directory.Exists(TempFolderPath))
-            {
-                Directory.CreateDirectory(TempFolderPath);
-            }
-
             UpdateFeatureList();
         }
-
-        public void UpdateRediveDatabase()
+        
+        /// <summary>
+        /// Rediveデータの更新
+        /// </summary>
+        /// <returns></returns>
+        public static async Task UpdateRediveDatabase()
         {
-            var webClient = new WebClient();
+            if(!MakeSaveFolder())
+            {
+                return;
+            }
+
+            var httpClient = new HttpClient();
             string updateRediveString;
 
             try
             {
-                updateRediveString = webClient.DownloadString(rediveURL + RediveJsonName);
+                updateRediveString = await httpClient.GetStringAsync(rediveURL + RediveJsonName);
             }
             catch
             {
@@ -75,11 +76,24 @@ namespace ShioriBot.Script
             var rediveDBBrotliPath = Path.Combine(TempFolderPath, RediveDatabaseName + ".br");
             var rediveDBPath = Path.Combine(DataFolderPath, RediveDatabaseName);
 
-            webClient.DownloadFile(rediveDBURL, rediveDBBrotliPath);
+            var rediveResult = await httpClient.GetAsync(rediveDBURL);
+
+            if (rediveResult.StatusCode != HttpStatusCode.OK)
+            {
+                return;
+            }
+
+            using (var stream = await rediveResult.Content.ReadAsStreamAsync())
+            using (var outStream = File.Create(rediveDBBrotliPath))
+            {
+                stream.CopyTo(outStream);
+            }
+
             if (!DecompressBrotli(rediveDBBrotliPath, rediveDBPath))
             {
                 Console.WriteLine("False");
             }
+
             File.Delete(rediveDBBrotliPath);
 
             return;
@@ -91,7 +105,7 @@ namespace ShioriBot.Script
         /// <param name="preDecompressFilePath">解凍するファイルのパス</param>
         /// <param name="decompressedFilePath">解凍した後のファイルのパス</param>
         /// <returns></returns>
-        private bool DecompressBrotli(string preDecompressFilePath, string decompressedFilePath)
+        private static bool DecompressBrotli(string preDecompressFilePath, string decompressedFilePath)
         {
             try
             {
@@ -118,7 +132,13 @@ namespace ShioriBot.Script
             return true;
         }
 
-        private T LoadJson<T>(string jsonString)
+        /// <summary>
+        /// Jsonデータをデシリアライズ
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="jsonString"></param>
+        /// <returns></returns>
+        private static T LoadJson<T>(string jsonString)
         {
             if (string.IsNullOrEmpty(jsonString))
             {
@@ -132,11 +152,35 @@ namespace ShioriBot.Script
                 PropertyNameCaseInsensitive = true,
             };
 
-            var instance = JsonSerializer.Deserialize<T>(jsonString, options);
-            return instance;
+            return JsonSerializer.Deserialize<T>(jsonString, options);
         }
 
-        private void UpdateFeatureList()
+        /// <summary>
+        /// 保存するフォルダを生成する.
+        /// </summary>
+        private static bool MakeSaveFolder()
+        {
+            try
+            {
+                if (!Directory.Exists(DataFolderPath))
+                {
+                    Directory.CreateDirectory(DataFolderPath);
+                }
+
+                if (!Directory.Exists(TempFolderPath))
+                {
+                    Directory.CreateDirectory(TempFolderPath);
+                }
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static void UpdateFeatureList()
         {
             var channelFeatures = new List<ChannelFeature>();
             var messageFeatures = new List<MessageFeature>();
