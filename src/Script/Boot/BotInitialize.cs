@@ -31,73 +31,73 @@ namespace ShioriBot.Script
         /// Rediveデータの更新
         /// </summary>
         /// <returns></returns>
-        public static async Task UpdateRediveDatabase()
-        {
-            if(!MakeSaveFolder())
-            {
-                return;
-            }
+        //public static async Task UpdateRediveDatabase()
+        //{
+        //    if(!MakeSaveFolder())
+        //    {
+        //        return;
+        //    }
 
-            var httpClient = new HttpClient();
-            string updateRediveString;
+        //    var httpClient = new HttpClient();
+        //    string updateRediveString;
 
-            try
-            {
-                updateRediveString = await httpClient.GetStringAsync(rediveURL + RediveJsonName);
-            }
-            catch
-            {
-                return;
-            }
+        //    try
+        //    {
+        //        updateRediveString = await httpClient.GetStringAsync(rediveURL + RediveJsonName);
+        //    }
+        //    catch
+        //    {
+        //        return;
+        //    }
 
-            var rediveJsonPath = Path.Combine(DataFolderPath, RediveJsonName);
+        //    var rediveJsonPath = Path.Combine(DataFolderPath, RediveJsonName);
 
-            if (string.IsNullOrEmpty(updateRediveString))
-            {
-                return;
-            }
+        //    if (string.IsNullOrEmpty(updateRediveString))
+        //    {
+        //        return;
+        //    }
 
-            var updateRediveData = LoadJson<RediveVersionData>(updateRediveString);
+        //    var updateRediveData = LoadJson<RediveVersionData>(updateRediveString);
 
-            if (File.Exists(rediveJsonPath))
-            {
-                var preRediveData = LoadJson<RediveVersionData>(File.ReadAllText(rediveJsonPath));
+        //    if (File.Exists(rediveJsonPath))
+        //    {
+        //        var preRediveData = LoadJson<RediveVersionData>(File.ReadAllText(rediveJsonPath));
 
-                if (updateRediveData == null
-                    || (preRediveData != null && preRediveData.TruthVersion == updateRediveData.TruthVersion))
-                {
-                    return;
-                }
-            }
+        //        if (updateRediveData == null
+        //            || (preRediveData != null && preRediveData.TruthVersion == updateRediveData.TruthVersion))
+        //        {
+        //            return;
+        //        }
+        //    }
 
-            File.WriteAllText(rediveJsonPath, updateRediveString);
+        //    File.WriteAllText(rediveJsonPath, updateRediveString);
 
-            var rediveDBURL = rediveURL + "db/" + RediveDatabaseName + ".br";
-            var rediveDBBrotliPath = Path.Combine(TempFolderPath, RediveDatabaseName + ".br");
-            var rediveDBPath = Path.Combine(DataFolderPath, RediveDatabaseName);
+        //    var rediveDBURL = rediveURL + "db/" + RediveDatabaseName + ".br";
+        //    var rediveDBBrotliPath = Path.Combine(TempFolderPath, RediveDatabaseName + ".br");
+        //    var rediveDBPath = Path.Combine(DataFolderPath, RediveDatabaseName);
 
-            var rediveResult = await httpClient.GetAsync(rediveDBURL);
+        //    var rediveResult = await httpClient.GetAsync(rediveDBURL);
 
-            if (rediveResult.StatusCode != HttpStatusCode.OK)
-            {
-                return;
-            }
+        //    if (rediveResult.StatusCode != HttpStatusCode.OK)
+        //    {
+        //        return;
+        //    }
 
-            using (var stream = await rediveResult.Content.ReadAsStreamAsync())
-            using (var outStream = File.Create(rediveDBBrotliPath))
-            {
-                stream.CopyTo(outStream);
-            }
+        //    using (var stream = await rediveResult.Content.ReadAsStreamAsync())
+        //    using (var outStream = File.Create(rediveDBBrotliPath))
+        //    {
+        //        stream.CopyTo(outStream);
+        //    }
 
-            if (!DecompressBrotli(rediveDBBrotliPath, rediveDBPath))
-            {
-                Console.WriteLine("False");
-            }
+        //    if (!DecompressBrotli(rediveDBBrotliPath, rediveDBPath))
+        //    {
+        //        Console.WriteLine("False");
+        //    }
 
-            File.Delete(rediveDBBrotliPath);
+        //    File.Delete(rediveDBBrotliPath);
 
-            return;
-        }
+        //    return;
+        //}
 
         /// <summary>
         /// 指定されたパスのファイルを解凍する。

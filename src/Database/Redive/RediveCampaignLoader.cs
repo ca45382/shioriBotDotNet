@@ -5,6 +5,7 @@ using ShioriBot.Model;
 
 namespace ShioriBot.Database
 {
+    /*
     public static class RediveCampaignLoader
     {
         public static IEnumerable<CampaignData> LoadCampaignData()
@@ -23,4 +24,5 @@ namespace ShioriBot.Database
                 .ToList();
         }
     }
+    */
 }

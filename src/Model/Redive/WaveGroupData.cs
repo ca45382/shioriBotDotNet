@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ShioriBot.Model
 {
+    /*
     [Table("wave_group_data")]
     public class WaveGroupData
     {
@@ -27,4 +28,5 @@ namespace ShioriBot.Model
         [Column("enemy_id_5", TypeName = "INTEGER")]
         public int EnemyID5 { get; set; }
     }
+    */
 }
