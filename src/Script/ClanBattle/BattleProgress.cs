@@ -10,6 +10,8 @@ using ShioriBot.Model;
 using ShioriBot.DataType;
 using ShioriBot.Define;
 
+using ReactionType = ShioriBot.DataType.ReactionType;
+
 namespace ShioriBot.Script
 {
     public class BattleProgress

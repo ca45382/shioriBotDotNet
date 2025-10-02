@@ -16,11 +16,11 @@ namespace ShioriBot.Script
 {
     public class BotInitialize
     {
-        private const string rediveURL = "https://redive.estertion.win/";
+        //private const string rediveURL = "https://redive.estertion.win/";
         private static readonly string DataFolderPath = Path.Combine("data");
         private static readonly string TempFolderPath = Path.Combine("temp");
-        private static readonly string RediveJsonName = "last_version_jp.json";
-        private static readonly string RediveDatabaseName = "redive_jp.db";
+        //private static readonly string RediveJsonName = "last_version_jp.json";
+        //private static readonly string RediveDatabaseName = "redive_jp.db";
 
         public BotInitialize()
         {
