@@ -10,6 +10,8 @@ using ShioriBot.DataType;
 using ShioriBot.Define;
 using ShioriBot.Extension;
 
+using ReactionType = ShioriBot.DataType.ReactionType;
+
 namespace ShioriBot.Script
 {
     public class BattleCarryOver

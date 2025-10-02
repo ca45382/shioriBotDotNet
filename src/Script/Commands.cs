@@ -352,9 +352,9 @@ namespace ShioriBot.Script
         public static async Task TimeLineConversion(CommandEventArgs commandEventArgs)
             => await new TimeLineConversion(commandEventArgs).RunByMessage();
 
-        [Command("!today", 0, 0)]
-        public static async Task EventInformation(CommandEventArgs commandEventArgs)
-            => await new PriconneEventViewer(commandEventArgs).SendEventInfomationByMessage();
+        //[Command("!today", 0, 0)]
+        //public static async Task EventInformation(CommandEventArgs commandEventArgs)
+        //    => await new PriconneEventViewer(commandEventArgs).SendEventInfomationByMessage();
 
         [Command("!time", 2, 10)]
         public static async Task CalculateCarryOverTime(CommandEventArgs commandEventArgs)

@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ShioriBot.Model
 {
+    /*
     [Table("enemy_parameter")]
     public class EnemyParameter
     {
@@ -18,4 +19,5 @@ namespace ShioriBot.Model
         [Column("hp", TypeName = "INTEGER")]
         public int HP { get; set; }
     }
+    */
 }

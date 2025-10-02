@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ShioriBot.Model
 {
+    /*
     [Table("campaign_schedule")]
     public class CampaignData
     {
@@ -33,4 +34,5 @@ namespace ShioriBot.Model
         public DateTime CampaignEndTime { get; set; }
 
     }
+    */
 }

@@ -8,6 +8,8 @@ using ShioriBot.Model;
 using ShioriBot.DataType;
 using ShioriBot.Extension;
 
+using ReactionType = ShioriBot.DataType.ReactionType;
+
 namespace ShioriBot.Script
 {
     public class BattleTaskKill

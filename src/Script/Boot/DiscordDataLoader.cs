@@ -157,7 +157,6 @@ namespace ShioriBot.Script
                 }
 
                 var roleID = allUserRoleID.FirstOrDefault();
-                var nickName = user.Nickname ?? user.Username;
 
                 var playerData = new PlayerData
                 {
@@ -168,7 +167,7 @@ namespace ShioriBot.Script
                     },
 
                     UserID = user.Id,
-                    GuildUserName = nickName
+                    GuildUserName = user.DisplayName
                 };
 
                 clanMember.Add(playerData);

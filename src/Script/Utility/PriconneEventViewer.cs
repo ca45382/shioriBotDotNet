@@ -10,6 +10,7 @@ using ShioriBot.Extension;
 
 namespace ShioriBot.Script
 {
+    /*
     public class PriconneEventViewer
     {
         private CommandEventArgs m_CommandEventArgs;
@@ -96,4 +97,5 @@ namespace ShioriBot.Script
             return campaignStringBuilder.ToString();
         }
     }
+    */
 }

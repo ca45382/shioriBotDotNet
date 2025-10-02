@@ -17,16 +17,16 @@ namespace ShioriBot.Model
 
         public class BossData
         {
-            public int LapNumberFrom;
-            public int LapNumberTo;
-            public int Phase;
-            public byte BossNumber;
-            public int WaveGroupID;
-            public int EnemyID;
-            public string Name;
-            public int Level;
-            public int HP;
-            public float ScoreCoefficient;
+            public int LapNumberFrom { get; set; }
+            public int LapNumberTo { get; set; }
+            public int Phase { get; set; }
+            public byte BossNumber { get; set; }
+            public int WaveGroupID { get; set; }
+            public int EnemyID { get; set; }
+            public string Name { get; set; } = string.Empty;
+            public int Level { get; set; }
+            public int HP { get; set; }
+            public float ScoreCoefficient { get; set; }
             public int DisplayHP { get => HP / CommonDefine.DisplayDamageUnit; }
         }
 
@@ -36,6 +36,32 @@ namespace ShioriBot.Model
                 && x.LapNumberFrom <= lap && (x.LapNumberTo == -1 || x.LapNumberTo >= lap)
             );
 
+        /// <summary>
+        /// RediveDBが読み込めない対応
+        /// </summary>
+        /// <returns></returns>
+        public static bool ReloadData()
+        {
+            var bossStatusList = new List<BossData>();
+
+            for (int i = CommonDefine.MinBossNumber; i <= CommonDefine.MaxBossNumber; i++)
+            {
+                bossStatusList.Add(new BossData()
+                {
+                    LapNumberFrom = 0,
+                    LapNumberTo = 99,
+                    BossNumber = (byte)i,
+                    WaveGroupID = 0,
+                    ScoreCoefficient = 0,
+                    Phase = 1,
+                });
+            }
+
+            BossDataList = bossStatusList;
+            return true;
+        }
+
+        /*
         public static bool ReloadData()
         {
             // TODO : 日本時間に対応
@@ -121,5 +147,6 @@ namespace ShioriBot.Model
             BossDataList = bossStatusList;
             return true;
         }
+        */
     }
 }

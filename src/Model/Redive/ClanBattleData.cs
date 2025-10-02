@@ -5,6 +5,7 @@ using ShioriBot.DataType;
 
 namespace ShioriBot.Model
 {
+    /*
     [Table("clan_battle_2_map_data")]
     public class ClanBattleData
     {
@@ -79,4 +80,5 @@ namespace ShioriBot.Model
             };
         }
     }
+    */
 }

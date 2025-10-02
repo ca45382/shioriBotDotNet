@@ -9,6 +9,8 @@ using ShioriBot.Attribute;
 using ShioriBot.DataType;
 using ShioriBot.Extension;
 
+using ReactionType = ShioriBot.DataType.ReactionType;
+
 namespace ShioriBot.Script
 {
     public static class EnumMapper

@@ -5,6 +5,10 @@ VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShioriBotDotNet", "src\ShioriBotDotNet.csproj", "{24C95780-F93B-425D-9B2A-6D1B941FC8A7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{BFC2F7C1-77E5-4355-B0DD-1629C290FF22}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RediveUpdateTest", "src\Test\RediveUpdateTest\RediveUpdateTest.csproj", "{2C46E267-FE5E-4648-8F17-C6962E85E702}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,9 +19,16 @@ Global
 		{24C95780-F93B-425D-9B2A-6D1B941FC8A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24C95780-F93B-425D-9B2A-6D1B941FC8A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24C95780-F93B-425D-9B2A-6D1B941FC8A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C46E267-FE5E-4648-8F17-C6962E85E702}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C46E267-FE5E-4648-8F17-C6962E85E702}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C46E267-FE5E-4648-8F17-C6962E85E702}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C46E267-FE5E-4648-8F17-C6962E85E702}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2C46E267-FE5E-4648-8F17-C6962E85E702} = {BFC2F7C1-77E5-4355-B0DD-1629C290FF22}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {34D80670-FB5F-417F-8CC6-A48220D27B0C}
